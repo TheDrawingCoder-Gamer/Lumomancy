@@ -37,7 +37,7 @@ object LumomancyItems:
 
   val lens: Item = make(Lumomancy.locate("lens"), new Item(Item.Properties()))
   
-  val toolContainer: Item = make(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties()))
+  val toolContainer: Item = make(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties().stacksTo(1)))
 
   val bottleOfLight: Item = make(Lumomancy.locate("bottle_of_light"), new Item(Item.Properties()))
 

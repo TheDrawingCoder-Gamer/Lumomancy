@@ -2,7 +2,7 @@ package gay.menkissing.lumomancy.content.item
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import gay.menkissing.lumomancy.content.item.StasisBottle.getMaxStoredAmount
+import gay.menkissing.lumomancy.content.item.StasisBottle.{StasisBottleContents, getMaxStoredAmount}
 import gay.menkissing.lumomancy.registries.LumomancyDataComponents
 import gay.menkissing.lumomancy.util.codec.LumoCodecs
 import net.minecraft.network.chat.Component
@@ -18,47 +18,48 @@ class StasisBottle(props: Item.Properties) extends Item(props):
     if clickAction != ClickAction.SECONDARY then
       return false
     val thatStack = slot.getItem
-    val curStack = StasisBottle.getContainedStack(thisStack)
+    val contents = StasisBottle.getContents(thisStack)
     if thatStack.isEmpty then
-      if !curStack.isEmpty then
-        val res = curStack.split(curStack.getMaxStackSize)
+      if !contents.isEmpty then
+        val (newContents, res) = contents.splitStack()
+        newContents.patched(thisStack)
         slot.setByPlayer(res)
         return true
     else
       if !thatStack.getItem.canFitInsideContainerItems then
         return false
-      if curStack.isEmpty then
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, thatStack)
+      if contents.isEmpty then
+        StasisBottleContents.fromStack(thatStack).patched(thisStack)
         slot.setByPlayer(ItemStack.EMPTY)
         return true
-      else if ItemStack.isSameItemSameComponents(curStack, thatStack) then
-        curStack.grow(thatStack.getCount)
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, curStack)
+      else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
+        val newContents = contents.grown(thatStack.getCount)
+        newContents.patched(thisStack)
         slot.setByPlayer(ItemStack.EMPTY)
         return true
     false
   }
 
   override def overrideOtherStackedOnMe(thisStack: ItemStack, thatStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, slotAccess: SlotAccess): Boolean = {
-    val curStack = StasisBottle.getContainedStack(thisStack)
+    val contents = StasisBottle.getContents(thisStack)
     if clickAction != ClickAction.SECONDARY then
       return false
     if thatStack.isEmpty then
-      if !curStack.isEmpty then
-        val res = curStack.split(curStack.getMaxStackSize)
+      if !contents.isEmpty then
+        val (newContents, res) = contents.splitStack()
         slotAccess.set(res)
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, curStack)
+        thisStack.set(LumomancyDataComponents.stasisBottleContents, newContents)
         return true
     else
       if !thatStack.getItem.canFitInsideContainerItems then
         return false
-      if curStack.isEmpty then
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, thatStack)
+      if contents.isEmpty then
+        thisStack.set(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.fromStack(thatStack))
         slotAccess.set(ItemStack.EMPTY)
         return true
-      else if ItemStack.isSameItemSameComponents(curStack, thatStack) then
-        curStack.grow(thatStack.getCount)
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, curStack)
+      else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
+        val newContents = contents.grown(thatStack.getCount)
+        thisStack.set(LumomancyDataComponents.stasisBottleContents, newContents)
         slot.setChanged()
         slotAccess.set(ItemStack.EMPTY)
         return true
@@ -66,27 +67,42 @@ class StasisBottle(props: Item.Properties) extends Item(props):
   }
 
   override def appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: util.List[Component], tooltipFlag: TooltipFlag): Unit = {
-    val thatStack = StasisBottle.getContainedStack(stack)
-    if thatStack.isEmpty then
+    val contents = StasisBottle.getContents(stack)
+    if contents.isEmpty then
       tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.empty"))
     else
-      val totalStacks = math.floorDiv(thatStack.getCount, thatStack.getMaxStackSize).toString
-      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count", thatStack.getCount, getMaxStoredAmount(stack), totalStacks))
-      tooltip.add(thatStack.getHoverName)
+      val totalStacks = math.floorDiv(contents.count, contents.baseStack.getMaxStackSize).toString
+      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count", contents.count, getMaxStoredAmount(stack), totalStacks))
+      tooltip.add(contents.baseStack.getHoverName)
   }
 
 object StasisBottle:
-  def getContainedStack(stack: ItemStack): ItemStack =
-    stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, ItemStack.EMPTY)
+  def getContents(stack: ItemStack): StasisBottleContents =
+    stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.EMPTY)
 
-  def getStoredAmount(stack: ItemStack): Int =
-    getContainedStack(stack).getCount
+  def getStoredAmount(stack: ItemStack): Long =
+    getContents(stack).count
 
   // todo: changable power
-  def getMaxStoredAmount(stack: ItemStack): Int = 20000
+  def getMaxStoredAmount(stack: ItemStack): Long = 20000
 
 
-  case class StasisBottleContents(baseStack: ItemStack, count: Long)
+  case class StasisBottleContents(baseStack: ItemStack, count: Long):
+    def isEmpty: Boolean = baseStack.isEmpty || count == 0
+
+    def splitStack(): (StasisBottleContents, ItemStack) =
+      split(baseStack.getMaxStackSize)
+
+    def split(amount: Int): (StasisBottleContents, ItemStack) =
+      if this.isEmpty then
+        (this, ItemStack.EMPTY)
+      else
+        (this.copy(count = math.max(0L, count - amount)), baseStack.copyWithCount(math.min(count, amount.toLong).toInt))
+
+    def grown(by: Int): StasisBottleContents = this.copy(count = count + by)
+
+    def patched(stack: ItemStack): Unit =
+      stack.set(LumomancyDataComponents.stasisBottleContents, this)
 
   object StasisBottleContents:
     val CODEC: Codec[StasisBottleContents] = RecordCodecBuilder.create { instance =>
@@ -95,3 +111,8 @@ object StasisBottle:
         LumoCodecs.scalaLongCodec.fieldOf("count").forGetter((it: StasisBottleContents) => it.count)
       ).apply(instance, StasisBottleContents.apply)
     }
+
+    val EMPTY: StasisBottleContents = StasisBottleContents(ItemStack.EMPTY, 0)
+
+    def fromStack(stack: ItemStack): StasisBottleContents =
+      new StasisBottleContents(stack.copyWithCount(1), stack.getCount.toLong)
