@@ -1,15 +1,27 @@
 package gay.menkissing.lumomancy.content.item
 
+import com.mojang.authlib.minecraft.client.MinecraftClient
+import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.item.StasisBottle.{StasisBottleContents, getMaxStoredAmount}
+import gay.menkissing.lumomancy.mixin.RenderSystemAccessor
 import gay.menkissing.lumomancy.registries.LumomancyDataComponents
 import gay.menkissing.lumomancy.util.codec.LumoCodecs
+import net.fabricmc.api.{EnvType, Environment}
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.network.chat.Component
+import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.SlotAccess
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{ClickAction, Slot}
-import net.minecraft.world.item.{Item, ItemStack, TooltipFlag}
+import net.minecraft.world.item.{Item, ItemDisplayContext, ItemStack, TooltipFlag}
 
 import java.util
 
@@ -116,3 +128,47 @@ object StasisBottle:
 
     def fromStack(stack: ItemStack): StasisBottleContents =
       new StasisBottleContents(stack.copyWithCount(1), stack.getCount.toLong)
+
+  object Renderer:
+    val stasisBottleID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_bottle_base")
+
+  @Environment(EnvType.CLIENT)
+  class Renderer extends BuiltinItemRendererRegistry.DynamicItemRenderer, ModelLoadingPlugin:
+    override def render(stack: ItemStack, itemDisplayContext: ItemDisplayContext, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int, overlay: Int): Unit =
+      val client = Minecraft.getInstance()
+      val itemRenderer = client.getItemRenderer
+
+      val modelManager = client.getModelManager
+      val bottleModel = modelManager.getModel(Renderer.stasisBottleID)
+
+
+      poseStack.pushPose()
+
+      poseStack.translate(0.5f, 0.5f, 0.5f)
+      if itemDisplayContext == ItemDisplayContext.GUI then
+        Lighting.setupForFlatItems()
+      itemRenderer.render(stack, itemDisplayContext, false, poseStack, multiBufferSource, light, overlay, bottleModel)
+      bottleModel.getTransforms.getTransform(itemDisplayContext).apply(false, poseStack)
+      poseStack.popPose()
+      if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisBottleContents) then
+        return
+
+      val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
+      if !contents.isEmpty then
+        val bundledModel = itemRenderer.getModel(contents.baseStack, null, null, 0)
+        poseStack.pushPose()
+        val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
+
+        if bundledModel.isGui3d then
+          Lighting.setupFor3DItems()
+
+        poseStack.translate(0.5f, 0.5f, 1f)
+        poseStack.scale(0.5f, 0.5f, 0.5f)
+        poseStack.translate(0.5f, 0.5f, 0.5f)
+        itemRenderer.render(contents.baseStack, itemDisplayContext, false, poseStack, multiBufferSource, light, OverlayTexture.NO_OVERLAY, bundledModel)
+
+        Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
+        poseStack.popPose()
+
+    override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
+      context.addModels(Renderer.stasisBottleID)
