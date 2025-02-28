@@ -1,0 +1,19 @@
+{
+  "replace": false,
+  "values": [
+    "#minecraft:axes",
+    "#minecraft:compasses",
+    "#minecraft:foot_armor",
+    "#minecraft:head_armor",
+    "#minecraft:hoes",
+    "#minecraft:leg_armor",
+    "#minecraft:pickaxes",
+    "#minecraft:shovels",
+    "#minecraft:swords",
+    "#minecraft:chest_armor",
+    "minecraft:flint_and_steel",
+    "minecraft:spyglass",
+    "minecraft:fishing_rod",
+    { "id":  "#c:tools", "required":  false }
+  ]
+}
