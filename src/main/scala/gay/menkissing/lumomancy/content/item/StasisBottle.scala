@@ -15,7 +15,9 @@ import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
+import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.SlotAccess
@@ -134,6 +136,42 @@ object StasisBottle:
 
   @Environment(EnvType.CLIENT)
   class Renderer extends BuiltinItemRendererRegistry.DynamicItemRenderer, ModelLoadingPlugin:
+    def drawBundle(itemRenderer: ItemRenderer, stack: ItemStack, mode: ItemDisplayContext, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int, overlay: Int, model: BakedModel): Unit =
+      poseStack.pushPose()
+
+      poseStack.translate(0.5f, 0.5f, 0.5f)
+      // hack
+      //val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
+      if mode == ItemDisplayContext.GUI then
+        Lighting.setupForFlatItems()
+
+      itemRenderer.render(stack, mode, false, poseStack, multiBufferSource, light, overlay, model)
+
+      // model.getTransforms.getTransform(mode).apply(false, poseStack)
+
+      poseStack.popPose()
+      //Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
+
+    def drawContents(itemRenderer: ItemRenderer, stack: ItemStack, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int): Unit =
+      val bundledModel = itemRenderer.getModel(stack, null, null, 0)
+      poseStack.pushPose()
+      val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
+
+      if bundledModel.isGui3d then
+        Lighting.setupFor3DItems()
+      else
+        Lighting.setupForFlatItems()
+
+      poseStack.translate(0.5f, 0.5f, 1f)
+      poseStack.scale(0.5f, 0.5f, 0.5f)
+      poseStack.translate(0.5f, 0.5f, 0.5f)
+      itemRenderer.render(stack, ItemDisplayContext.GUI, false, poseStack, multiBufferSource, light, OverlayTexture
+          .NO_OVERLAY, bundledModel)
+
+      Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
+      poseStack.popPose()
+
+
     override def render(stack: ItemStack, itemDisplayContext: ItemDisplayContext, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int, overlay: Int): Unit =
       val client = Minecraft.getInstance()
       val itemRenderer = client.getItemRenderer
@@ -142,34 +180,14 @@ object StasisBottle:
       val bottleModel = modelManager.getModel(Renderer.stasisBottleID)
 
 
-      poseStack.pushPose()
+      drawBundle(itemRenderer, stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay, bottleModel)
 
-      poseStack.translate(0.5f, 0.5f, 0.5f)
-      if itemDisplayContext == ItemDisplayContext.GUI then
-        Lighting.setupForFlatItems()
-      itemRenderer.render(stack, itemDisplayContext, false, poseStack, multiBufferSource, light, overlay, bottleModel)
-      bottleModel.getTransforms.getTransform(itemDisplayContext).apply(false, poseStack)
-      poseStack.popPose()
       if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisBottleContents) then
         return
 
       val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
       if !contents.isEmpty then
-        val bundledModel = itemRenderer.getModel(contents.baseStack, null, null, 0)
-        poseStack.pushPose()
-        // hack copied from Basic Storage
-        val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
-
-        if bundledModel.isGui3d then
-          Lighting.setupFor3DItems()
-
-        poseStack.translate(0.5f, 0.5f, 1f)
-        poseStack.scale(0.5f, 0.5f, 0.5f)
-        poseStack.translate(0.5f, 0.5f, 0.5f)
-        itemRenderer.render(contents.baseStack, itemDisplayContext, false, poseStack, multiBufferSource, light, OverlayTexture.NO_OVERLAY, bundledModel)
-
-        Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
-        poseStack.popPose()
+        drawContents(itemRenderer, contents.baseStack, poseStack, multiBufferSource, light)
 
     override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
       context.addModels(Renderer.stasisBottleID)
