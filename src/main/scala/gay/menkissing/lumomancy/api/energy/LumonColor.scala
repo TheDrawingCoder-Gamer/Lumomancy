@@ -2,6 +2,7 @@ package gay.menkissing.lumomancy.api.energy
 
 import com.mojang.serialization.Codec
 import gay.menkissing.lumomancy.registries.LumomancyRegistries
+import gay.menkissing.lumomancy.util.ColorUtil
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.tags.TagKey
 import org.joml.Vector3f
@@ -26,3 +27,6 @@ object LumonColor:
 
   val CODEC: Codec[LumonColor] =
     ResourceLocation.CODEC.xmap(it => LumonColor.ofID(it).get, _.id)
+
+  def fromInts(color: Int, textColor: Int): LumonColor =
+    LumonColor(color, ColorUtil.colorIntToVec(color), textColor, ColorUtil.colorIntToVec(textColor))

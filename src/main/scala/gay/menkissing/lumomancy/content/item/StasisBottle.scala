@@ -157,6 +157,7 @@ object StasisBottle:
       if !contents.isEmpty then
         val bundledModel = itemRenderer.getModel(contents.baseStack, null, null, 0)
         poseStack.pushPose()
+        // hack copied from Basic Storage
         val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
 
         if bundledModel.isGui3d then

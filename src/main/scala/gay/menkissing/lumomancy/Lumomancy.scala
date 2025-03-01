@@ -1,7 +1,7 @@
 package gay.menkissing.lumomancy
 
 import gay.menkissing.lumomancy.content.LumomancyItems
-import gay.menkissing.lumomancy.registries.{LumomancyDataComponents, LumomancyRegistries, LumomancyScreens, LumomancyTags}
+import gay.menkissing.lumomancy.registries.{LumomancyDataComponents, LumomancyRegistries, LumomancyScreens, LumomancyTags, LumonColors}
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.ResourceLocation
 
@@ -16,3 +16,4 @@ object Lumomancy extends ModInitializer:
     LumomancyDataComponents.init()
     LumomancyTags.init()
     LumomancyScreens.init()
+    LumonColors.init()
