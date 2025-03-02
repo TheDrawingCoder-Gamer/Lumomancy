@@ -2,6 +2,7 @@ package gay.menkissing.lumomancy.content.item
 
 import com.mojang.authlib.minecraft.client.MinecraftClient
 import com.mojang.blaze3d.platform.Lighting
+import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
@@ -14,7 +15,7 @@ import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.MultiBufferSource
+import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.model.BakedModel
@@ -131,6 +132,7 @@ object StasisBottle:
     def fromStack(stack: ItemStack): StasisBottleContents =
       new StasisBottleContents(stack.copyWithCount(1), stack.getCount.toLong)
 
+  // FIXME: Weird rendering order can cause 3d items to render as 2d items
   object Renderer:
     val stasisBottleID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_bottle_base")
 
@@ -145,11 +147,19 @@ object StasisBottle:
       if mode == ItemDisplayContext.GUI then
         Lighting.setupForFlatItems()
 
-      itemRenderer.render(stack, mode, false, poseStack, multiBufferSource, light, overlay, model)
+      // HACK: coerce to BufferSource so I can end the batch and render as a flat item
+      // correctly
+      val source = multiBufferSource.asInstanceOf[MultiBufferSource.BufferSource]
 
-      // model.getTransforms.getTransform(mode).apply(false, poseStack)
+      itemRenderer.render(stack, mode, false, poseStack, source, light, overlay, model)
+      model.getTransforms.getTransform(mode).apply(false, poseStack)
+      source.endBatch()
+
+
 
       poseStack.popPose()
+      if mode == ItemDisplayContext.GUI then
+        Lighting.setupFor3DItems()
       //Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
 
     def drawContents(itemRenderer: ItemRenderer, stack: ItemStack, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int): Unit =
@@ -165,8 +175,12 @@ object StasisBottle:
       poseStack.translate(0.5f, 0.5f, 1f)
       poseStack.scale(0.5f, 0.5f, 0.5f)
       poseStack.translate(0.5f, 0.5f, 0.5f)
-      itemRenderer.render(stack, ItemDisplayContext.GUI, false, poseStack, multiBufferSource, light, OverlayTexture
+
+      val source = multiBufferSource.asInstanceOf[MultiBufferSource.BufferSource]
+
+      itemRenderer.render(stack, ItemDisplayContext.GUI, false, poseStack, source, light, OverlayTexture
           .NO_OVERLAY, bundledModel)
+      source.endBatch()
 
       Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
       poseStack.popPose()
@@ -181,13 +195,13 @@ object StasisBottle:
 
 
       drawBundle(itemRenderer, stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay, bottleModel)
-
       if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisBottleContents) then
         return
 
       val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
       if !contents.isEmpty then
         drawContents(itemRenderer, contents.baseStack, poseStack, multiBufferSource, light)
+
 
     override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
       context.addModels(Renderer.stasisBottleID)
