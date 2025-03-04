@@ -34,6 +34,7 @@ class StasisBottle(props: Item.Properties) extends Item(props):
       return false
     val thatStack = slot.getItem
     val contents = StasisBottle.getContents(thisStack)
+    val maxPower = StasisBottle.getMaxStoredAmount(thisStack)
     if thatStack.isEmpty then
       if !contents.isEmpty then
         val (newContents, res) = contents.splitStack()
@@ -48,15 +49,16 @@ class StasisBottle(props: Item.Properties) extends Item(props):
         slot.setByPlayer(ItemStack.EMPTY)
         return true
       else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
-        val newContents = contents.grown(thatStack.getCount)
+        val (newContents, resStack) = contents.safeGrown(maxPower, thatStack.getCount)
         newContents.patched(thisStack)
-        slot.setByPlayer(ItemStack.EMPTY)
+        slot.setByPlayer(resStack)
         return true
     false
   }
 
   override def overrideOtherStackedOnMe(thisStack: ItemStack, thatStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, slotAccess: SlotAccess): Boolean = {
     val contents = StasisBottle.getContents(thisStack)
+    val maxPower = StasisBottle.getMaxStoredAmount(thisStack)
     if clickAction != ClickAction.SECONDARY then
       return false
     if thatStack.isEmpty then
@@ -73,10 +75,10 @@ class StasisBottle(props: Item.Properties) extends Item(props):
         slotAccess.set(ItemStack.EMPTY)
         return true
       else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
-        val newContents = contents.grown(thatStack.getCount)
+        val (newContents, resStack) = contents.safeGrown(maxPower, thatStack.getCount)
         thisStack.set(LumomancyDataComponents.stasisBottleContents, newContents)
         slot.setChanged()
-        slotAccess.set(ItemStack.EMPTY)
+        slotAccess.set(resStack)
         return true
     false
   }
@@ -112,13 +114,25 @@ object StasisBottle:
       if this.isEmpty then
         (this, ItemStack.EMPTY)
       else
-        (this.copy(count = math.max(0L, count - amount)), baseStack.copyWithCount(math.min(count, amount.toLong).toInt))
+        (this.copyWithCount(math.max(0L, count - amount)), baseStack.copyWithCount(math.min(count, amount.toLong).toInt))
 
     def grown(by: Int): StasisBottleContents = this.copy(count = count + by)
+
+    def safeGrown(maxStored: Long, by: Int): (StasisBottleContents, ItemStack) =
+      // Compare unsigned for when we get to the max power of two
+      if java.lang.Long.compareUnsigned(count + by, maxStored) > 0 then
+        (this.copyWithCount(maxStored), baseStack.copyWithCount(by - (maxStored - count).toInt))
+      else
+        (this.copyWithCount(count + by), ItemStack.EMPTY)
 
     def patched(stack: ItemStack): Unit =
       stack.set(LumomancyDataComponents.stasisBottleContents, this)
 
+    def copyWithCount(count: Long): StasisBottleContents =
+      if count == 0 then
+        StasisBottleContents(ItemStack.EMPTY, 0)
+      else
+        this.copy(count = count)
   object StasisBottleContents:
     val CODEC: Codec[StasisBottleContents] = RecordCodecBuilder.create { instance =>
       instance.group(
@@ -131,8 +145,7 @@ object StasisBottle:
 
     def fromStack(stack: ItemStack): StasisBottleContents =
       new StasisBottleContents(stack.copyWithCount(1), stack.getCount.toLong)
-
-  // FIXME: Weird rendering order can cause 3d items to render as 2d items
+  
   object Renderer:
     val stasisBottleID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_bottle_base")
 
