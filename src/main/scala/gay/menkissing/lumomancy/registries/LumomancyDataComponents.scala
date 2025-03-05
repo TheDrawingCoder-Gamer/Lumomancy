@@ -27,7 +27,7 @@ object LumomancyDataComponents:
   val stasisBottleContents: DataComponentType[StasisBottleContents] = Registry.register(
     BuiltInRegistries.DATA_COMPONENT_TYPE,
     Lumomancy.locate("stasis_bottle_contents"),
-    DataComponentType.builder[StasisBottleContents]().persistent(StasisBottleContents.CODEC).build()
+    DataComponentType.builder[StasisBottleContents]().persistent(StasisBottleContents.CODEC).networkSynchronized(StasisBottleContents.STREAM_CODEC).build()
   )
   
   def init(): Unit = ()

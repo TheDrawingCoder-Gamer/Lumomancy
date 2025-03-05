@@ -7,80 +7,79 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.item.StasisBottle.{StasisBottleContents, getMaxStoredAmount}
+import gay.menkissing.lumomancy.content.item.StasisBottle.StasisBottleContents
 import gay.menkissing.lumomancy.mixin.RenderSystemAccessor
 import gay.menkissing.lumomancy.registries.LumomancyDataComponents
+import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
 import gay.menkissing.lumomancy.util.codec.LumoCodecs
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
+import net.fabricmc.fabric.api.item.v1.EnchantingContext
+import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.api.transfer.v1.storage.Storage
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleVariantStorage
+import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.core.{Holder, HolderLookup}
+import net.minecraft.core.component.DataComponents
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.Component
+import net.minecraft.network.codec.{ByteBufCodecs, StreamCodec}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.SlotAccess
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.inventory.{ClickAction, Slot}
-import net.minecraft.world.item.{Item, ItemDisplayContext, ItemStack, TooltipFlag}
+import net.minecraft.world.item.enchantment.{Enchantment, Enchantments, ItemEnchantments}
+import net.minecraft.world.item.{Item, ItemDisplayContext, ItemStack, Items, TooltipFlag}
+import net.minecraft.world.level.Level
 
 import java.util
+import scala.util.Using
 
 class StasisBottle(props: Item.Properties) extends Item(props):
   override def overrideStackedOnOther(thisStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player): Boolean = {
-    if clickAction != ClickAction.SECONDARY then
-      return false
-    val thatStack = slot.getItem
-    val contents = StasisBottle.getContents(thisStack)
-    val maxPower = StasisBottle.getMaxStoredAmount(thisStack)
-    if thatStack.isEmpty then
-      if !contents.isEmpty then
-        val (newContents, res) = contents.splitStack()
-        newContents.patched(thisStack)
-        slot.setByPlayer(res)
-        return true
+    if clickAction == ClickAction.SECONDARY then
+      val thatStack = slot.getItem
+      val builder = StasisBottle.StasisBottleContents.Builder.ofWorld(player.level(), thisStack)
+      if thatStack.isEmpty then
+        val stack = builder.removeStack()
+        if !stack.isEmpty then
+          val remainder = slot.safeInsert(stack)
+          builder.insertStack(remainder)
+
+      else
+        // not needed?
+        if thatStack.getItem.canFitInsideContainerItems then
+          builder.addFromSlot(slot, player)
+
+      thisStack.set(LumomancyDataComponents.stasisBottleContents, builder.build)
+      true
     else
-      if !thatStack.getItem.canFitInsideContainerItems then
-        return false
-      if contents.isEmpty then
-        StasisBottleContents.fromStack(thatStack).patched(thisStack)
-        slot.setByPlayer(ItemStack.EMPTY)
-        return true
-      else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
-        val (newContents, resStack) = contents.safeGrown(maxPower, thatStack.getCount)
-        newContents.patched(thisStack)
-        slot.setByPlayer(resStack)
-        return true
-    false
+      false
   }
 
   override def overrideOtherStackedOnMe(thisStack: ItemStack, thatStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, slotAccess: SlotAccess): Boolean = {
-    val contents = StasisBottle.getContents(thisStack)
-    val maxPower = StasisBottle.getMaxStoredAmount(thisStack)
-    if clickAction != ClickAction.SECONDARY then
-      return false
-    if thatStack.isEmpty then
-      if !contents.isEmpty then
-        val (newContents, res) = contents.splitStack()
-        slotAccess.set(res)
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, newContents)
-        return true
+
+    if clickAction == ClickAction.SECONDARY && slot.allowModification(player) then
+      val builder = StasisBottleContents.Builder.ofWorld(player.level(), thisStack)
+      if thatStack.isEmpty then
+        if !builder.isEmpty then
+          val removed = builder.removeStack()
+          if !removed.isEmpty then
+            slotAccess.set(removed)
+      else
+        builder.insertStack(thatStack)
+
+      thisStack.set(LumomancyDataComponents.stasisBottleContents, builder.build)
+      true
     else
-      if !thatStack.getItem.canFitInsideContainerItems then
-        return false
-      if contents.isEmpty then
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.fromStack(thatStack))
-        slotAccess.set(ItemStack.EMPTY)
-        return true
-      else if ItemStack.isSameItemSameComponents(contents.baseStack, thatStack) then
-        val (newContents, resStack) = contents.safeGrown(maxPower, thatStack.getCount)
-        thisStack.set(LumomancyDataComponents.stasisBottleContents, newContents)
-        slot.setChanged()
-        slotAccess.set(resStack)
-        return true
-    false
+      false
   }
 
   override def appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: util.List[Component], tooltipFlag: TooltipFlag): Unit = {
@@ -88,9 +87,20 @@ class StasisBottle(props: Item.Properties) extends Item(props):
     if contents.isEmpty then
       tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.empty"))
     else
-      val totalStacks = math.floorDiv(contents.count, contents.baseStack.getMaxStackSize).toString
-      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count", contents.count, getMaxStoredAmount(stack), totalStacks))
-      tooltip.add(contents.baseStack.getHoverName)
+      val containedStack = contents.variant.toStack
+      val totalStacks = math.floorDiv(contents.count, containedStack.getMaxStackSize).toString
+      val maxCount = StasisBottle.maxAmountWithLookup(ctx.registries(), stack)
+      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count", contents.count, maxCount, totalStacks))
+      tooltip.add(containedStack.getHoverName)
+  }
+
+  override def isEnchantable(stack: ItemStack): Boolean = stack.getCount == 1
+
+  override def getEnchantmentValue: Int = 5
+
+  override def canBeEnchantedWith(stack: ItemStack, enchantment: Holder[Enchantment], context: EnchantingContext): Boolean = {
+    super
+      .canBeEnchantedWith(stack, enchantment, context) || enchantment.is(Enchantments.POWER)
   }
 
 object StasisBottle:
@@ -100,51 +110,103 @@ object StasisBottle:
   def getStoredAmount(stack: ItemStack): Long =
     getContents(stack).count
 
-  // todo: changable power
-  def getMaxStoredAmount(stack: ItemStack): Long = 20000
+  def getMaxAmount(level: Int): Long =
+    20000L * math.pow(10, math.min(5, level)).toInt
 
+  def maxAmountWithLookup(lookup: HolderLookup.Provider, stack: ItemStack): Long =
+    getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
 
-  case class StasisBottleContents(baseStack: ItemStack, count: Long):
-    def isEmpty: Boolean = baseStack.isEmpty || count == 0
-
-    def splitStack(): (StasisBottleContents, ItemStack) =
-      split(baseStack.getMaxStackSize)
-
-    def split(amount: Int): (StasisBottleContents, ItemStack) =
-      if this.isEmpty then
-        (this, ItemStack.EMPTY)
-      else
-        (this.copyWithCount(math.max(0L, count - amount)), baseStack.copyWithCount(math.min(count, amount.toLong).toInt))
-
-    def grown(by: Int): StasisBottleContents = this.copy(count = count + by)
-
-    def safeGrown(maxStored: Long, by: Int): (StasisBottleContents, ItemStack) =
-      // Compare unsigned for when we get to the max power of two
-      if java.lang.Long.compareUnsigned(count + by, maxStored) > 0 then
-        (this.copyWithCount(maxStored), baseStack.copyWithCount(by - (maxStored - count).toInt))
-      else
-        (this.copyWithCount(count + by), ItemStack.EMPTY)
+  case class StasisBottleContents(variant: ItemVariant, count: Long):
+    def isEmpty: Boolean = variant.isBlank || count == 0
 
     def patched(stack: ItemStack): Unit =
       stack.set(LumomancyDataComponents.stasisBottleContents, this)
 
-    def copyWithCount(count: Long): StasisBottleContents =
-      if count == 0 then
-        StasisBottleContents(ItemStack.EMPTY, 0)
-      else
-        this.copy(count = count)
   object StasisBottleContents:
     val CODEC: Codec[StasisBottleContents] = RecordCodecBuilder.create { instance =>
       instance.group(
-        ItemStack.STRICT_SINGLE_ITEM_CODEC.fieldOf("base_stack").forGetter((it: StasisBottleContents) => it.baseStack),
+        ItemVariant.CODEC.fieldOf("variant").forGetter((it: StasisBottleContents) => it.variant),
         LumoCodecs.scalaLongCodec.fieldOf("count").forGetter((it: StasisBottleContents) => it.count)
       ).apply(instance, StasisBottleContents.apply)
     }
 
-    val EMPTY: StasisBottleContents = StasisBottleContents(ItemStack.EMPTY, 0)
+    val STREAM_CODEC: StreamCodec[RegistryFriendlyByteBuf, StasisBottleContents] = StreamCodec.composite(
+      ItemVariant.PACKET_CODEC, (it: StasisBottleContents) => it.variant,
+      ByteBufCodecs.VAR_LONG, (it: StasisBottleContents) => it.count,
+      StasisBottleContents.apply
+    )
+
+    val EMPTY: StasisBottleContents = StasisBottleContents(ItemVariant.blank(), 0)
 
     def fromStack(stack: ItemStack): StasisBottleContents =
-      new StasisBottleContents(stack.copyWithCount(1), stack.getCount.toLong)
+      new StasisBottleContents(ItemVariant.of(stack), stack.getCount.toLong)
+
+    // idea stolen from spectrum
+    // this is _required_ because you NEED to grab the world (or at least the max allowed)
+    class Builder(var template: ItemVariant, var count: Long, val max: Long):
+      def isEmpty: Boolean = count == 0 || template.isBlank
+      def getMaxAllowed(variant: ItemVariant, amount: Long): Long =
+        if (variant.isBlank || amount <= 0 || !variant.getItem.canFitInsideContainerItems)
+          0
+        else
+          this.max - this.count
+      def getMaxAllowed(stack: ItemStack): Int =
+        math.min(getMaxAllowed(ItemVariant.of(stack), stack.getCount), Int.MaxValue).toInt
+      def insertStack(stack: ItemStack): Int =
+        val added = math.min(stack.getCount, this.getMaxAllowed(stack))
+        if added == 0 then
+          return 0
+
+        if this.count == 0 then
+          this.template = ItemVariant.of(stack)
+
+        this.count += math.min(this.max - this.count, added)
+        stack.shrink(added)
+        added
+      def extractFromStorage(storage: SingleVariantStorage[ItemVariant]): Long =
+        Using(Transaction.openOuter()) { transaction =>
+          val max = getMaxAllowed(storage.variant, storage.amount)
+          val added = storage.extract(storage.variant, max, transaction)
+          // Written like this to avoid Non Local Returns
+          if added == 0 then
+            0
+          else
+            if this.count == 0 then
+              this.template = storage.variant
+
+            this.count += math.min(this.max - this.count, added)
+            transaction.commit()
+            added
+        }.get
+
+      def addFromSlot(slot: Slot, player: Player): Long =
+        val i = this.getMaxAllowed(slot.getItem)
+        this.insertStack(slot.safeTake(slot.getItem.getCount, i, player))
+
+      def remove(amount: Int): ItemStack =
+        if this.isEmpty then
+          ItemStack.EMPTY
+        else
+          val toRemove = math.min(this.count, amount).toInt
+          val removed = this.template.toStack(toRemove)
+          this.count -= toRemove
+          if this.count == 0 then
+            this.template = ItemVariant.blank()
+
+          removed
+
+      def removeStack(): ItemStack =
+        remove(template.toStack.getMaxStackSize)
+
+      def build: StasisBottleContents = StasisBottleContents(template, count)
+
+    object Builder:
+      def ofLookup(lookup: HolderLookup.Provider, stack: ItemStack): Builder =
+        val prev = stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.EMPTY)
+        val max = StasisBottle.getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
+        Builder(prev.variant, prev.count, max)
+      def ofWorld(world: Level, stack: ItemStack): Builder = ofLookup(world.registryAccess(), stack)
+
   
   object Renderer:
     val stasisBottleID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_bottle_base")
@@ -213,7 +275,7 @@ object StasisBottle:
 
       val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
       if !contents.isEmpty then
-        drawContents(itemRenderer, contents.baseStack, poseStack, multiBufferSource, light)
+        drawContents(itemRenderer, contents.variant.toStack, poseStack, multiBufferSource, light)
 
 
     override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =

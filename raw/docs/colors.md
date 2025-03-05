@@ -88,7 +88,12 @@ Missing dye colors:
 
 Light blue (Azure?)
 Pink (MAYBE rose? it looks nothing like it)
-Light Gray
-Gray
-Brown
 
+
+Light Gray represents
+
+
+Gray
+
+
+Brown is a darker version of Orange. Brown represents CALAMITY. You thought orange was bad? Try this!
