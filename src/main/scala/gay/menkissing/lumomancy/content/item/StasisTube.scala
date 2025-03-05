@@ -161,7 +161,10 @@ object StasisTube:
     class Builder(var template: ItemVariant, var count: Long, val max: Long):
       def isEmpty: Boolean = count == 0 || template.isBlank
       def getMaxAllowed(variant: ItemVariant, amount: Long): Long =
-        if (variant.isBlank || amount <= 0 || !variant.getItem.canFitInsideContainerItems)
+        if variant.isBlank
+          || amount <= 0
+          || !variant.getItem.canFitInsideContainerItems
+          || (!template.isBlank && variant != template) then
           0
         else
           this.max - this.count
