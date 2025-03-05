@@ -19,10 +19,10 @@
   "item.lumomancy.seafoam_bottle_of_light": "Seafoam Bottle of Light",
   "item.lumomancy.white_bottle_of_light": "White Bottle of Light",
   "item.lumomancy.yellow_bottle_of_light": "Yellow Bottle of Light",
-  "item.lumomancy.stasis_bottle": "Stasis Bottle",
+  "item.lumomancy.stasis_tube": "Stasis Tube",
   "tag.item.lumomancy.valid_tools": "Tools that go in Tool Containers",
   "itemGroup.lumomancy": "Lumomancy",
-  "item.lumomancy.stasis_bottle.tooltip.empty": "Empty",
-  "item.lumomancy.stasis_bottle.tooltip.count": "%d / %d (%d stacks)",
-  "item.lumomancy.stasis_bottle.tooltip.count_of": "%d / %d of "
+  "item.lumomancy.stasis_tube.tooltip.empty": "Empty",
+  "item.lumomancy.stasis_tube.tooltip.count": "%d / %d (%d stacks)",
+  "item.lumomancy.stasis_tube.tooltip.count_of": "%d / %d of "
 }

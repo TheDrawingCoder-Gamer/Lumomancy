@@ -17,7 +17,7 @@ package gay.menkissing.lumomancy.registries
 
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.api.energy.LumonColor
-import gay.menkissing.lumomancy.content.item.StasisBottle.StasisBottleContents
+import gay.menkissing.lumomancy.content.item.StasisTube.StasisTubeContents
 import gay.menkissing.lumomancy.util.codec.LumoCodecs
 import net.minecraft.core.Registry
 import net.minecraft.core.component.DataComponentType
@@ -39,10 +39,10 @@ object LumomancyDataComponents:
 
 
 
-  val stasisBottleContents: DataComponentType[StasisBottleContents] = Registry.register(
+  val stasisTubeContents: DataComponentType[StasisTubeContents] = Registry.register(
     BuiltInRegistries.DATA_COMPONENT_TYPE,
-    Lumomancy.locate("stasis_bottle_contents"),
-    DataComponentType.builder[StasisBottleContents]().persistent(StasisBottleContents.CODEC).networkSynchronized(StasisBottleContents.STREAM_CODEC).build()
+    Lumomancy.locate("stasis_tube_contents"),
+    DataComponentType.builder[StasisTubeContents]().persistent(StasisTubeContents.CODEC).networkSynchronized(StasisTubeContents.STREAM_CODEC).build()
   )
   
   def init(): Unit = ()

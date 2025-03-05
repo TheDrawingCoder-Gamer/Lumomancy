@@ -16,7 +16,7 @@
 package gay.menkissing.lumomancy.content
 
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.item.{StasisBottle, ToolContainer}
+import gay.menkissing.lumomancy.content.item.{StasisTube, ToolContainer}
 import net.fabricmc.fabric.api.itemgroup.v1.{FabricItemGroup, ItemGroupEvents}
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
@@ -74,7 +74,7 @@ object LumomancyItems:
   val whiteBottleOfLight: Item = make(Lumomancy.locate("white_bottle_of_light"), new Item(Item.Properties()))
   val yellowBottleOfLight: Item = make(Lumomancy.locate("yellow_bottle_of_light"), new Item(Item.Properties()))
 
-  val stasisBottle: Item = make(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
+  val stasisTube: Item = make(Lumomancy.locate("stasis_tube"), new StasisTube(Item.Properties().stacksTo(1)))
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)

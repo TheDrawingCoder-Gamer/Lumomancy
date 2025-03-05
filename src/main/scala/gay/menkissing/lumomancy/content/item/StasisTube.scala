@@ -22,7 +22,7 @@ import com.mojang.blaze3d.vertex.PoseStack
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.item.StasisBottle.StasisBottleContents
+import gay.menkissing.lumomancy.content.item.StasisTube.StasisTubeContents
 import gay.menkissing.lumomancy.mixin.RenderSystemAccessor
 import gay.menkissing.lumomancy.registries.LumomancyDataComponents
 import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
@@ -57,11 +57,11 @@ import net.minecraft.world.level.Level
 import java.util
 import scala.util.Using
 
-class StasisBottle(props: Item.Properties) extends Item(props):
+class StasisTube(props: Item.Properties) extends Item(props):
   override def overrideStackedOnOther(thisStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player): Boolean = {
     if clickAction == ClickAction.SECONDARY then
       val thatStack = slot.getItem
-      val builder = StasisBottle.StasisBottleContents.Builder.ofWorld(player.level(), thisStack)
+      val builder = StasisTube.StasisTubeContents.Builder.ofWorld(player.level(), thisStack)
       if thatStack.isEmpty then
         val stack = builder.removeStack()
         if !stack.isEmpty then
@@ -73,7 +73,7 @@ class StasisBottle(props: Item.Properties) extends Item(props):
         if thatStack.getItem.canFitInsideContainerItems then
           builder.addFromSlot(slot, player)
 
-      thisStack.set(LumomancyDataComponents.stasisBottleContents, builder.build)
+      thisStack.set(LumomancyDataComponents.stasisTubeContents, builder.build)
       true
     else
       false
@@ -82,7 +82,7 @@ class StasisBottle(props: Item.Properties) extends Item(props):
   override def overrideOtherStackedOnMe(thisStack: ItemStack, thatStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, slotAccess: SlotAccess): Boolean = {
 
     if clickAction == ClickAction.SECONDARY && slot.allowModification(player) then
-      val builder = StasisBottleContents.Builder.ofWorld(player.level(), thisStack)
+      val builder = StasisTubeContents.Builder.ofWorld(player.level(), thisStack)
       if thatStack.isEmpty then
         if !builder.isEmpty then
           val removed = builder.removeStack()
@@ -91,21 +91,21 @@ class StasisBottle(props: Item.Properties) extends Item(props):
       else
         builder.insertStack(thatStack)
 
-      thisStack.set(LumomancyDataComponents.stasisBottleContents, builder.build)
+      thisStack.set(LumomancyDataComponents.stasisTubeContents, builder.build)
       true
     else
       false
   }
 
   override def appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: util.List[Component], tooltipFlag: TooltipFlag): Unit = {
-    val contents = StasisBottle.getContents(stack)
+    val contents = StasisTube.getContents(stack)
     if contents.isEmpty then
-      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.empty"))
+      tooltip.add(Component.translatable("item.lumomancy.stasis_tube.tooltip.empty"))
     else
       val containedStack = contents.variant.toStack
       val totalStacks = math.floorDiv(contents.count, containedStack.getMaxStackSize).toString
-      val maxCount = StasisBottle.maxAmountWithLookup(ctx.registries(), stack)
-      tooltip.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count", contents.count, maxCount, totalStacks))
+      val maxCount = StasisTube.maxAmountWithLookup(ctx.registries(), stack)
+      tooltip.add(Component.translatable("item.lumomancy.stasis_tube.tooltip.count", contents.count, maxCount, totalStacks))
       tooltip.add(containedStack.getHoverName)
   }
 
@@ -118,9 +118,9 @@ class StasisBottle(props: Item.Properties) extends Item(props):
       .canBeEnchantedWith(stack, enchantment, context) || enchantment.is(Enchantments.POWER)
   }
 
-object StasisBottle:
-  def getContents(stack: ItemStack): StasisBottleContents =
-    stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.EMPTY)
+object StasisTube:
+  def getContents(stack: ItemStack): StasisTubeContents =
+    stack.getOrDefault(LumomancyDataComponents.stasisTubeContents, StasisTubeContents.EMPTY)
 
   def getStoredAmount(stack: ItemStack): Long =
     getContents(stack).count
@@ -131,30 +131,30 @@ object StasisBottle:
   def maxAmountWithLookup(lookup: HolderLookup.Provider, stack: ItemStack): Long =
     getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
 
-  case class StasisBottleContents(variant: ItemVariant, count: Long):
+  case class StasisTubeContents(variant: ItemVariant, count: Long):
     def isEmpty: Boolean = variant.isBlank || count == 0
 
     def patched(stack: ItemStack): Unit =
-      stack.set(LumomancyDataComponents.stasisBottleContents, this)
+      stack.set(LumomancyDataComponents.stasisTubeContents, this)
 
-  object StasisBottleContents:
-    val CODEC: Codec[StasisBottleContents] = RecordCodecBuilder.create { instance =>
+  object StasisTubeContents:
+    val CODEC: Codec[StasisTubeContents] = RecordCodecBuilder.create { instance =>
       instance.group(
-        ItemVariant.CODEC.fieldOf("variant").forGetter((it: StasisBottleContents) => it.variant),
-        LumoCodecs.scalaLongCodec.fieldOf("count").forGetter((it: StasisBottleContents) => it.count)
-      ).apply(instance, StasisBottleContents.apply)
+        ItemVariant.CODEC.fieldOf("variant").forGetter((it: StasisTubeContents) => it.variant),
+        LumoCodecs.scalaLongCodec.fieldOf("count").forGetter((it: StasisTubeContents) => it.count)
+      ).apply(instance, StasisTubeContents.apply)
     }
 
-    val STREAM_CODEC: StreamCodec[RegistryFriendlyByteBuf, StasisBottleContents] = StreamCodec.composite(
-      ItemVariant.PACKET_CODEC, (it: StasisBottleContents) => it.variant,
-      ByteBufCodecs.VAR_LONG, (it: StasisBottleContents) => it.count,
-      StasisBottleContents.apply
+    val STREAM_CODEC: StreamCodec[RegistryFriendlyByteBuf, StasisTubeContents] = StreamCodec.composite(
+      ItemVariant.PACKET_CODEC, (it: StasisTubeContents) => it.variant,
+      ByteBufCodecs.VAR_LONG, (it: StasisTubeContents) => it.count,
+      StasisTubeContents.apply
     )
 
-    val EMPTY: StasisBottleContents = StasisBottleContents(ItemVariant.blank(), 0)
+    val EMPTY: StasisTubeContents = StasisTubeContents(ItemVariant.blank(), 0)
 
-    def fromStack(stack: ItemStack): StasisBottleContents =
-      new StasisBottleContents(ItemVariant.of(stack), stack.getCount.toLong)
+    def fromStack(stack: ItemStack): StasisTubeContents =
+      new StasisTubeContents(ItemVariant.of(stack), stack.getCount.toLong)
 
     // idea stolen from spectrum
     // this is _required_ because you NEED to grab the world (or at least the max allowed)
@@ -213,18 +213,18 @@ object StasisBottle:
       def removeStack(): ItemStack =
         remove(template.toStack.getMaxStackSize)
 
-      def build: StasisBottleContents = StasisBottleContents(template, count)
+      def build: StasisTubeContents = StasisTubeContents(template, count)
 
     object Builder:
       def ofLookup(lookup: HolderLookup.Provider, stack: ItemStack): Builder =
-        val prev = stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.EMPTY)
-        val max = StasisBottle.getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
+        val prev = stack.getOrDefault(LumomancyDataComponents.stasisTubeContents, StasisTubeContents.EMPTY)
+        val max = StasisTube.getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
         Builder(prev.variant, prev.count, max)
       def ofWorld(world: Level, stack: ItemStack): Builder = ofLookup(world.registryAccess(), stack)
 
   
   object Renderer:
-    val stasisBottleID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_bottle_base")
+    val stasisTubeID: ResourceLocation = ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "item/stasis_tube_base")
 
   @Environment(EnvType.CLIENT)
   class Renderer extends BuiltinItemRendererRegistry.DynamicItemRenderer, ModelLoadingPlugin:
@@ -281,17 +281,17 @@ object StasisBottle:
       val itemRenderer = client.getItemRenderer
 
       val modelManager = client.getModelManager
-      val bottleModel = modelManager.getModel(Renderer.stasisBottleID)
+      val bottleModel = modelManager.getModel(Renderer.stasisTubeID)
 
 
       drawBundle(itemRenderer, stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay, bottleModel)
-      if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisBottleContents) then
+      if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisTubeContents) then
         return
 
-      val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
+      val contents = stack.get(LumomancyDataComponents.stasisTubeContents)
       if !contents.isEmpty then
         drawContents(itemRenderer, contents.variant.toStack, poseStack, multiBufferSource, light)
 
 
     override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
-      context.addModels(Renderer.stasisBottleID)
+      context.addModels(Renderer.stasisTubeID)
