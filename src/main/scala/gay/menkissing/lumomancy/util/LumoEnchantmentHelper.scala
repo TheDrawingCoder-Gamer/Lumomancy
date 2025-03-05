@@ -15,11 +15,14 @@
 
 package gay.menkissing.lumomancy.util
 
+import net.minecraft.core.component.DataComponents
 import net.minecraft.core.registries.Registries
 import net.minecraft.core.{HolderLookup, RegistryAccess}
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.item.ItemStack
-import net.minecraft.world.item.enchantment.{Enchantment, EnchantmentHelper}
+import net.minecraft.world.item.enchantment.{Enchantment, EnchantmentHelper, ItemEnchantments}
+
+import scala.jdk.CollectionConverters.*
 
 object LumoEnchantmentHelper:
   def getLevel(lookup: HolderLookup.Provider, key: ResourceKey[Enchantment], stack: ItemStack): Int =
@@ -27,5 +30,14 @@ object LumoEnchantmentHelper:
           .flatMap(_.get(key))
           .map(entry => EnchantmentHelper.getItemEnchantmentLevel(entry, stack))
           .orElse(0)
+
+  def getLevelExpensive(key: ResourceKey[Enchantment], stack: ItemStack): Int =
+    stack.getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
+         .entrySet()
+         .iterator()
+         .asScala
+         .find(_.getKey.is(key))
+         .map(_.getIntValue)
+         .getOrElse(0)
 
 

@@ -16,12 +16,16 @@
 package gay.menkissing.lumomancy.content
 
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.item.{StasisTube, ToolContainer}
+import gay.menkissing.lumomancy.content.item.{StasisBottle, StasisTube, ToolContainer}
+import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
 import net.fabricmc.fabric.api.itemgroup.v1.{FabricItemGroup, ItemGroupEvents}
+import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.world.item.enchantment.Enchantments
 import net.minecraft.world.item.{CreativeModeTab, Item, ItemStack}
 
 import scala.collection.mutable as mut
@@ -75,9 +79,17 @@ object LumomancyItems:
   val yellowBottleOfLight: Item = make(Lumomancy.locate("yellow_bottle_of_light"), new Item(Item.Properties()))
 
   val stasisTube: Item = make(Lumomancy.locate("stasis_tube"), new StasisTube(Item.Properties().stacksTo(1)))
+  val stasisBottle: Item = make(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
+
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)
     ItemGroupEvents.modifyEntriesEvent(itemGroupKey).register { group =>
       items.foreach(group.accept)
     }
+    /*
+    FluidStorage.ITEM.registerForItems((stack: ItemStack, context: ContainerItemContext) => {
+      val max = StasisBottle.getMaxStackExpensive(stack)
+      context.
+    }, stasisBottle)
+    */

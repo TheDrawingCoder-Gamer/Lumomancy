@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "lumomancy:item/stasis_tube"
+    "layer0": "lumomancy:item/stasis_bottle"
   }
 }

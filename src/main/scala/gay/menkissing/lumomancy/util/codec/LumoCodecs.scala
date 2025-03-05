@@ -24,3 +24,6 @@ object LumoCodecs:
 
   val scalaLongCodec: Codec[Long] =
     Codec.LONG.xmap(identity, identity)
+  object LongExtensions:
+    extension (longCodec: Codec[java.lang.Long])
+      def asScala: Codec[Long] = longCodec.asInstanceOf[Codec[Long]]
