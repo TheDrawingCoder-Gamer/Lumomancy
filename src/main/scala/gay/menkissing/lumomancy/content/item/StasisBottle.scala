@@ -52,15 +52,17 @@ import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.core.cauldron.CauldronInteraction
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.particles.{ParticleOptions, ParticleTypes}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.{SoundEvents, SoundSource}
 import net.minecraft.tags.FluidTags
-import net.minecraft.world.{InteractionHand, InteractionResultHolder}
+import net.minecraft.world.{InteractionHand, InteractionResultHolder, ItemInteractionResult}
 import net.minecraft.world.entity.player.Player
-import net.minecraft.world.level.block.{BucketPickup, LiquidBlockContainer}
+import net.minecraft.world.level.block.state.BlockState
+import net.minecraft.world.level.block.{Blocks, BucketPickup, LayeredCauldronBlock, LiquidBlockContainer}
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import org.jetbrains.annotations.Nullable
@@ -174,15 +176,17 @@ class StasisBottle(props: Item.Properties) extends Item(props):
             val fluid = level.getFluidState(hitPos)
 
             if fluid != null && (builder.isEmpty || builder.template.getFluid == fluid.getType) then
-              hitState.getBlock match
-                case bucketPickup: BucketPickup =>
-                  if !bucketPickup.pickupBlock(player, level, hitPos, hitState).isEmpty then
-                    // play sound...
-                    Lumomancy.LOGGER.info("inserted " + builder.insert(if builder.isEmpty then FluidVariant.of(fluid.getType) else builder.template, FluidConstants.BUCKET))
-                    Lumomancy.LOGGER.info("maximum " + builder.max)
-                    val newStack = stack.copy()
-                    newStack.applyComponents(builder.asPatch)
-                    return InteractionResultHolder.success(newStack)
+              if builder.insert(FluidVariant.of(fluid.getType), FluidConstants.BUCKET) == FluidConstants.BUCKET then
+                hitState.getBlock match
+                  case bucketPickup: BucketPickup =>
+                    if !bucketPickup.pickupBlock(player, level, hitPos, hitState).isEmpty then
+                      val sound = FluidVariantAttributes.getFillSound(FluidVariant.of(fluid.getType))
+                      level.playSound(player, hitPos, sound, SoundSource.BLOCKS, 1f, 1f)
+
+                      val newStack = stack.copy()
+                      newStack.applyComponents(builder.asPatch)
+                      return InteractionResultHolder.success(newStack)
+                  case _ => ()
 
 
 
@@ -194,6 +198,12 @@ class StasisBottle(props: Item.Properties) extends Item(props):
 object StasisBottle:
   val baseMax: Long = FluidConstants.BUCKET * 128
 
+  def registerCauldronInteractions(): Unit =
+
+    CauldronInteraction.EMPTY.map().put(LumomancyItems.stasisBottle, emptyStasisBottleInteraction)
+    CauldronInteraction.WATER.map().put(LumomancyItems.stasisBottle, fillStasisBottleInteraction(Fluids.WATER))
+    CauldronInteraction.LAVA.map().put(LumomancyItems.stasisBottle, fillStasisBottleInteraction(Fluids.LAVA))
+
   def maxAllowed(level: Int): Long =
     baseMax * math.pow(2, math.min(level, 5)).toLong
 
@@ -202,6 +212,43 @@ object StasisBottle:
 
   def getContents(stack: ItemStack): StasisBottleContents =
     stack.getOrDefault(LumomancyDataComponents.stasisBottleContents, StasisBottleContents.EMPTY)
+
+  def emptyStasisBottleInteraction(blockState: BlockState, level: Level, blockPos: BlockPos, player: Player, usedHand: InteractionHand, stack: ItemStack): ItemInteractionResult = {
+    val contents = StasisBottle.getContents(stack)
+
+    if contents.variant.getFluid == Fluids.WATER then
+      val builder = StasisBottle.StasisBottleContents.Builder.ofWorld(level, stack)
+      if builder.extract(FluidVariant.of(Fluids.WATER), FluidConstants.BUCKET) == FluidConstants.BUCKET then
+        level.setBlockAndUpdate(blockPos, Blocks.WATER_CAULDRON.defaultBlockState()
+                                                .setValue(LayeredCauldronBlock.LEVEL, LayeredCauldronBlock
+                                                  .MAX_FILL_LEVEL))
+        level.playSound(player, blockPos, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1f, 1f)
+        stack.applyComponents(builder.asPatch)
+        return ItemInteractionResult.SUCCESS
+    else if contents.variant.getFluid == Fluids.LAVA then
+      val builder = StasisBottleContents.Builder.ofWorld(level, stack)
+      if builder.extract(FluidVariant.of(Fluids.LAVA), FluidConstants.BUCKET) == FluidConstants.BUCKET then
+        level.setBlockAndUpdate(blockPos, Blocks.LAVA_CAULDRON.defaultBlockState())
+        level.playSound(player, blockPos, SoundEvents.BUCKET_EMPTY_LAVA, SoundSource.BLOCKS, 1f, 1f)
+        stack.applyComponents(builder.asPatch)
+        return ItemInteractionResult.SUCCESS
+
+    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+  }
+
+  def fillStasisBottleInteraction(fluid: Fluid)(blockState: BlockState, level: Level, blockPos: BlockPos, player: Player, usedHand: InteractionHand, stack: ItemStack): ItemInteractionResult =
+    val contents = StasisBottle.getContents(stack)
+    if contents.isEmpty || contents.variant.getFluid == fluid then
+      val amount = blockState.getOptionalValue(LayeredCauldronBlock.LEVEL).orElse(3) * FluidConstants.BOTTLE
+      val builder = StasisBottleContents.Builder.ofWorld(level, stack)
+      if builder.insert(FluidVariant.of(fluid), amount) == amount then
+        stack.applyComponents(builder.asPatch)
+        level.setBlockAndUpdate(blockPos, Blocks.CAULDRON.defaultBlockState())
+        level.playSound(player, blockPos, FluidVariantAttributes.getFillSound(builder.template), SoundSource.BLOCKS, 1f, 1f)
+        return ItemInteractionResult.SUCCESS
+
+    ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
+
 
   case class StasisBottleContents(variant: FluidVariant, amount: Long):
     def isEmpty: Boolean = variant.isBlank || amount == 0

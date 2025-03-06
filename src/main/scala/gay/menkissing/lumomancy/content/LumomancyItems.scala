@@ -84,6 +84,7 @@ object LumomancyItems:
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)
+    StasisBottle.registerCauldronInteractions()
     ItemGroupEvents.modifyEntriesEvent(itemGroupKey).register { group =>
       items.foreach(group.accept)
     }
