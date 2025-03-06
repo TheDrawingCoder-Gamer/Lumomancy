@@ -1,3 +1,6 @@
 {
-  "parent": "minecraft:builtin/entity"
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "lumomancy:item/stasis_bottle"
+  }
 }

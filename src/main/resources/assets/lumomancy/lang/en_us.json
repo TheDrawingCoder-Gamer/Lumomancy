@@ -24,5 +24,8 @@
   "itemGroup.lumomancy": "Lumomancy",
   "item.lumomancy.stasis_tube.tooltip.empty": "Empty",
   "item.lumomancy.stasis_tube.tooltip.count": "%d / %d (%d stacks)",
-  "item.lumomancy.stasis_tube.tooltip.count_of": "%d / %d of "
+  "item.lumomancy.stasis_tube.tooltip.count_of": "%d / %d of ",
+  "item.lumomancy.stasis_bottle": "Stasis Bottle",
+  "item.lumomancy.stasis_bottle.tooltip.empty": "Empty",
+  "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s / %2$s mB"
 }

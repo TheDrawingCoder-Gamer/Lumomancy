@@ -87,9 +87,7 @@ object LumomancyItems:
     ItemGroupEvents.modifyEntriesEvent(itemGroupKey).register { group =>
       items.foreach(group.accept)
     }
-    /*
+
     FluidStorage.ITEM.registerForItems((stack: ItemStack, context: ContainerItemContext) => {
-      val max = StasisBottle.getMaxStackExpensive(stack)
-      context.
+      StasisBottle.StasisBottleContents.StasisBottleStorage(context)
     }, stasisBottle)
-    */

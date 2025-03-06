@@ -164,7 +164,7 @@ object StasisTube:
         if variant.isBlank
           || amount <= 0
           || !variant.getItem.canFitInsideContainerItems
-          || (!template.isBlank && variant != template) then
+          || (!this.isEmpty && variant != template) then
           0
         else
           this.max - this.count
