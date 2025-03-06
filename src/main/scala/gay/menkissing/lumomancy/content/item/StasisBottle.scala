@@ -22,7 +22,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.client.render.LumoRenderHelper
 import gay.menkissing.lumomancy.content.LumomancyItems
-import gay.menkissing.lumomancy.mixin.RenderSystemAccessor
+import gay.menkissing.lumomancy.mixin.{LumoBucketItemAccessor, RenderSystemAccessor}
 import gay.menkissing.lumomancy.registries.LumomancyDataComponents
 import gay.menkissing.lumomancy.util.{LumoEnchantmentHelper, LumoNumberFormatting}
 import net.fabricmc.fabric.api.item.v1.EnchantingContext
@@ -32,27 +32,38 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidVariant, 
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
-import net.minecraft.core.Holder
+import net.minecraft.core.{BlockPos, Holder}
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.{ByteBufCodecs, StreamCodec}
 import net.minecraft.world.item.enchantment.{Enchantment, Enchantments}
-import net.minecraft.world.item.{Item, ItemDisplayContext, ItemStack, TooltipFlag}
-import net.minecraft.world.level.Level
+import net.minecraft.world.item.{BucketItem, Item, ItemDisplayContext, ItemStack, TooltipFlag}
+import net.minecraft.world.level.{ClipContext, Level}
+import net.minecraft.world.level.material.{FlowingFluid, Fluid, Fluids}
 import gay.menkissing.lumomancy.util.codec.LumoCodecs.LongExtensions.*
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.component.DataComponentPatch
+import net.minecraft.core.particles.{ParticleOptions, ParticleTypes}
 import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.sounds.{SoundEvents, SoundSource}
+import net.minecraft.tags.FluidTags
+import net.minecraft.world.{InteractionHand, InteractionResultHolder}
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.level.block.{BucketPickup, LiquidBlockContainer}
+import net.minecraft.world.level.gameevent.GameEvent
+import net.minecraft.world.phys.{BlockHitResult, HitResult}
+import org.jetbrains.annotations.Nullable
 
 import java.util
 
@@ -80,6 +91,102 @@ class StasisBottle(props: Item.Properties) extends Item(props):
 
 
   }
+
+  def playEmptyingSound(player: Player, level: Level, pos: BlockPos, variant: FluidVariant): Unit =
+    val event = FluidVariantAttributes.getEmptySound(variant)
+    level.playSound(player, pos, event, SoundSource.BLOCKS, 1f, 1f)
+
+  // adapted from tech reborn
+  def placeFluid(@Nullable player: Player, level: Level, pos: BlockPos, hitResult: BlockHitResult, thisStack: ItemStack): Boolean =
+    val contents = StasisBottle.getContents(thisStack)
+    if contents.isEmpty || contents.amount < FluidConstants.BUCKET then
+      return false
+
+    val blockState = level.getBlockState(pos)
+    val canPlace = blockState.canBeReplaced(contents.variant.getFluid)
+
+    if
+      !blockState.isAir && !canPlace && (
+        blockState.getBlock match
+          case liquidBlock: LiquidBlockContainer => !liquidBlock.canPlaceLiquid(player, level, pos, blockState, contents.variant.getFluid)
+          case _ => true
+      )
+    then
+      hitResult != null && this.placeFluid(player, level, hitResult.getBlockPos.relative(hitResult.getDirection), null, thisStack)
+    else
+      if level.dimensionType().ultraWarm() && contents.variant.getFluid.is(FluidTags.WATER) then
+        val i = pos.getX
+        val j = pos.getY
+        val k = pos.getZ
+        level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5f, 2.6f + (level.random.nextFloat() - level.random.nextFloat()) * 0.8f)
+
+        (0 until 8).foreach { l =>
+          level.addParticle(ParticleTypes.LARGE_SMOKE, i.toDouble + math.random(), j.toDouble + math.random(), k.toDouble + math.random, 0d, 0d, 0d)
+        }
+      else if blockState.getBlock.isInstanceOf[LiquidBlockContainer] && contents.variant.getFluid == Fluids.WATER then
+        if blockState.getBlock.asInstanceOf[LiquidBlockContainer].placeLiquid(level, pos, blockState, Fluids.WATER.getSource(false)) then
+          this.playEmptyingSound(player, level, pos, contents.variant)
+      else
+        if !level.isClientSide && canPlace && !blockState.liquid() then
+          level.removeBlock(pos, true)
+
+        this.playEmptyingSound(player, level, pos, contents.variant)
+        level.setBlock(pos, contents.variant.getFluid.defaultFluidState().createLegacyBlock(), 11)
+
+      true
+
+
+  override def use(level: Level, player: Player, usedHand: InteractionHand): InteractionResultHolder[ItemStack] = {
+    val stack = player.getItemInHand(usedHand)
+    val contents = StasisBottle.getContents(stack)
+    val blockHitResult = Item.getPlayerPOVHitResult(level, player, if player.isShiftKeyDown then ClipContext.Fluid.NONE else ClipContext.Fluid.SOURCE_ONLY)
+    if blockHitResult.getType == HitResult.Type.MISS || (!contents.variant.getFluid.isInstanceOf[FlowingFluid] || contents.variant.isBlank) then
+      return InteractionResultHolder.pass(stack)
+    else if blockHitResult.getType != HitResult.Type.BLOCK then
+      return InteractionResultHolder.pass(stack)
+    else
+      val hitPos = blockHitResult.getBlockPos
+      val direction = blockHitResult.getDirection
+      val placePos = hitPos.relative(direction)
+      if !level.mayInteract(player, hitPos) || !player.mayUseItemAt(placePos, direction, stack) then
+        return InteractionResultHolder.fail(stack)
+      else
+        val hitState = level.getBlockState(hitPos)
+        val builder = StasisBottle.StasisBottleContents.Builder.ofWorld(level, stack)
+        if player.isShiftKeyDown then
+          // placing
+          if builder.extract(builder.template, FluidConstants.BUCKET) != FluidConstants.BUCKET then
+            return InteractionResultHolder.fail(stack)
+
+
+          val targetPos = if hitState.getBlock.isInstanceOf[LiquidBlockContainer] then hitPos else placePos
+          if this.placeFluid(player, level, targetPos, blockHitResult, stack) then
+            if player.getAbilities.instabuild then
+              return InteractionResultHolder.success(stack)
+
+            val newStack = stack.copy()
+            newStack.applyComponents(builder.asPatch)
+            return InteractionResultHolder.success(newStack)
+        else
+          // pickup
+          if builder.max - builder.amount >= FluidConstants.BUCKET then
+            val fluid = level.getFluidState(hitPos)
+            if builder.isEmpty || builder.template.getFluid == fluid then
+              hitState.getBlock match
+                case bucketPickup: BucketPickup =>
+                  if !bucketPickup.pickupBlock(player, level, hitPos, hitState).isEmpty then
+                    // play sound...
+                    builder.insert(builder.template, FluidConstants.BUCKET)
+                    val newStack = stack.copy()
+                    newStack.applyComponents(builder.asPatch)
+                    return InteractionResultHolder.success(newStack)
+
+
+
+
+    InteractionResultHolder.fail(stack)
+  }
+
 
 object StasisBottle:
   val baseMax: Long = FluidConstants.BUCKET * 128
