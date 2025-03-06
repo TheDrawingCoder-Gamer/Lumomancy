@@ -19,9 +19,11 @@ import gay.menkissing.lumomancy.content.LumomancyItems
 import gay.menkissing.lumomancy.registries.{LumomancyDataComponents, LumomancyRegistries, LumomancyScreens, LumomancyTags, LumonColors}
 import net.fabricmc.api.ModInitializer
 import net.minecraft.resources.ResourceLocation
+import org.slf4j.{Logger, LoggerFactory}
 
 object Lumomancy extends ModInitializer:
   val MOD_ID: String = "lumomancy"
+  val LOGGER: Logger = LoggerFactory.getLogger("lumomancy")
 
   def locate(id: String): ResourceLocation = ResourceLocation.fromNamespaceAndPath(MOD_ID, id)
   

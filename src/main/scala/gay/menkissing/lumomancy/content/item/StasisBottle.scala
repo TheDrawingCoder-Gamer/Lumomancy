@@ -140,7 +140,7 @@ class StasisBottle(props: Item.Properties) extends Item(props):
     val stack = player.getItemInHand(usedHand)
     val contents = StasisBottle.getContents(stack)
     val blockHitResult = Item.getPlayerPOVHitResult(level, player, if player.isShiftKeyDown then ClipContext.Fluid.NONE else ClipContext.Fluid.SOURCE_ONLY)
-    if blockHitResult.getType == HitResult.Type.MISS || (!contents.variant.getFluid.isInstanceOf[FlowingFluid] || contents.variant.isBlank) then
+    if blockHitResult.getType == HitResult.Type.MISS then
       return InteractionResultHolder.pass(stack)
     else if blockHitResult.getType != HitResult.Type.BLOCK then
       return InteractionResultHolder.pass(stack)
@@ -170,13 +170,16 @@ class StasisBottle(props: Item.Properties) extends Item(props):
         else
           // pickup
           if builder.max - builder.amount >= FluidConstants.BUCKET then
+
             val fluid = level.getFluidState(hitPos)
-            if builder.isEmpty || builder.template.getFluid == fluid then
+
+            if fluid != null && (builder.isEmpty || builder.template.getFluid == fluid.getType) then
               hitState.getBlock match
                 case bucketPickup: BucketPickup =>
                   if !bucketPickup.pickupBlock(player, level, hitPos, hitState).isEmpty then
                     // play sound...
-                    builder.insert(builder.template, FluidConstants.BUCKET)
+                    Lumomancy.LOGGER.info("inserted " + builder.insert(if builder.isEmpty then FluidVariant.of(fluid.getType) else builder.template, FluidConstants.BUCKET))
+                    Lumomancy.LOGGER.info("maximum " + builder.max)
                     val newStack = stack.copy()
                     newStack.applyComponents(builder.asPatch)
                     return InteractionResultHolder.success(newStack)
