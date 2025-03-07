@@ -30,6 +30,8 @@
   "item.lumomancy.stasis_tube.tooltip.count_of": "%d / %d of ",
   "item.lumomancy.stasis_bottle": "Stasis Bottle",
   "item.lumomancy.stasis_bottle.tooltip.empty": "Empty",
-  "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s / %2$s mB",
+  "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",
+  "item.lumomancy.stasis_bottle.tooltip.usage_pickup": "Right-click to pickup",
+  "item.lumomancy.stasis_bottle.tooltip.usage_place": "Shift-right-click to place",
   "item.lumomancy.lumon_lens": "Lumon Lens"
 }

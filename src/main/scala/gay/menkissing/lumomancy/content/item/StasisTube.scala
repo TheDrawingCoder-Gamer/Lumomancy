@@ -24,7 +24,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.item.StasisTube.StasisTubeContents
 import gay.menkissing.lumomancy.mixin.RenderSystemAccessor
-import gay.menkissing.lumomancy.registries.LumomancyDataComponents
+import gay.menkissing.lumomancy.registries.{LumomancyDataComponents, LumomancyTranslationKeys}
 import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
 import gay.menkissing.lumomancy.util.codec.LumoCodecs
 import net.fabricmc.api.{EnvType, Environment}
@@ -100,12 +100,12 @@ class StasisTube(props: Item.Properties) extends Item(props):
   override def appendHoverText(stack: ItemStack, ctx: Item.TooltipContext, tooltip: util.List[Component], tooltipFlag: TooltipFlag): Unit = {
     val contents = StasisTube.getContents(stack)
     if contents.isEmpty then
-      tooltip.add(Component.translatable("item.lumomancy.stasis_tube.tooltip.empty"))
+      tooltip.add(LumomancyTranslationKeys.stasisTube.tooltip.empty)
     else
       val containedStack = contents.variant.toStack
       val totalStacks = math.floorDiv(contents.count, containedStack.getMaxStackSize).toString
       val maxCount = StasisTube.maxAmountWithLookup(ctx.registries(), stack)
-      tooltip.add(Component.translatable("item.lumomancy.stasis_tube.tooltip.count", contents.count, maxCount, totalStacks))
+      tooltip.add(LumomancyTranslationKeys.stasisTube.tooltip.count(contents.count, maxCount, totalStacks))
       tooltip.add(containedStack.getHoverName)
   }
 

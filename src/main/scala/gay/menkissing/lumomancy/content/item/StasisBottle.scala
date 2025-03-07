@@ -23,7 +23,7 @@ import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.client.render.LumoRenderHelper
 import gay.menkissing.lumomancy.content.LumomancyItems
 import gay.menkissing.lumomancy.mixin.{LumoBucketItemAccessor, RenderSystemAccessor}
-import gay.menkissing.lumomancy.registries.LumomancyDataComponents
+import gay.menkissing.lumomancy.registries.{LumomancyDataComponents, LumomancyTranslationKeys}
 import gay.menkissing.lumomancy.util.{LumoEnchantmentHelper, LumoNumberFormatting}
 import net.fabricmc.fabric.api.item.v1.EnchantingContext
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
@@ -84,12 +84,15 @@ class StasisBottle(props: Item.Properties) extends Item(props):
 
     val contents = StasisBottle.getContents(stack)
     if contents.isEmpty then
-      tooltipComponents.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.empty"))
+      tooltipComponents.add(LumomancyTranslationKeys.stasisBottle.tooltip.empty)
+      tooltipComponents.add(LumomancyTranslationKeys.stasisBottle.tooltip.usagePickup)
     else
       val containedFluid = contents.variant
       val max = StasisBottle.maxAllowed(LumoEnchantmentHelper.getLevel(context.registries(), Enchantments.POWER, stack))
-      tooltipComponents.add(Component.translatable("item.lumomancy.stasis_bottle.tooltip.count_mb", LumoNumberFormatting.formatMB(contents.amount),LumoNumberFormatting.formatMB(max)))
+      tooltipComponents.add(LumomancyTranslationKeys.stasisBottle.tooltip.countMB(contents.amount, max))
       tooltipComponents.add(FluidVariantAttributes.getName(containedFluid))
+      tooltipComponents.add(LumomancyTranslationKeys.stasisBottle.tooltip.usagePickup)
+      tooltipComponents.add(LumomancyTranslationKeys.stasisBottle.tooltip.usagePlace)
 
 
   }
