@@ -16,7 +16,7 @@
 package gay.menkissing.lumomancy.content
 
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.item.{StasisBottle, StasisTube, ToolContainer}
+import gay.menkissing.lumomancy.content.item.{LumonLens, StasisBottle, StasisTube, ToolContainer}
 import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
 import net.fabricmc.fabric.api.itemgroup.v1.{FabricItemGroup, ItemGroupEvents}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
@@ -81,6 +81,7 @@ object LumomancyItems:
   val stasisTube: Item = make(Lumomancy.locate("stasis_tube"), new StasisTube(Item.Properties().stacksTo(1)))
   val stasisBottle: Item = make(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
 
+  val lumonLens: Item = make(Lumomancy.locate("lumon_lens"), new LumonLens(Item.Properties().stacksTo(1)))
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)

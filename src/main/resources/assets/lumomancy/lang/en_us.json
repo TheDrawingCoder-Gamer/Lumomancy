@@ -8,9 +8,12 @@
   "item.lumomancy.azure_bottle_of_light": "Azure Bottle of Light",
   "item.lumomancy.black_bottle_of_light": "Black Bottle of Light",
   "item.lumomancy.blue_bottle_of_light": "Blue Bottle of Light",
+  "item.lumomancy.brown_bottle_of_light": "Brown Bottle of Light",
   "item.lumomancy.cyan_bottle_of_light": "Cyan Bottle of Light",
+  "item.lumomancy.gray_bottle_of_light": "Gray Bottle of Light",
   "item.lumomancy.rose_bottle_of_light": "Rose Bottle of Light",
   "item.lumomancy.green_bottle_of_light": "Green Bottle of Light",
+  "item.lumomancy.light_gray_bottle_of_light": "Light Gray Bottle of Light",
   "item.lumomancy.lime_bottle_of_light": "Lime Bottle of Light",
   "item.lumomancy.magenta_bottle_of_light": "Magenta Bottle of Light",
   "item.lumomancy.orange_bottle_of_light": "Orange Bottle of Light",
@@ -27,5 +30,6 @@
   "item.lumomancy.stasis_tube.tooltip.count_of": "%d / %d of ",
   "item.lumomancy.stasis_bottle": "Stasis Bottle",
   "item.lumomancy.stasis_bottle.tooltip.empty": "Empty",
-  "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s / %2$s mB"
+  "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s / %2$s mB",
+  "item.lumomancy.lumon_lens": "Lumon Lens"
 }

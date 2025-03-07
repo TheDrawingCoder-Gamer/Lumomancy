@@ -23,6 +23,14 @@ repositories {
         name = 'ParchmentMC'
         url = 'https://maven.parchmentmc.org'
     }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+    maven {
+        name = "Ladysnake Libs"
+        url = 'https://maven.ladysnake.org/releases'
+    }
 }
 
 dependencies {
@@ -30,13 +38,16 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings loom.layered() {
       officialMojangMappings()
-      parchment("org.parchmentmc.data:parchment-1.21:${project.parchment_version}@zip")
+      parchment("org.parchmentmc.data:parchment-1.21.1:${project.parchment_version}@zip")
     }
 
     modImplementation "dev.krysztal:krysztal-language-scala:${project.kls_version}+scala.${project.scala_version}"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    // i'll eventually need this
+    modCompileOnly "dev.emi:emi-fabric:${project.emi_version}"
+    modImplementation "dev.emi:trinkets:${project.trinkets_version}"
 }
 
 processResources {
