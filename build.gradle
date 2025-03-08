@@ -11,6 +11,9 @@ base {
     archivesName = project.archives_base_name
 }
 
+fabricApi {
+    configureDataGeneration()
+}
 
 repositories {
     // Add repositories to retrieve artifacts from in here.

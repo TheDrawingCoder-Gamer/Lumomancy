@@ -21,6 +21,12 @@
         "adapter": "scala",
         "value": "gay.menkissing.lumomancy.Lumomancy"
       }
+    ],
+    "fabric-datagen": [
+      {
+        "adapter": "scala",
+        "value": "gay.menkissing.lumomancy.datagen.LumoDatagen"
+      }
     ]
   },
   "mixins": [

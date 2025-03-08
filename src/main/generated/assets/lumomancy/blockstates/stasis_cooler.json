@@ -1,0 +1,1196 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler",
+        "uvlock": true,
+        "y": 0
+      },
+      "when": {
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_0_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_0_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_0_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_1_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_1_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_1_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_2_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_2_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_2_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_3_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_3_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_left",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_3_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_4_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_4_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_mid",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_4_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_5_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_5_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_right",
+        "y": 0
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "north"
+          },
+          {
+            "cooler_slot_5_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_0_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_0_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_0_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_1_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_1_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_1_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_2_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_2_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_2_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_3_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_3_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_left",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_3_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_4_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_4_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_mid",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_4_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_5_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_5_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_right",
+        "y": 90
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "east"
+          },
+          {
+            "cooler_slot_5_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_0_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_0_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_0_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_1_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_1_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_1_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_2_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_2_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_2_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_3_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_3_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_left",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_3_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_4_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_4_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_mid",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_4_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_5_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_5_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_right",
+        "y": 180
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "south"
+          },
+          {
+            "cooler_slot_5_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_0_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_0_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_0_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_1_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_1_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_1_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_top_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_2_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_top_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_2_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_top_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_2_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_3_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_3_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_left",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_3_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_4_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_4_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_mid",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_4_occupied_by": "tube"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_empty_slot_bottom_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_5_occupied_by": "empty"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_bottle_slot_bottom_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_5_occupied_by": "bottle"
+          }
+        ]
+      }
+    },
+    {
+      "apply": {
+        "model": "lumomancy:block/stasis_cooler_tube_slot_bottom_right",
+        "y": 270
+      },
+      "when": {
+        "AND": [
+          {
+            "facing": "west"
+          },
+          {
+            "cooler_slot_5_occupied_by": "tube"
+          }
+        ]
+      }
+    }
+  ]
+}
