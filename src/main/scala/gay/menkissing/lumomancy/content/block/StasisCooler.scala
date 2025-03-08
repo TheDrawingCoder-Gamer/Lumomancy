@@ -26,7 +26,7 @@ import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.entity.BlockEntity
-import net.minecraft.world.level.block.{BaseEntityBlock, Block, HorizontalDirectionalBlock}
+import net.minecraft.world.level.block.{BaseEntityBlock, Block, HorizontalDirectionalBlock, RenderShape}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState, StateDefinition}
 import net.minecraft.world.level.block.state.properties.EnumProperty
 import net.minecraft.world.level.gameevent.GameEvent
@@ -62,7 +62,7 @@ class StasisCooler(props: BlockBehaviour.Properties) extends BaseEntityBlock(pro
     level.getBlockEntity(pos) match
       case coolerBlockEntity: StasisCoolerBlockEntity =>
         if !stack.is(LumomancyItems.stasisTube) && !stack.is(LumomancyItems.stasisBottle) then
-          ItemInteractionResult.SUCCESS
+          ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION
         else
           this.getHitSlot(hitResult, state) match
             case None => 
@@ -92,6 +92,8 @@ class StasisCooler(props: BlockBehaviour.Properties) extends BaseEntityBlock(pro
       case _ =>
         InteractionResult.PASS
   }
+
+  override def getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
 
 object StasisCooler:
   enum CoolerSlotOccupiedBy extends Enum[CoolerSlotOccupiedBy], StringRepresentable:
@@ -124,7 +126,7 @@ object StasisCooler:
 
   def insertContainer(level: Level, pos: BlockPos, player: Player, blockEntity: StasisCoolerBlockEntity, stack: ItemStack, slot: Int): Unit =
     if !level.isClientSide then
-      blockEntity.setItem(slot, stack)
+      blockEntity.setItem(slot, stack.consumeAndReturn(1, player))
       
   def removeContainer(level: Level, pos: BlockPos, player: Player, blockEntity: StasisCoolerBlockEntity, slot: Int): Unit =
     if !level.isClientSide then

@@ -38,13 +38,13 @@ object LumoDatagen extends DataGeneratorEntrypoint:
   private class ModelGenerator(output: FabricDataOutput) extends FabricModelProvider(output):
 
     private val coolerCache = mutable.HashMap[CoolerModelSlotKey, ResourceLocation]()
-    
+
     def addCoolerSlotModel(modelGens: BlockModelGenerators, generator: MultiPartGenerator, condition: Condition.TerminalCondition, rot: VariantProperties.Rotation, slotProp: EnumProperty[StasisCooler.CoolerSlotOccupiedBy],
                            template: ModelTemplate)(propValue: StasisCooler.CoolerSlotOccupiedBy): Unit =
       val str = "_" + propValue.getSerializedName
       val mapping = new TextureMapping().put(TextureSlot.TEXTURE, TextureMapping.getBlockTexture(LumomancyBlocks.stasisCooler, str))
       val key = CoolerModelSlotKey(template, str)
-      val model = coolerCache.getOrElseUpdate(key, (template.createWithSuffix(LumomancyBlocks.stasisCooler, str, mapping, modelGens.modelOutput)))
+      val model = coolerCache.getOrElseUpdate(key, template.createWithSuffix(LumomancyBlocks.stasisCooler, str, mapping, modelGens.modelOutput))
       generator.`with`(Condition.and(condition, Condition.condition().term(slotProp, propValue)), Variant.variant().`with`(VariantProperties.MODEL, model).`with`(VariantProperties.Y_ROT, rot))
 
 
@@ -69,8 +69,12 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       val block = LumomancyBlocks.stasisCooler
       val rl = ModelLocationUtils.getModelLocation(block)
       val multiPartGenerator = MultiPartGenerator.multiPart(block)
-      List((Direction.NORTH, Rotation.R0), (Direction.EAST, Rotation.R90), (Direction.SOUTH, Rotation.R180), (Direction
-        .WEST, Rotation.R270)).foreach { (dir, rot) =>
+      List(
+        (Direction.NORTH, Rotation.R0),
+        (Direction.EAST, Rotation.R90),
+        (Direction.SOUTH, Rotation.R180),
+        (Direction.WEST, Rotation.R270)
+      ).foreach { (dir, rot) =>
         val cond = Condition.condition().term(BlockStateProperties.HORIZONTAL_FACING, dir)
         multiPartGenerator
           .`with`(cond, Variant.variant().`with`(VariantProperties.MODEL, rl).`with`(VariantProperties.Y_ROT, rot)

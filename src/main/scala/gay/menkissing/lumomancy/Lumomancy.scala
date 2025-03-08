@@ -35,3 +35,4 @@ object Lumomancy extends ModInitializer:
     LumomancyTags.init()
     LumomancyScreens.init()
     LumonColors.init()
+    

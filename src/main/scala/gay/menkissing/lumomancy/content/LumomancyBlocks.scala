@@ -47,5 +47,6 @@ object LumomancyBlocks:
   val stasisCoolerBlockEntity: BlockEntityType[StasisCoolerBlockEntity] =
     makeEntity("stasis_cooler",StasisCoolerBlockEntity.apply, stasisCooler)
     
-  def init(): Unit = ()
+  def init(): Unit =
+    StasisCoolerBlockEntity.registerStorages()
     

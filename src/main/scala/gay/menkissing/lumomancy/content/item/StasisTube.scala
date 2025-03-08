@@ -41,7 +41,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer
 import net.minecraft.client.renderer.texture.OverlayTexture
 import net.minecraft.client.resources.model.BakedModel
 import net.minecraft.core.{Holder, HolderLookup}
-import net.minecraft.core.component.DataComponents
+import net.minecraft.core.component.{DataComponentPatch, DataComponents}
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.chat.Component
@@ -128,6 +128,9 @@ object StasisTube:
   def getMaxAmount(level: Int): Long =
     20000L * math.pow(10, math.min(5, level)).toInt
 
+  def maxAmountExpensive(stack: ItemStack): Long =
+    getMaxAmount(LumoEnchantmentHelper.getLevelExpensive(Enchantments.POWER, stack))
+
   def maxAmountWithLookup(lookup: HolderLookup.Provider, stack: ItemStack): Long =
     getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
 
@@ -160,6 +163,12 @@ object StasisTube:
     // this is _required_ because you NEED to grab the world (or at least the max allowed)
     class Builder(var template: ItemVariant, var count: Long, val max: Long):
       def isEmpty: Boolean = count == 0 || template.isBlank
+
+      def asPatch: DataComponentPatch =
+        DataComponentPatch.builder()
+                          .set(LumomancyDataComponents.stasisTubeContents, this.build)
+                          .build()
+
       def getMaxAllowed(variant: ItemVariant, amount: Long): Long =
         if variant.isBlank
           || amount <= 0
@@ -197,6 +206,29 @@ object StasisTube:
             added
         }.get
 
+      def insertVariant(variant: ItemVariant, amount: Long): Long =
+        val added = math.min(amount, getMaxAllowed(variant, amount))
+
+        if added == 0 then
+          return 0
+
+        if this.isEmpty then
+          this.template = variant
+
+        this.count += math.min(this.max - this.count, added)
+        added
+
+      def removeVariant(variant: ItemVariant, amount: Long): Long =
+        if this.isEmpty || variant != template then
+          0
+        else
+          val toRemove = math.min(this.count, amount)
+          this.count -= toRemove
+          if this.count == 0 then
+            this.template = ItemVariant.blank()
+
+          toRemove
+
       def addFromSlot(slot: Slot, player: Player): Long =
         val i = this.getMaxAllowed(slot.getItem)
         this.insertStack(slot.safeTake(slot.getItem.getCount, i, player))
@@ -224,6 +256,11 @@ object StasisTube:
         val max = StasisTube.getMaxAmount(LumoEnchantmentHelper.getLevel(lookup, Enchantments.POWER, stack))
         Builder(prev.variant, prev.count, max)
       def ofWorld(world: Level, stack: ItemStack): Builder = ofLookup(world.registryAccess(), stack)
+
+      def expensively(stack: ItemStack): Builder =
+        val prev = stack.getOrDefault(LumomancyDataComponents.stasisTubeContents, StasisTubeContents.EMPTY)
+        val max = maxAmountExpensive(stack)
+        Builder(prev.variant, prev.count, max)
 
   
   object Renderer:
