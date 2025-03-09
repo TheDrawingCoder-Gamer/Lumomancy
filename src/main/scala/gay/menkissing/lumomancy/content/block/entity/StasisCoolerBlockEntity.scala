@@ -268,6 +268,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
         case Some(tube) =>
           tube.set(LumomancyDataComponents.stasisTubeContents, StasisTube.StasisTubeContents(t.resource(), t.amount()))
 
+    override def onFinalCommit(): Unit =
+      // better safe than soggy....
+      StasisCoolerBlockEntity.this.setChanged()
+
   class BottleFluidStorageWrapper(val slot: Int) extends SnapshotParticipant[ResourceAmount[FluidVariant]], SingleSlotStorage[FluidVariant]:
     var filter: FluidVariant = FluidVariant.blank()
 
@@ -357,6 +361,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
         case Some(bottle) =>
           val contents = StasisBottle.StasisBottleContents(t.resource(), t.amount())
           bottle.set(LumomancyDataComponents.stasisBottleContents, contents)
+
+    override def onFinalCommit(): Unit =
+      // better safe than soggy...
+      StasisCoolerBlockEntity.this.setChanged()
 
 object StasisCoolerBlockEntity:
   val tagFluidFilters = "fluid_filters"
