@@ -20,7 +20,8 @@ import net.minecraft.network.chat.Component
 import scala.collection.mutable
 
 /**
- * Add this to a [[net.minecraft.world.level.block.entity.BlockEntity]] to get hover information when wearing
+ * Add this to a [[net.minecraft.world.level.block.entity.BlockEntity]] to get hover information when wearing a
+ * Lumon lens
  */
 trait LumoTooltipInfo:
   def appendLumoTooltip(tooltip: mutable.ListBuffer[Component], isPlayerSneaking: Boolean): Boolean = false

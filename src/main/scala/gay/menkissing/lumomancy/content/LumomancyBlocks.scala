@@ -42,8 +42,9 @@ object LumomancyBlocks:
   def makeEntity[T <: BlockEntity](name: String, factory: BlockEntityType.BlockEntitySupplier[T], blocks: Block*): BlockEntityType[T] =
     val id = Lumomancy.locate(name)
     Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, id, BlockEntityType.Builder.of[T](factory, blocks*).build())
-    
-  val stasisCooler: Block = makeWithItem(Lumomancy.locate("stasis_cooler"), StasisCooler(BlockBehaviour.Properties.of().sound(SoundType.WOOD)))
+
+  // strength copied from chiseled bookshelf
+  val stasisCooler: Block = makeWithItem(Lumomancy.locate("stasis_cooler"), StasisCooler(BlockBehaviour.Properties.of().sound(SoundType.WOOD).strength(1.5f)))
   
   val stasisCoolerBlockEntity: BlockEntityType[StasisCoolerBlockEntity] =
     makeEntity("stasis_cooler",StasisCoolerBlockEntity.apply, stasisCooler)
