@@ -33,5 +33,6 @@
   "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",
   "item.lumomancy.stasis_bottle.tooltip.usage_pickup": "Right-click to pickup",
   "item.lumomancy.stasis_bottle.tooltip.usage_place": "Shift-right-click to place",
-  "item.lumomancy.lumon_lens": "Lumon Lens"
+  "item.lumomancy.lumon_lens": "Lumon Lens",
+  "block.lumomancy.stasis_cooler": "Stasis Cooler"
 }

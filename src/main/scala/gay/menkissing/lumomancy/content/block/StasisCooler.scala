@@ -21,7 +21,7 @@ import gay.menkissing.lumomancy.content.block.entity.StasisCoolerBlockEntity
 import gay.menkissing.lumomancy.registries.LumomancyScreens
 import net.minecraft.core.{BlockPos, Direction}
 import net.minecraft.util.StringRepresentable
-import net.minecraft.world.{InteractionHand, InteractionResult, ItemInteractionResult}
+import net.minecraft.world.{Containers, InteractionHand, InteractionResult, ItemInteractionResult}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.ItemStack
 import net.minecraft.world.level.Level
@@ -94,6 +94,27 @@ class StasisCooler(props: BlockBehaviour.Properties) extends BaseEntityBlock(pro
   }
 
   override def getRenderShape(state: BlockState): RenderShape = RenderShape.MODEL
+
+  override def onRemove(state: BlockState, level: Level, pos: BlockPos, newState: BlockState, movedByPiston: Boolean): Unit = {
+    if state.is(newState.getBlock) then
+      return
+
+    val update = level.getBlockEntity(pos) match
+      case coolerBlockEntity: StasisCoolerBlockEntity if !coolerBlockEntity.isEmpty =>
+        (0 until 6).foreach: slot =>
+          val item = coolerBlockEntity.getItem(slot)
+          if !item.isEmpty then
+            Containers.dropItemStack(level, pos.getX, pos.getY, pos.getZ, item)
+
+        coolerBlockEntity.clearContent()
+        true
+      case _ => false
+
+    super.onRemove(state, level, pos, newState, movedByPiston)
+
+    if update then
+      level.updateNeighbourForOutputSignal(pos, this)
+  }
 
 object StasisCooler:
   enum CoolerSlotOccupiedBy extends Enum[CoolerSlotOccupiedBy], StringRepresentable:

@@ -18,6 +18,7 @@ package gay.menkissing.lumomancy.content
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.block.StasisCooler
 import gay.menkissing.lumomancy.content.block.entity.StasisCoolerBlockEntity
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
@@ -49,4 +50,7 @@ object LumomancyBlocks:
     
   def init(): Unit =
     StasisCoolerBlockEntity.registerStorages()
+    ItemGroupEvents.modifyEntriesEvent(LumomancyItems.itemGroupKey).register { group =>
+      blockItems.foreach(group.accept)
+    }
     
