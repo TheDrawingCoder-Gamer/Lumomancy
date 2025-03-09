@@ -19,13 +19,15 @@ import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.StasisCooler
 import gay.menkissing.lumomancy.content.item.{StasisBottle, StasisTube}
+import gay.menkissing.lumomancy.registries.LumomancyDataComponents
 import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidStorage, FluidVariant}
 import net.fabricmc.fabric.api.transfer.v1.item.{ItemStorage, ItemVariant}
 import net.fabricmc.fabric.api.transfer.v1.storage.{Storage, StoragePreconditions}
-import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedStorage, SingleSlotStorage, SingleVariantStorage}
+import net.fabricmc.fabric.api.transfer.v1.storage.base.{CombinedStorage, ResourceAmount, SingleSlotStorage, SingleVariantStorage}
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
+import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant
 import net.minecraft.core.{BlockPos, HolderLookup, NonNullList}
-import net.minecraft.nbt.{CompoundTag, NbtOps, ListTag}
+import net.minecraft.nbt.{CompoundTag, ListTag, NbtOps}
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.{Container, ContainerHelper}
 import net.minecraft.world.item.ItemStack
@@ -61,6 +63,18 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
 
   def isEmpty: Boolean =
     items.stream().allMatch(_.isEmpty)
+
+  private def updateSlot(slot: Int): Unit =
+    val stack = this.items.get(slot)
+    if stack.is(LumomancyItems.stasisBottle) then
+      itemStorage.parts.get(slot).resetVariant()
+      fluidStorage.parts.get(slot).filter = StasisBottle.getContents(stack).variant
+    else if stack.is(LumomancyItems.stasisTube) then
+      fluidStorage.parts.get(slot).resetVariant()
+      itemStorage.parts.get(slot).filter = StasisTube.getContents(stack).variant
+    else
+      fluidStorage.parts.get(slot).resetVariant()
+      itemStorage.parts.get(slot).resetVariant()
 
   private def updateState(slot: Int): Unit =
     if slot >= 0 && slot < 6 then
@@ -132,7 +146,7 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
   def removeItem(slot: Int, amount: Int): ItemStack =
     val stack = Objects.requireNonNullElse(this.items.get(slot), ItemStack.EMPTY)
     this.items.set(slot, ItemStack.EMPTY)
-    resetSlot(slot)
+    updateSlot(slot)
     if !stack.isEmpty then
       this.updateState(slot)
 
@@ -140,11 +154,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
 
   def removeItemNoUpdate(slot: Int): ItemStack = this.removeItem(slot, 1)
 
-  def setItem(slot: Int, stack: ItemStack, ignoreReset: Boolean = false): Unit =
+  def setItem(slot: Int, stack: ItemStack): Unit =
     if stack.is(LumomancyItems.stasisTube) || stack.is(LumomancyItems.stasisBottle) then
       this.items.set(slot, stack)
-      if !ignoreReset then
-        resetSlot(slot)
+      this.updateSlot(slot)
       this.updateState(slot)
     else if stack.isEmpty then
       this.removeItem(slot, 1)
@@ -153,10 +166,6 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
 
   def getMaxStackSize(stack: ItemStack): Int = 1
 
-  def resetSlot(slot: Int): Unit =
-    if slot >= 0 && slot < 6 then
-      fluidStorage.parts.get(slot).resetVariant()
-      itemStorage.parts.get(slot).resetVariant()
 
 
 
@@ -166,7 +175,7 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
   val itemStorage: CombinedStorage[ItemVariant, TubeItemStorageWrapper] =
     CombinedStorage((0 until 6).map(TubeItemStorageWrapper.apply).toList.asJava)
 
-  class TubeItemStorageWrapper(val slot: Int) extends SingleSlotStorage[ItemVariant]:
+  class TubeItemStorageWrapper(val slot: Int) extends SnapshotParticipant[ResourceAmount[ItemVariant]], SingleSlotStorage[ItemVariant]:
     var filter: ItemVariant = ItemVariant.blank()
 
 
@@ -186,6 +195,9 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
       val thingie = StasisCoolerBlockEntity.this.items.get(slot)
       Option.when(thingie.is(LumomancyItems.stasisTube))(thingie)
 
+
+
+
     override def insert(resource: ItemVariant, maxAmount: Long, transactionContext: TransactionContext): Long =
       StoragePreconditions.notBlankNotNegative(resource, maxAmount)
 
@@ -195,9 +207,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
           val builder = StasisTube.StasisTubeContents.Builder.expensively(tube)
 
           if validVariant(builder.template, resource) then
+            this.updateSnapshots(transactionContext)
             val inserted = builder.insertVariant(resource, maxAmount)
             tube.applyComponents(builder.asPatch)
-            StasisCoolerBlockEntity.this.setItem(slot, tube, true)
+            // StasisCoolerBlockEntity.this.setItem(slot, tube)
 
             inserted
           else
@@ -212,9 +225,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
           val builder = StasisTube.StasisTubeContents.Builder.expensively(tube)
 
           if validVariant(builder.template, resource) then
+            this.updateSnapshots(transactionContext)
             val extracted = builder.removeVariant(resource, maxAmount)
             tube.applyComponents(builder.asPatch)
-            StasisCoolerBlockEntity.this.setItem(slot, tube, true)
+            // StasisCoolerBlockEntity.this.setItem(slot, tube)
 
             extracted
           else
@@ -241,8 +255,20 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
         case None => 0L
         case Some(tube) => StasisTube.maxAmountExpensive(tube)
 
+    override def createSnapshot(): ResourceAmount[ItemVariant] =
+      this.tube match
+        case None => ResourceAmount(ItemVariant.blank(), 0L)
+        case Some(tube) =>
+          val contents = StasisTube.getContents(tube)
+          ResourceAmount(contents.variant, contents.count)
 
-  class BottleFluidStorageWrapper(val slot: Int) extends SingleSlotStorage[FluidVariant]:
+    override def readSnapshot(t: ResourceAmount[ItemVariant]): Unit =
+      this.tube match
+        case None => ()
+        case Some(tube) =>
+          tube.set(LumomancyDataComponents.stasisTubeContents, StasisTube.StasisTubeContents(t.resource(), t.amount()))
+
+  class BottleFluidStorageWrapper(val slot: Int) extends SnapshotParticipant[ResourceAmount[FluidVariant]], SingleSlotStorage[FluidVariant]:
     var filter: FluidVariant = FluidVariant.blank()
 
 
@@ -270,9 +296,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
           val builder = StasisBottle.StasisBottleContents.Builder.expensively(bottle)
 
           if validVariant(builder.template, resource) then
+            this.updateSnapshots(transaction)
             val inserted = builder.insert(resource, maxAmount)
             bottle.applyComponents(builder.asPatch)
-            StasisCoolerBlockEntity.this.setItem(slot, bottle, true)
+            //StasisCoolerBlockEntity.this.setItem(slot, bottle)
 
             inserted
           else
@@ -288,9 +315,10 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
           val builder = StasisBottle.StasisBottleContents.Builder.expensively(bottle)
 
           if validVariant(builder.template, resource) then
+            this.updateSnapshots(transaction)
             val extracted = builder.extract(resource, maxAmount)
             bottle.applyComponents(builder.asPatch)
-            StasisCoolerBlockEntity.this.setItem(slot, bottle, true)
+            //StasisCoolerBlockEntity.this.setItem(slot, bottle)
 
             extracted
           else
@@ -315,6 +343,20 @@ class StasisCoolerBlockEntity(pos: BlockPos, state: BlockState) extends BlockEnt
         case None => 0L
         case Some(bottle) =>
           StasisBottle.getMaxStackExpensive(bottle)
+
+    override def createSnapshot(): ResourceAmount[FluidVariant] =
+      this.bottle match
+        case None => ResourceAmount(FluidVariant.blank(), 0L)
+        case Some(bottle) =>
+          val contents = StasisBottle.getContents(bottle)
+          ResourceAmount(contents.variant, contents.amount)
+
+    override def readSnapshot(t: ResourceAmount[FluidVariant]): Unit =
+      this.bottle match
+        case None => ()
+        case Some(bottle) =>
+          val contents = StasisBottle.StasisBottleContents(t.resource(), t.amount())
+          bottle.set(LumomancyDataComponents.stasisBottleContents, contents)
 
 object StasisCoolerBlockEntity:
   val tagFluidFilters = "fluid_filters"
