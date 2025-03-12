@@ -41,7 +41,7 @@ object LumomancyItems:
 
   val itemGroupKey: ResourceKey[CreativeModeTab] = ResourceKey.create(BuiltInRegistries.CREATIVE_MODE_TAB.key(), ResourceLocation.fromNamespaceAndPath(Lumomancy.MOD_ID, "creative_tab"))
   val itemGroup: CreativeModeTab = FabricItemGroup.builder()
-                                                  .icon(() => new ItemStack(bloodTopazShard))
+                                                  .icon(() => new ItemStack(lumonLens))
                                                   .title(Component.translatable("itemGroup.lumomancy"))
                                                   .build()
 
