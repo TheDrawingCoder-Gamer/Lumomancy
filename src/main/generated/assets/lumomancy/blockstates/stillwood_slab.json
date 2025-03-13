@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "lumomancy:block/stillwood_slab"
+    },
+    "type=double": {
+      "model": "lumomancy:block/stillwood_planks"
+    },
+    "type=top": {
+      "model": "lumomancy:block/stillwood_slab_top"
+    }
+  }
+}

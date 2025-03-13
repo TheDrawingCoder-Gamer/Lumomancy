@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "lumomancy:item/brown_bottle_of_light"
+  }
+}

@@ -1,6 +1,0 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "lumomancy:item/green_bottle_of_light"
-    }
-}

@@ -4,6 +4,7 @@
   "package": "gay.menkissing.lumomancy.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "AxeItemAccessor"
   ],
   "client": [
     "RenderSystemAccessor"

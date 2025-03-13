@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "lumomancy:item/blood_topaz_shard"
+  }
+}

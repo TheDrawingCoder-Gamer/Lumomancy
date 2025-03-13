@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "lumomancy:block/stillwood_log",
+    "side": "lumomancy:block/stillwood_log"
+  }
+}

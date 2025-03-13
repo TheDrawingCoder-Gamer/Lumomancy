@@ -24,6 +24,7 @@
   "item.lumomancy.yellow_bottle_of_light": "Yellow Bottle of Light",
   "item.lumomancy.stasis_tube": "Stasis Tube",
   "tag.item.lumomancy.valid_tools": "Tools that go in Tool Containers",
+  "tag.item.lumomancy.stillwood_logs": "Stillwood Logs",
   "itemGroup.lumomancy": "Lumomancy",
   "item.lumomancy.stasis_tube.tooltip.empty": "Empty",
   "item.lumomancy.stasis_tube.tooltip.count": "%d / %d (%d stacks)",
@@ -34,5 +35,18 @@
   "item.lumomancy.stasis_bottle.tooltip.usage_pickup": "Use to pickup",
   "item.lumomancy.stasis_bottle.tooltip.usage_place": "Shift-use to place",
   "item.lumomancy.lumon_lens": "Lumon Lens",
-  "block.lumomancy.stasis_cooler": "Stasis Cooler"
+  "block.lumomancy.stasis_cooler": "Stasis Cooler",
+  "block.lumomancy.stillwood_log": "Stillwood Log",
+  "block.lumomancy.stillwood_wood": "Stillwood Wood",
+  "block.lumomancy.stripped_stillwood_log": "Stripped Stillwood Log",
+  "block.lumomancy.stripped_stillwood_wood": "Stripped Stillwood Wood",
+  "block.lumomancy.stillwood_planks": "Stillwood Planks",
+  "block.lumomancy.stillwood_slab": "Stillwood Slab",
+  "block.lumomancy.stillwood_fence": "Stillwood Fence",
+  "block.lumomancy.stillwood_fence_gate": "Stillwood Fence Gate",
+  "block.lumomancy.stillwood_button": "Stillwood Button",
+  "block.lumomancy.stillwood_pressure_plate": "Stillwood Pressure Plate",
+  "block.lumomancy.stillwood_stairs": "Stillwood Stairs",
+  "block.lumomancy.stillwood_sign": "Stillwood Sign",
+  "block.lumomancy.stillwood_hanging_sign": "Stillwood Hanging Sign"
 }

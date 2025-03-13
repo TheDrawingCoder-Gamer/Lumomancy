@@ -15,8 +15,8 @@
 
 package gay.menkissing.lumomancy.datagen
 
-import gay.menkissing.lumomancy.content.LumomancyBlocks
-import gay.menkissing.lumomancy.content.block.StasisCooler
+import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
+import gay.menkissing.lumomancy.content.block.{LumoBlockFamilies, StasisCooler}
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
 import net.minecraft.core.Direction
@@ -35,6 +35,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     pack.addProvider(ModelGenerator.apply)
 
   private case class CoolerModelSlotKey(template: ModelTemplate, str: String)
+
   private class ModelGenerator(output: FabricDataOutput) extends FabricModelProvider(output):
 
     private val coolerCache = mutable.HashMap[CoolerModelSlotKey, ResourceLocation]()
@@ -87,9 +88,58 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       coolerCache.clear()
 
 
-    override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit = ()
+    def generateStillwood(blockModelGenerators: BlockModelGenerators): Unit =
+      val family = LumoBlockFamilies.stillwoodPlanks
+      blockModelGenerators.family(family.getBaseBlock).generateFor(family)
+      blockModelGenerators.woodProvider(LumomancyBlocks.stillwoodLog).logWithHorizontal(LumomancyBlocks.stillwoodLog).wood(LumomancyBlocks.stillwoodWood)
+      blockModelGenerators.woodProvider(LumomancyBlocks.strippedStillwoodLog).logWithHorizontal(LumomancyBlocks.strippedStillwoodLog).wood(LumomancyBlocks.strippedStillwoodWood)
+      blockModelGenerators.createHangingSign(LumomancyBlocks.strippedStillwoodLog, LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodWallHangingSign)
+
+    override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit =
+      // shards
+      itemModelGenerators.generateFlatItem(LumomancyItems.adventurineShard, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.clearQuartz, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.bloodTopazShard, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.prasioliteShard, ModelTemplates.FLAT_ITEM)
+
+      // bottles of light
+      itemModelGenerators.generateFlatItem(LumomancyItems.azureBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.blackBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.blueBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.bottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.brownBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.cyanBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.grayBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.greenBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.lightGrayBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.limeBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.magentaBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.orangeBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.purpleBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.redBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.roseBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.seafoamBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.whiteBottleOfLight, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.yellowBottleOfLight, ModelTemplates.FLAT_ITEM)
+
+      // lumon lens
+      itemModelGenerators.generateFlatItem(LumomancyItems.lumonLens, ModelTemplates.FLAT_ITEM)
+
+      // stasis bottle
+      itemModelGenerators.generateFlatItem(LumomancyItems.stasisBottle, ModelTemplates.FLAT_ITEM)
+
+      // tool container
+      itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
+
+      // stasis tube
+      // is there a way to automate the entity part as well?
+      ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(LumomancyItems.stasisTube, "_base"), TextureMapping.layer0(LumomancyItems.stasisTube), itemModelGenerators.output)
+
+
+
     override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
       generateStasisCoolerModels(blockModelGenerators)
+      generateStillwood(blockModelGenerators)
  
 
 
