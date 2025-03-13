@@ -17,7 +17,7 @@ package gay.menkissing.lumomancy.client
 
 import dev.emi.trinkets.api.client.TrinketRendererRegistry
 import gay.menkissing.lumomancy.client.gui.ToolContainerGui
-import gay.menkissing.lumomancy.content.LumomancyItems
+import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.item.{LumonLens, StasisBottle, StasisTube}
 import gay.menkissing.lumomancy.registries.LumomancyScreens
 import net.fabricmc.api.{ClientModInitializer, EnvType, Environment}
@@ -33,6 +33,7 @@ object LumomancyClient extends ClientModInitializer:
     ModelLoadingPlugin.register(new StasisTube.Renderer())
     //ModelLoadingPlugin.register(new StasisBottle.Renderer())
     MenuScreens.register(LumomancyScreens.toolContainer, ToolContainerGui.apply)
+    LumomancyBlocks.registerClient()
 
     TrinketRendererRegistry.registerRenderer(LumomancyItems.lumonLens, LumonLens.Renderer())
 

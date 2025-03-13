@@ -33,7 +33,7 @@
   "item.lumomancy.stasis_bottle.tooltip.empty": "Empty",
   "item.lumomancy.stasis_bottle.tooltip.count_mb": "%1$s mB / %2$s buckets",
   "item.lumomancy.stasis_bottle.tooltip.usage_pickup": "Use to pickup",
-  "item.lumomancy.stasis_bottle.tooltip.usage_place": "Shift-use to place",
+  "item.lumomancy.stasis_bottle.tooltip.usage_place": "Sneak-use to place",
   "item.lumomancy.lumon_lens": "Lumon Lens",
   "block.lumomancy.stasis_cooler": "Stasis Cooler",
   "block.lumomancy.stillwood_log": "Stillwood Log",

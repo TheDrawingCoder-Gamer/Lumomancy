@@ -27,6 +27,8 @@ object LumoBlockFamilies:
                                                   .slab(LumomancyBlocks.stillwoodSlab)
                                                   .stairs(LumomancyBlocks.stillwoodStairs)
                                                   .sign(LumomancyBlocks.stillwoodSign, LumomancyBlocks.stillwoodWallSign)
+                                                  .door(LumomancyBlocks.stillwoodDoor)
+                                                  .trapdoor(LumomancyBlocks.stillwoodTrapdoor)
                                                   .recipeGroupPrefix("wooden")
                                                   .recipeUnlockedBy("has_planks")
                                                   .getFamily

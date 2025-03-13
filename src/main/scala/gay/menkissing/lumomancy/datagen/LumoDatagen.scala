@@ -17,15 +17,17 @@ package gay.menkissing.lumomancy.datagen
 
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.{LumoBlockFamilies, StasisCooler}
-import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider
+import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
+import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricModelProvider}
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
-import net.minecraft.core.Direction
+import net.minecraft.core.{Direction, HolderLookup}
 import net.minecraft.data.models.{BlockModelGenerators, ItemModelGenerators}
 import net.minecraft.data.models.blockstates.{Condition, MultiPartGenerator, Variant, VariantProperties}
 import net.minecraft.data.models.model.{ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.level.block.state.properties.{BlockStateProperties, EnumProperty}
 
+import java.util.concurrent.CompletableFuture
 import scala.collection.mutable
 
 object LumoDatagen extends DataGeneratorEntrypoint:
@@ -33,6 +35,27 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     val pack = fabricDataGenerator.createPack()
 
     pack.addProvider(ModelGenerator.apply)
+    pack.addProvider(LootTableGenerator.apply)
+
+  private class LootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricBlockLootTableProvider(output, lookup):
+    override def generate(): Unit =
+      dropSelf(LumomancyBlocks.stasisCooler)
+      dropSelf(LumomancyBlocks.stillwoodLog)
+      dropSelf(LumomancyBlocks.stillwoodWood)
+      dropSelf(LumomancyBlocks.strippedStillwoodLog)
+      dropSelf(LumomancyBlocks.strippedStillwoodWood)
+      dropSelf(LumomancyBlocks.stillwoodPlanks)
+      dropSelf(LumomancyBlocks.stillwoodSlab)
+      dropSelf(LumomancyBlocks.stillwoodButton)
+      dropSelf(LumomancyBlocks.stillwoodPressurePlate)
+      dropSelf(LumomancyBlocks.stillwoodFence)
+      dropSelf(LumomancyBlocks.stillwoodFenceGate)
+      dropSelf(LumomancyBlocks.stillwoodStairs)
+      // wall variants of signs drop like their normal variant
+      dropOther(LumomancyBlocks.stillwoodSign, LumomancyBlocks.stillwoodSignItem)
+      dropOther(LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodHangingSignItem)
+
+
 
   private case class CoolerModelSlotKey(template: ModelTemplate, str: String)
 

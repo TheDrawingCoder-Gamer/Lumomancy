@@ -1,0 +1,2 @@
+use aseprite's --save-as {slice} function:
+aseprite -b stillwood_door.aseprite --save-as stillwood_door_{slice}.png

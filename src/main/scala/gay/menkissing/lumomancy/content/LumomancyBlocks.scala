@@ -20,14 +20,17 @@ import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.block.{LumoBlockFamilies, StasisCooler}
 import gay.menkissing.lumomancy.content.block.entity.StasisCoolerBlockEntity
 import gay.menkissing.lumomancy.mixin.AxeItemAccessor
+import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.`object`.builder.v1.block.`type`.{BlockSetTypeBuilder, WoodTypeBuilder}
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
+import net.minecraft.client.renderer.RenderType
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BlockItem, HangingSignItem, Item, SignItem}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.world.level.block.{Block, Blocks, CeilingHangingSignBlock, FenceBlock, FenceGateBlock, PressurePlateBlock, RotatedPillarBlock, SignBlock, SlabBlock, SoundType, StairBlock, StandingSignBlock, WallHangingSignBlock, WallSignBlock}
+import net.minecraft.world.level.block.{Block, Blocks, CeilingHangingSignBlock, DoorBlock, FenceBlock, FenceGateBlock, PressurePlateBlock, RotatedPillarBlock, SignBlock, SlabBlock, SoundType, StairBlock, StandingSignBlock, TrapDoorBlock, WallHangingSignBlock, WallSignBlock}
 import net.minecraft.world.level.block.state.BlockBehaviour
 import net.minecraft.world.level.block.state.properties.{BlockSetType, NoteBlockInstrument, WoodType}
 import net.minecraft.world.level.material.{MapColor, PushReaction}
@@ -88,12 +91,21 @@ object LumomancyBlocks:
   val stillwoodSign: Block = makeNoItem(Lumomancy.locate("stillwood_sign"), StandingSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_SIGN).mapColor(MapColor.COLOR_CYAN)))
   val stillwoodWallSign: Block = makeNoItem(Lumomancy.locate("stillwood_wall_sign"), WallSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(MapColor.COLOR_CYAN).dropsLike(stillwoodSign)))
 
-  val stillwoodSignItem: Item = makeItem(Lumomancy.locate("stillwood_sign"), SignItem(Item.Properties(), stillwoodSign, stillwoodWallSign))
+  val stillwoodSignItem: Item = makeItem(Lumomancy.locate("stillwood_sign"), SignItem(Item.Properties().stacksTo(16), stillwoodSign, stillwoodWallSign))
 
   val stillwoodHangingSign: Block = makeNoItem(Lumomancy.locate("stillwood_hanging_sign"), CeilingHangingSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_HANGING_SIGN).mapColor(MapColor.COLOR_CYAN)))
   val stillwoodWallHangingSign: Block = makeNoItem(Lumomancy.locate("stillwood_wall_hanging_sign"), WallHangingSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_CYAN).dropsLike(stillwoodHangingSign)))
 
-  val stillwoodHangingSignItem: Item = makeItem(Lumomancy.locate("stillwood_hanging_sign"), HangingSignItem(stillwoodHangingSign, stillwoodWallHangingSign, Item.Properties()))
+  val stillwoodHangingSignItem: Item = makeItem(Lumomancy.locate("stillwood_hanging_sign"), HangingSignItem(stillwoodHangingSign, stillwoodWallHangingSign, Item.Properties().stacksTo(16)))
+
+  val stillwoodDoor: Block = makeWithItem(Lumomancy.locate("stillwood_door"), DoorBlock(stillwoodBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR).mapColor(stillwoodPlanks.defaultMapColor())))
+  val stillwoodTrapdoor: Block = makeWithItem(Lumomancy.locate("stillwood_trapdoor"), TrapDoorBlock(stillwoodBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(stillwoodPlanks.defaultMapColor())))
+
+
+  @Environment(EnvType.CLIENT)
+  def registerClient(): Unit =
+    BlockRenderLayerMap.INSTANCE.putBlock(stillwoodDoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(stillwoodTrapdoor, RenderType.cutout())
 
 
   def init(): Unit =
