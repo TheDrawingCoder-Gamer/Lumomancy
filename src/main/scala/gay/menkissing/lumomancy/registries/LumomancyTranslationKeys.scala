@@ -15,22 +15,39 @@
 
 package gay.menkissing.lumomancy.registries
 
+import gay.menkissing.lumomancy.content.LumomancyItems
 import gay.menkissing.lumomancy.util.LumoNumberFormatting
 import net.minecraft.network.chat.Component
 
 object LumomancyTranslationKeys:
+  object keys:
+    object stasisTube:
+      object tooltip:
+        val empty: String = LumomancyItems.stasisTube.getDescriptionId + ".tooltip.empty"
+        val count: String = LumomancyItems.stasisTube.getDescriptionId + ".tooltip.count"
+    
+    object stasisBottle:
+      object tooltip:
+        val usagePickup: String = LumomancyItems.stasisBottle.getDescriptionId + ".tooltip.usage_pickup"
+        val usagePlace: String = LumomancyItems.stasisBottle.getDescriptionId + ".tooltip.usage_place"
+        
+        val empty: String = LumomancyItems.stasisBottle.getDescriptionId + ".tooltip.empty"
+        
+        val countMB: String = LumomancyItems.stasisBottle.getDescriptionId + ".tooltip.count_mb"
+        
+  
   object stasisBottle:
     object tooltip:
-      val usagePickup: Component = Component.translatable("item.lumomancy.stasis_bottle.tooltip.usage_pickup")
-      val usagePlace: Component = Component.translatable("item.lumomancy.stasis_bottle.tooltip.usage_place")
+      val usagePickup: Component = Component.translatable(keys.stasisBottle.tooltip.usagePickup)
+      val usagePlace: Component = Component.translatable(keys.stasisBottle.tooltip.usagePlace)
       // These are different because its possible the word for "Empty of fluid" and "Empty of items" is different
       // in some languages
-      val empty: Component = Component.translatable("item.lumomancy.stasis_bottle.tooltip.empty")
+      val empty: Component = Component.translatable(keys.stasisBottle.tooltip.empty)
       def countMB(amount: Long, max: Long): Component = 
-        Component.translatable("item.lumomancy.stasis_bottle.tooltip.count_mb", LumoNumberFormatting.formatMB(amount), LumoNumberFormatting.formatFluidMax(max))
+        Component.translatable(keys.stasisBottle.tooltip.countMB, LumoNumberFormatting.formatMB(amount), LumoNumberFormatting.formatFluidMax(max))
   
   object stasisTube:
     object tooltip:
-      val empty: Component = Component.translatable("item.lumomancy.stasis_tube.tooltip.empty")
+      val empty: Component = Component.translatable(keys.stasisTube.tooltip.empty)
       def count(amount: Long, max: Long, stacksSize: String): Component =
-        Component.translatable("item.lumomancy.stasis_tube.tooltip.count", amount, max, stacksSize)
+        Component.translatable(keys.stasisTube.tooltip.count, amount, max, stacksSize)

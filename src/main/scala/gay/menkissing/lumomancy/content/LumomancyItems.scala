@@ -54,7 +54,7 @@ object LumomancyItems:
   val adventurineShard: Item = make(Lumomancy.locate("adventurine_shard"), new Item(Item.Properties()))
   
 
-  val lens: Item = make(Lumomancy.locate("lens"), new Item(Item.Properties()))
+  // val lens: Item = make(Lumomancy.locate("lens"), new Item(Item.Properties()))
   
   val toolContainer: Item = make(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties().stacksTo(1)))
 

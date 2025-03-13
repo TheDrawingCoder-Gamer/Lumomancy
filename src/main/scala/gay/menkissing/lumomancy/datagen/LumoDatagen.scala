@@ -17,14 +17,20 @@ package gay.menkissing.lumomancy.datagen
 
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.{LumoBlockFamilies, StasisCooler}
+import gay.menkissing.lumomancy.registries.{LumomancyTags, LumomancyTranslationKeys}
 import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
-import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricModelProvider}
+import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider}
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
-import net.minecraft.core.{Direction, HolderLookup}
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags
+import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.{Direction, HolderLookup, Registry}
 import net.minecraft.data.models.{BlockModelGenerators, ItemModelGenerators}
 import net.minecraft.data.models.blockstates.{Condition, MultiPartGenerator, Variant, VariantProperties}
 import net.minecraft.data.models.model.{ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot}
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.tags.{BlockTags, ItemTags, TagKey}
+import net.minecraft.world.item.{Item, Items}
+import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.{BlockStateProperties, EnumProperty}
 
 import java.util.concurrent.CompletableFuture
@@ -36,6 +42,11 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
     pack.addProvider(ModelGenerator.apply)
     pack.addProvider(LootTableGenerator.apply)
+    pack.addProvider(EnglishLanguageGenerator.apply)
+    pack.addProvider(ItemTagGenerator.apply)
+    pack.addProvider(BlockTagGenerator.apply)
+
+
 
   private class LootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricBlockLootTableProvider(output, lookup):
     override def generate(): Unit =
@@ -54,6 +65,9 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       // wall variants of signs drop like their normal variant
       dropOther(LumomancyBlocks.stillwoodSign, LumomancyBlocks.stillwoodSignItem)
       dropOther(LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodHangingSignItem)
+
+      dropSelf(LumomancyBlocks.stillwoodDoor)
+      dropSelf(LumomancyBlocks.stillwoodTrapdoor)
 
 
 
@@ -165,4 +179,182 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       generateStillwood(blockModelGenerators)
  
 
+
+
+  private class EnglishLanguageGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricLanguageProvider(output, "en_us", lookup):
+    override def generateTranslations(provider: HolderLookup.Provider, translationBuilder: FabricLanguageProvider.TranslationBuilder): Unit =
+      translationBuilder.add(LumomancyItems.clearQuartz, "Clear Quartz")
+      translationBuilder.add(LumomancyItems.bloodTopazShard, "Blood Topaz Shard")
+      translationBuilder.add(LumomancyItems.prasioliteShard, "Prasiolite Shard")
+      translationBuilder.add(LumomancyItems.adventurineShard, "Adventurine Shard")
+      translationBuilder.add(LumomancyItems.toolContainer, "Tool Container")
+      translationBuilder.add(LumomancyItems.bottleOfLight, "Empty Bottle of Light")
+      translationBuilder.add(LumomancyItems.azureBottleOfLight, "Azure Bottle of Light")
+      translationBuilder.add(LumomancyItems.blackBottleOfLight, "Black Bottle of Light")
+      translationBuilder.add(LumomancyItems.blueBottleOfLight, "Blue Bottle of Light")
+      translationBuilder.add(LumomancyItems.brownBottleOfLight, "Brown Bottle of Light")
+      translationBuilder.add(LumomancyItems.cyanBottleOfLight, "Cyan Bottle of Light")
+      translationBuilder.add(LumomancyItems.grayBottleOfLight, "Gray Bottle of Light")
+      translationBuilder.add(LumomancyItems.greenBottleOfLight, "Green Bottle of Light")
+      translationBuilder.add(LumomancyItems.lightGrayBottleOfLight, "Light Gray Bottle of Light")
+      translationBuilder.add(LumomancyItems.limeBottleOfLight, "Lime Bottle of Light")
+      translationBuilder.add(LumomancyItems.magentaBottleOfLight, "Magenta Bottle of Light")
+      translationBuilder.add(LumomancyItems.orangeBottleOfLight, "Orange Bottle of Light")
+      translationBuilder.add(LumomancyItems.purpleBottleOfLight, "Purple Bottle of Light")
+      translationBuilder.add(LumomancyItems.redBottleOfLight, "Red Bottle of Light")
+      translationBuilder.add(LumomancyItems.roseBottleOfLight, "Rose Bottle of Light")
+      translationBuilder.add(LumomancyItems.seafoamBottleOfLight, "Seafoam Bottle of Light")
+      translationBuilder.add(LumomancyItems.whiteBottleOfLight, "White Bottle of Light")
+      translationBuilder.add(LumomancyItems.yellowBottleOfLight, "Yellow Bottle of Light")
+
+      translationBuilder.add(LumomancyItems.stasisTube, "Stasis Tube")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisTube.tooltip.empty, "Empty")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisTube.tooltip.count, "%1$d / %2$d (%3$d stacks)")
+
+      translationBuilder.add(LumomancyItems.stasisBottle, "Stasis Bottle")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.empty, "Empty")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.usagePickup, "Use to pickup")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.usagePlace, "Sneak-use to place")
+      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.countMB, "%1$s mB / %2$s buckets")
+
+      translationBuilder.add(LumomancyItems.lumonLens, "Lumon Lens")
+
+      // blocks
+      translationBuilder.add(LumomancyBlocks.stasisCooler, "Stasis Cooler")
+      // stillwood
+      translationBuilder.add(LumomancyBlocks.stillwoodLog, "Stillwood Log")
+      translationBuilder.add(LumomancyBlocks.stillwoodWood, "Stillwood Wood")
+      translationBuilder.add(LumomancyBlocks.strippedStillwoodLog, "Stripped Stillwood Log")
+      translationBuilder.add(LumomancyBlocks.strippedStillwoodWood, "Stripped Stillwood Wood")
+
+      translationBuilder.add(LumomancyBlocks.stillwoodPlanks, "Stillwood Planks")
+      translationBuilder.add(LumomancyBlocks.stillwoodSlab, "Stillwood Slab")
+      translationBuilder.add(LumomancyBlocks.stillwoodButton, "Stillwood Button")
+      translationBuilder.add(LumomancyBlocks.stillwoodPressurePlate, "Stillwood Pressure Plate")
+      translationBuilder.add(LumomancyBlocks.stillwoodFence, "Stillwood Fence")
+      translationBuilder.add(LumomancyBlocks.stillwoodFenceGate, "Stillwood Fence Gate")
+      translationBuilder.add(LumomancyBlocks.stillwoodStairs, "Stillwood Stairs")
+      translationBuilder.add(LumomancyBlocks.stillwoodSignItem, "Stillwood Sign")
+      translationBuilder.add(LumomancyBlocks.stillwoodHangingSignItem, "Stillwood Hanging Sign")
+      translationBuilder.add(LumomancyBlocks.stillwoodDoor, "Stillwood Door")
+      translationBuilder.add(LumomancyBlocks.stillwoodTrapdoor, "Stillwood Trapdoor")
+
+      // item group
+      translationBuilder.add(LumomancyItems.itemGroupKey, "Lumomancy")
+
+      // tags
+      translationBuilder.add(LumomancyTags.item.validToolTag, "Tools that go in Tool Containers")
+      translationBuilder.add(LumomancyTags.item.stillwoodLogsTag, "Stillwood Logs")
+      translationBuilder.add(LumomancyTags.block.stillwoodLogsTag, "Stillwood Logs")
+  private object tagHelper:
+    trait AcceptsBlockItems[T]:
+      def addBlock(self: T, block: Block): T
+
+    extension[T](self: T)(using abi: AcceptsBlockItems[T])
+      def addBlock(block: Block): T =
+        abi.addBlock(self, block)
+
+    extension[T](self: TagKey[T])
+      def transmute[G](target: ResourceKey[? <: Registry[G]]) : TagKey[G] =
+        TagKey.create(target, self.location())
+
+    given acceptsBlockItemsItem: AcceptsBlockItems[FabricTagProvider[Item]#FabricTagBuilder]:
+      override def addBlock(self: FabricTagProvider[Item]#FabricTagBuilder, block: Block): FabricTagProvider[Item]#FabricTagBuilder =
+        self.add(block.asItem())
+
+    given acceptsBlockItemsBlock: AcceptsBlockItems[FabricTagProvider[Block]#FabricTagBuilder]:
+      override def addBlock(self: FabricTagProvider[Block]#FabricTagBuilder, block: Block): FabricTagProvider[Block]#FabricTagBuilder =
+        self.add(block)
+
+    def addStillwoodLogs[T](builder: FabricTagProvider[T]#FabricTagBuilder)
+                           (using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
+      builder
+        .addBlock(LumomancyBlocks.stillwoodLog)
+        .addBlock(LumomancyBlocks.stillwoodWood)
+        .addBlock(LumomancyBlocks.strippedStillwoodLog)
+        .addBlock(LumomancyBlocks.strippedStillwoodWood)
+        .setReplace(false)
+
+
+    def addStillwoodSetTags[T](registry: ResourceKey[? <: Registry[T]], makeBuilder: TagKey[T] => FabricTagProvider[T]#FabricTagBuilder)(using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
+      makeBuilder(BlockTags.WOODEN_FENCES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodFence)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_BUTTONS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodButton)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_PRESSURE_PLATES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodPressurePlate)
+        .setReplace(false)
+      makeBuilder(BlockTags.FENCE_GATES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodFenceGate)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_DOORS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodDoor)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_SLABS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodSlab)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_STAIRS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodStairs)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_TRAPDOORS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodTrapdoor)
+        .setReplace(false)
+      makeBuilder(BlockTags.LOGS_THAT_BURN.transmute(registry))
+        .addTag(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
+        .setReplace(false)
+      makeBuilder(BlockTags.PLANKS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodPlanks)
+        .setReplace(false)
+
+
+
+
+
+  import tagHelper.given
+
+  private class ItemTagGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricTagProvider[Item](output, BuiltInRegistries.ITEM.key(), lookup):
+    override def addTags(provider: HolderLookup.Provider): Unit =
+      getOrCreateTagBuilder(LumomancyTags.item.validToolTag)
+        .addOptionalTag(ConventionalItemTags.TOOLS)
+        .addOptionalTag(ItemTags.HEAD_ARMOR)
+        .addOptionalTag(ItemTags.CHEST_ARMOR)
+        .addOptionalTag(ItemTags.LEG_ARMOR)
+        .addOptionalTag(ItemTags.FOOT_ARMOR)
+        .add(Items.SPYGLASS)
+        .addOptionalTag(ItemTags.COMPASSES)
+        .addOptionalTag(TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath("c", "wrenches")))
+        .setReplace(false)
+      tagHelper.addStillwoodLogs(getOrCreateTagBuilder(LumomancyTags.item.stillwoodLogsTag))
+      tagHelper.addStillwoodSetTags(registryKey, this.getOrCreateTagBuilder)
+      getOrCreateTagBuilder(ItemTags.SIGNS)
+        .add(LumomancyBlocks.stillwoodSignItem)
+        .setReplace(false)
+      getOrCreateTagBuilder(ItemTags.HANGING_SIGNS)
+        .add(LumomancyBlocks.stillwoodHangingSignItem)
+        .setReplace(false)
+
+
+  private class BlockTagGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricTagProvider[Block](output, BuiltInRegistries
+    .BLOCK.key(), lookup):
+    override def addTags(provider: HolderLookup.Provider): Unit =
+      tagHelper.addStillwoodLogs(getOrCreateTagBuilder(LumomancyTags.block.stillwoodLogsTag))
+      tagHelper.addStillwoodSetTags(registryKey, this.getOrCreateTagBuilder)
+      getOrCreateTagBuilder(BlockTags.WALL_SIGNS)
+        .add(LumomancyBlocks.stillwoodWallSign)
+        .setReplace(false)
+      getOrCreateTagBuilder(BlockTags.STANDING_SIGNS)
+        .add(LumomancyBlocks.stillwoodSign)
+        .setReplace(false)
+      getOrCreateTagBuilder(BlockTags.CEILING_HANGING_SIGNS)
+        .add(LumomancyBlocks.stillwoodHangingSign)
+        .setReplace(false)
+      getOrCreateTagBuilder(BlockTags.WALL_HANGING_SIGNS)
+        .add(LumomancyBlocks.stillwoodWallHangingSign)
+        .setReplace(false)
+      getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
+        // all other mineable with axe blocks are covered under other tags
+        .add(LumomancyBlocks.stasisCooler)
+        .setReplace(false)
 

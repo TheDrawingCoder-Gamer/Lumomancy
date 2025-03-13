@@ -54,7 +54,7 @@ class ToolContainer(props: Item.Properties) extends Item(props):
     itemEntity.getItem.remove(DataComponents.CONTAINER)
 
   override def overrideOtherStackedOnMe(thisStack: ItemStack, thatStack: ItemStack, slot: Slot, clickAction: ClickAction, player: Player, slotAccess: SlotAccess): Boolean =
-    if clickAction == ClickAction.SECONDARY && slot.allowModification(player) && !thatStack.isEmpty && thatStack.is(LumomancyTags.validToolTag) then
+    if clickAction == ClickAction.SECONDARY && slot.allowModification(player) && !thatStack.isEmpty && thatStack.is(LumomancyTags.item.validToolTag) then
       val container = ToolContainer.getRawInventory(thisStack)
       if container.canAddItem(thatStack) then
         val res = container.addItem(thatStack)
@@ -68,7 +68,7 @@ class ToolContainer(props: Item.Properties) extends Item(props):
     else
       val container = ToolContainer.getRawInventory(thisStack)
       val thatStack = slot.getItem
-      if !thatStack.isEmpty && thatStack.is(LumomancyTags.validToolTag) then
+      if !thatStack.isEmpty && thatStack.is(LumomancyTags.item.validToolTag) then
           if container.canAddItem(thatStack) then
             val res = container.addItem(thatStack)
             slot.set(res)

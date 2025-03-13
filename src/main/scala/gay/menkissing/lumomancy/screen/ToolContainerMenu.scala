@@ -91,7 +91,7 @@ class ToolContainerMenu(windowId: Int, playerInv: Inventory, val box: ItemStack)
       slot.onTake(player, slotStack)
     transferredItemStack
 
-  def isValidItem(item: ItemStack): Boolean = item.is(LumomancyTags.validToolTag)
+  def isValidItem(item: ItemStack): Boolean = item.is(LumomancyTags.item.validToolTag)
   override def stillValid(player: Player): Boolean =
     player.getItemInHand(InteractionHand.MAIN_HAND) == box || player.getItemInHand(InteractionHand.OFF_HAND) == box
 

@@ -81,8 +81,7 @@ object LumomancyBlocks:
 
   val stillwoodPlanks: Block = makeWithItem(Lumomancy.locate("stillwood_planks"), Block(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
   val stillwoodSlab: Block = makeWithItem(Lumomancy.locate("stillwood_slab"), SlabBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
-  // todo: door, hanging sign, trapdoor
-  // these all require unique textures
+
   val stillwoodButton: Block = makeWithItem(Lumomancy.locate("stillwood_button"), Blocks.woodenButton(stillwoodBlockSet))
   val stillwoodPressurePlate: Block = makeWithItem(Lumomancy.locate("stillwood_pressure_plate"), PressurePlateBlock(stillwoodBlockSet, BlockBehaviour.Properties.of().sound(SoundType.WOOD).forceSolidOn().mapColor(stillwoodPlanks.defaultMapColor()).noCollission().strength(0.5f).pushReaction(PushReaction.DESTROY)))
   val stillwoodFence: Block = makeWithItem(Lumomancy.locate("stillwood_fence"), FenceBlock(BlockBehaviour.Properties.of().mapColor(stillwoodPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()))
