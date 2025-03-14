@@ -16,7 +16,7 @@
 package gay.menkissing.lumomancy.content.item
 
 import com.mojang.blaze3d.platform.Lighting
-import com.mojang.blaze3d.vertex.PoseStack
+import com.mojang.blaze3d.vertex.{PoseStack, VertexConsumer}
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
 import gay.menkissing.lumomancy.Lumomancy
@@ -32,26 +32,32 @@ import net.fabricmc.fabric.api.transfer.v1.fluid.{FluidConstants, FluidVariant, 
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage
 import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext
-import net.minecraft.core.{BlockPos, Holder}
+import net.minecraft.core.{BlockPos, Direction, Holder}
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.RegistryFriendlyByteBuf
 import net.minecraft.network.codec.{ByteBufCodecs, StreamCodec}
 import net.minecraft.world.item.enchantment.{Enchantment, Enchantments}
 import net.minecraft.world.item.{BucketItem, Item, ItemDisplayContext, ItemStack, TooltipFlag}
-import net.minecraft.world.level.{ClipContext, Level}
+import net.minecraft.world.level.{BlockAndTintGetter, ClipContext, Level}
 import net.minecraft.world.level.material.{FlowingFluid, Fluid, Fluids}
 import gay.menkissing.lumomancy.util.codec.LumoCodecs.LongExtensions.*
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess
+import net.fabricmc.fabric.api.renderer.v1.mesh.{Mesh, MutableQuadView}
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext
 import net.fabricmc.fabric.api.transfer.v1.client.fluid.FluidVariantRendering
 import net.fabricmc.fabric.api.transfer.v1.item.ItemVariant
+import net.fabricmc.fabric.impl.client.indigo.renderer.helper.GeometryHelper
 import net.fabricmc.fabric.mixin.transfer.BucketItemAccessor
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.block.model.{BakedQuad, ItemOverrides, ItemTransforms}
 import net.minecraft.client.renderer.{MultiBufferSource, RenderType}
 import net.minecraft.client.renderer.entity.ItemRenderer
-import net.minecraft.client.renderer.texture.OverlayTexture
-import net.minecraft.client.resources.model.BakedModel
+import net.minecraft.client.renderer.texture.{OverlayTexture, TextureAtlasSprite}
+import net.minecraft.client.resources.model.{BakedModel, Material, ModelBaker, ModelState, UnbakedModel}
 import net.minecraft.core.cauldron.CauldronInteraction
 import net.minecraft.core.component.DataComponentPatch
 import net.minecraft.core.particles.{ParticleOptions, ParticleTypes}
@@ -59,15 +65,21 @@ import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.sounds.{SoundEvents, SoundSource}
 import net.minecraft.tags.FluidTags
+import net.minecraft.util.RandomSource
 import net.minecraft.world.{InteractionHand, InteractionResultHolder, ItemInteractionResult}
 import net.minecraft.world.entity.player.Player
+import net.minecraft.world.inventory.InventoryMenu
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.level.block.{Blocks, BucketPickup, LayeredCauldronBlock, LiquidBlockContainer}
 import net.minecraft.world.level.gameevent.GameEvent
 import net.minecraft.world.phys.{BlockHitResult, HitResult}
 import org.jetbrains.annotations.Nullable
+import org.joml.Vector3f
 
 import java.util
+import java.util.function
+import java.util.function.Supplier
+import scala.compiletime.uninitialized
 
 // A container item 4 fluids : 3
 class StasisBottle(props: Item.Properties) extends Item(props):
@@ -393,74 +405,109 @@ object StasisBottle:
         val max = StasisBottle.getMaxStackExpensive(stack)
         StasisBottleContents.Builder(prev.variant, prev.amount, max)
 
-  /*
+
   object Renderer:
     val stasisBottleID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_base")
-  @Environment(EnvType.CLIENT)
-  class Renderer extends BuiltinItemRendererRegistry.DynamicItemRenderer, ModelLoadingPlugin:
-    def drawBundle(itemRenderer: ItemRenderer, stack: ItemStack, mode: ItemDisplayContext, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int, overlay: Int, model: BakedModel): Unit =
-      poseStack.pushPose()
+    val fluidModelID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_fluid")
 
-      poseStack.translate(0.5f, 0.5f, 0.5f)
-      // hack
-      //val lights = Array.copyOf(RenderSystemAccessor.getShaderLightDirections, 2)
-      if mode == ItemDisplayContext.GUI then
-        Lighting.setupForFlatItems()
+  class ItemModel extends UnbakedModel, BakedModel, FabricBakedModel:
+    private var baseModel: BakedModel = uninitialized
+    private var fluidModel: BakedModel = uninitialized
+    private var sprite: TextureAtlasSprite = uninitialized
 
-      // HACK: coerce to BufferSource so I can end the batch and render as a flat item
-      // correctly
-      val source = multiBufferSource.asInstanceOf[MultiBufferSource.BufferSource]
+    override def getDependencies: util.Collection[ResourceLocation] =
+      util.List.of(Renderer.stasisBottleID, Renderer.fluidModelID)
 
-      itemRenderer.render(stack, mode, false, poseStack, source, light, overlay, model)
-      model.getTransforms.getTransform(mode).apply(false, poseStack)
-      source.endBatch()
+    override def resolveParents(resolver: function.Function[ResourceLocation, UnbakedModel]): Unit = ()
 
+    override def getQuads(state: BlockState, direction: Direction, random: RandomSource): util.List[BakedQuad] =
+      util.List.of()
 
-      poseStack.popPose()
-      if mode == ItemDisplayContext.GUI then
-        Lighting.setupFor3DItems()
-    //Array.copy(lights, 0, RenderSystemAccessor.getShaderLightDirections, 0, 2)
+    override def emitBlockQuads(blockView: BlockAndTintGetter, state: BlockState, pos: BlockPos, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = ()
 
-    def drawContents(variant: FluidVariant, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int): Unit =
-      val sprites = FluidVariantRendering.getSprites(variant)
-      if sprites == null || sprites.length < 1 || sprites(0) == null then
-        return
-      val sprite = sprites(0)
-      val color = FluidVariantRendering.getColor(variant)
-      poseStack.pushPose()
+    override def emitItemQuads(stack: ItemStack, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = {
+      baseModel.emitItemQuads(stack, randomSupplier, context)
 
-      poseStack.translate(0.5f, 0.5f, 1f)
-      poseStack.scale(0.5f, 0.5f, 0.5f)
-      poseStack.translate(0.5f, 0.5f, 0.5f)
-
-      val source = multiBufferSource.asInstanceOf[MultiBufferSource.BufferSource]
-
-      val buf = source.getBuffer(RenderType.gui())
-      buf
-
-      LumoRenderHelper.drawTintedSprite(poseStack, sprite, source, color, 0, 0, 0, 0, 16, 16)
-      source.endBatch()
-
-      poseStack.popPose()
-
-
-    override def render(stack: ItemStack, itemDisplayContext: ItemDisplayContext, poseStack: PoseStack, multiBufferSource: MultiBufferSource, light: Int, overlay: Int): Unit =
-      val client = Minecraft.getInstance()
-      val itemRenderer = client.getItemRenderer
-
-      val modelManager = client.getModelManager
-      val bottleModel = modelManager.getModel(Renderer.stasisBottleID)
-
-
-      drawBundle(itemRenderer, stack, itemDisplayContext, poseStack, multiBufferSource, light, overlay, bottleModel)
-      if itemDisplayContext != ItemDisplayContext.GUI || !stack.has(LumomancyDataComponents.stasisBottleContents) then
+      if !stack.has(LumomancyDataComponents.stasisBottleContents) || context.itemTransformationMode() != ItemDisplayContext.GUI  then
         return
 
       val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
-      if !contents.isEmpty then
-        drawContents(contents.variant, poseStack, multiBufferSource, light)
+
+      val variant = contents.variant
+
+      if variant.isBlank then
+        return
+
+      val variantRenderHandler = FluidVariantRendering.getHandlerOrDefault(variant.getFluid)
+
+      if variantRenderHandler == null then
+        return
 
 
+      val fluidSprite = variantRenderHandler.getSprites(variant)(0)
+      // force full alpha
+      val fluidColor = variantRenderHandler.getColor(variant, null, null) | 0xFF000000
+
+      context.pushTransform { quad =>
+        quad.nominalFace(GeometryHelper.lightFace(quad))
+        quad.color(fluidColor, fluidColor, fluidColor, fluidColor)
+        (0 until 4).foreach { i =>
+          val pos = quad.copyPos(i, null)
+          pos.add(0.5f, 0.5f, 1f)
+          pos.mul(0.5f)
+          pos.add(0.25f, 0.25f, 0.25f)
+          quad.pos(i, pos)
+        }
+
+        if fluidSprite == null then
+          quad.spriteBake(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ResourceLocation.withDefaultNamespace("missingno")), MutableQuadView.BAKE_LOCK_UV)
+        else
+          quad.spriteBake(fluidSprite, MutableQuadView.BAKE_LOCK_UV)
+
+        true
+      }
+
+      val emitter = context.getEmitter
+
+      fluidModel.getQuads(null, null, randomSupplier.get()).forEach { q =>
+        emitter.fromVanilla(q.getVertices, 0)
+        emitter.emit()
+      }
+
+      context.popTransform()
+
+
+    }
+
+    override def isCustomRenderer: Boolean = false
+
+
+    override def isVanillaAdapter: Boolean = false
+
+    override def bake(baker: ModelBaker, spriteGetter: function.Function[Material, TextureAtlasSprite], state: ModelState): BakedModel =
+      baseModel = baker.bake(Renderer.stasisBottleID, state)
+      fluidModel = baker.bake(Renderer.fluidModelID, state)
+      sprite = spriteGetter.apply(Material(InventoryMenu.BLOCK_ATLAS, Lumomancy.locate("item/stasis_bottle")))
+      this
+
+    override def useAmbientOcclusion(): Boolean = false
+
+    override def isGui3d: Boolean = false
+
+    override def usesBlockLight(): Boolean = false
+
+    override def getParticleIcon: TextureAtlasSprite = sprite
+
+    override def getTransforms: ItemTransforms = baseModel.getTransforms
+
+    override def getOverrides: ItemOverrides = ItemOverrides.EMPTY
+
+  class ItemModelLoader extends ModelLoadingPlugin:
     override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
-      context.addModels(Renderer.stasisBottleID)
-        */
+      context.addModels(Renderer.fluidModelID, Renderer.stasisBottleID)
+      context.resolveModel().register { ctx =>
+        if ctx.id() == Lumomancy.locate("item/stasis_bottle") then
+          ItemModel()
+        else
+          null
+      }

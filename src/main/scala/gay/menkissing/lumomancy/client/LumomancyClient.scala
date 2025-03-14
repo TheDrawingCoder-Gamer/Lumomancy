@@ -29,9 +29,8 @@ import net.minecraft.client.gui.screens.MenuScreens
 object LumomancyClient extends ClientModInitializer:
   override def onInitializeClient(): Unit =
     BuiltinItemRendererRegistry.INSTANCE.register(LumomancyItems.stasisTube, new StasisTube.Renderer())
-    //BuiltinItemRendererRegistry.INSTANCE.register(LumomancyItems.stasisBottle, new StasisBottle.Renderer())
     ModelLoadingPlugin.register(new StasisTube.Renderer())
-    //ModelLoadingPlugin.register(new StasisBottle.Renderer())
+    ModelLoadingPlugin.register(new StasisBottle.ItemModelLoader())
     MenuScreens.register(LumomancyScreens.toolContainer, ToolContainerGui.apply)
     LumomancyBlocks.registerClient()
 

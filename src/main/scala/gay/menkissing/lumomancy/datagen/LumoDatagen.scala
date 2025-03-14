@@ -180,7 +180,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       itemModelGenerators.generateFlatItem(LumomancyItems.lumonLens, ModelTemplates.FLAT_ITEM)
 
       // stasis bottle
-      itemModelGenerators.generateFlatItem(LumomancyItems.stasisBottle, ModelTemplates.FLAT_ITEM)
+      ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(LumomancyItems.stasisBottle, "_base"), TextureMapping.layer0(LumomancyItems.stasisBottle), itemModelGenerators.output)
 
       // tool container
       itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
