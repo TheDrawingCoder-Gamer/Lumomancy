@@ -54,6 +54,7 @@ dependencies {
 }
 
 processResources {
+    duplicatesStrategy = DuplicatesStrategy.WARN
     inputs.property "version", project.version
     inputs.property "minecraft_version", project.minecraft_version
     inputs.property "loader_version", project.loader_version
@@ -115,8 +116,12 @@ java {
 }
 
 jar {
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
+    }
+    from ("LICENSE.lesser") {
+        rename { "${it}_${project.archivesBaseName}"}
     }
 }
 

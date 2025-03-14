@@ -447,7 +447,7 @@ object StasisBottle:
       val fluidSprite = variantRenderHandler.getSprites(variant)(0)
       // force full alpha
       val fluidColor = variantRenderHandler.getColor(variant, null, null) | 0xFF000000
-
+      
       context.pushTransform { quad =>
         quad.nominalFace(GeometryHelper.lightFace(quad))
         quad.color(fluidColor, fluidColor, fluidColor, fluidColor)
