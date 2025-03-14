@@ -16,10 +16,10 @@
 package gay.menkissing.lumomancy.datagen
 
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
-import gay.menkissing.lumomancy.content.block.{LumoBlockFamilies, StasisCooler}
-import gay.menkissing.lumomancy.registries.{LumomancyTags, LumomancyTranslationKeys}
+import gay.menkissing.lumomancy.content.block.StasisCooler
+import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables, LumomancyTags, LumomancyTranslationKeys}
 import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
-import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider}
+import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider, SimpleFabricLootTableProvider}
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags
 import net.minecraft.core.registries.BuiltInRegistries
@@ -32,8 +32,12 @@ import net.minecraft.tags.{BlockTags, ItemTags, TagKey}
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.{BlockStateProperties, EnumProperty}
+import net.minecraft.world.level.storage.loot.{LootPool, LootTable}
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
 
 import java.util.concurrent.CompletableFuture
+import java.util.function.BiConsumer
 import scala.collection.mutable
 
 object LumoDatagen extends DataGeneratorEntrypoint:
@@ -42,6 +46,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
     pack.addProvider(ModelGenerator.apply)
     pack.addProvider(LootTableGenerator.apply)
+    pack.addProvider(GameplayLootTableGenerator.apply)
     pack.addProvider(EnglishLanguageGenerator.apply)
     pack.addProvider(ItemTagGenerator.apply)
     pack.addProvider(BlockTagGenerator.apply)
@@ -69,6 +74,18 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       dropSelf(LumomancyBlocks.stillwoodDoor)
       dropSelf(LumomancyBlocks.stillwoodTrapdoor)
 
+  class GameplayLootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends SimpleFabricLootTableProvider(output, lookup, LootContextParamSets.BLOCK):
+    import net.minecraft.world.level.storage.loot.*
+    import entries.LootItem
+    override def generate(output: BiConsumer[ResourceKey[LootTable], LootTable.Builder]): Unit =
+      val built = LootTable.lootTable()
+                           .pool(
+                             LootPool.lootPool()
+                                     .setRolls(ConstantValue.exactly(1.0f))
+                                     .`with`(LootItem.lootTableItem(LumomancyItems.stillwoodBark).build())
+                                     .build()
+                           )
+      output.accept(LumomancyLootTables.stripStillwood, built)
 
 
   private case class CoolerModelSlotKey(template: ModelTemplate, str: String)
@@ -168,6 +185,8 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       // tool container
       itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
 
+      itemModelGenerators.generateFlatItem(LumomancyItems.stillwoodBark, ModelTemplates.FLAT_ITEM)
+
       // stasis tube
       // is there a way to automate the entity part as well?
       ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(LumomancyItems.stasisTube, "_base"), TextureMapping.layer0(LumomancyItems.stasisTube), itemModelGenerators.output)
@@ -238,6 +257,8 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       translationBuilder.add(LumomancyBlocks.stillwoodHangingSignItem, "Stillwood Hanging Sign")
       translationBuilder.add(LumomancyBlocks.stillwoodDoor, "Stillwood Door")
       translationBuilder.add(LumomancyBlocks.stillwoodTrapdoor, "Stillwood Trapdoor")
+
+      translationBuilder.add(LumomancyItems.stillwoodBark, "Stillwood Bark")
 
       // item group
       translationBuilder.add(LumomancyItems.itemGroupKey, "Lumomancy")

@@ -82,6 +82,8 @@ object LumomancyItems:
   val stasisBottle: Item = make(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
 
   val lumonLens: Item = make(Lumomancy.locate("lumon_lens"), new LumonLens(Item.Properties().stacksTo(1)))
+  
+  val stillwoodBark: Item = make(Lumomancy.locate("stillwood_bark"), new Item(Item.Properties()))
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)

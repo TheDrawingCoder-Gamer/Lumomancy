@@ -13,7 +13,7 @@
  *  see <https://www.gnu.org/licenses/>
  */
 
-package gay.menkissing.lumomancy.content.block
+package gay.menkissing.lumomancy.registries
 
 import gay.menkissing.lumomancy.content.LumomancyBlocks
 import net.minecraft.data.{BlockFamilies, BlockFamily}
