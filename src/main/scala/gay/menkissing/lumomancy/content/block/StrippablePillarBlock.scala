@@ -13,14 +13,14 @@
  *  see <https://www.gnu.org/licenses/>
  */
 
-package gay.menkissing.lumomancy.content.item
+package gay.menkissing.lumomancy.content.block
 
 import gay.menkissing.lumomancy.api.block.StrippableDrop
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceKey
 import net.minecraft.world.level.Level
-import net.minecraft.world.level.block.{Block, RotatedPillarBlock}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState}
+import net.minecraft.world.level.block.{Block, RotatedPillarBlock}
 import net.minecraft.world.level.storage.loot.LootTable
 
 class StrippablePillarBlock(val strippedBlock: Block,

@@ -17,9 +17,8 @@ package gay.menkissing.lumomancy.content
 
 import com.google.common.collect.ImmutableMap
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.content.block.StasisCooler
+import gay.menkissing.lumomancy.content.block.{StasisCooler, StrippablePillarBlock}
 import gay.menkissing.lumomancy.content.block.entity.StasisCoolerBlockEntity
-import gay.menkissing.lumomancy.content.item.StrippablePillarBlock
 import gay.menkissing.lumomancy.mixin.AxeItemAccessor
 import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables}
 import net.fabricmc.api.{EnvType, Environment}
@@ -76,19 +75,19 @@ object LumomancyBlocks:
 
 
 
- 
+
   val strippedStillwoodLog: Block = makeWithItem(Lumomancy.locate("stripped_stillwood_log"), Blocks.log(MapColor.COLOR_CYAN, MapColor.COLOR_CYAN))
   val strippedStillwoodWood: Block = makeWithItem(Lumomancy.locate("stripped_stillwood_wood"), RotatedPillarBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
-  val stillwoodLog: Block = 
-    makeWithItem(Lumomancy.locate("stillwood_log"), 
-      StrippablePillarBlock(strippedStillwoodLog, 
-                            LumomancyLootTables.stripStillwood, 
+  val stillwoodLog: Block =
+    makeWithItem(Lumomancy.locate("stillwood_log"),
+      StrippablePillarBlock(strippedStillwoodLog,
+                            LumomancyLootTables.stripStillwood,
                             BlockBehaviour.Properties.of()
                                           .sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS)
                                           .strength(2.0f).ignitedByLava()))
   // wood is still a rotated pillar block
   val stillwoodWood: Block = makeWithItem(Lumomancy.locate("stillwood_wood"), StrippablePillarBlock(strippedStillwoodWood,
-    LumomancyLootTables.stripStillwood,  
+    LumomancyLootTables.stripStillwood,
     BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
 
   val stillwoodPlanks: Block = makeWithItem(Lumomancy.locate("stillwood_planks"), Block(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
