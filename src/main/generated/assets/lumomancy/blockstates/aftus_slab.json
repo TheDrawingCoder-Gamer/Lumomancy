@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "lumomancy:block/aftus_slab"
+    },
+    "type=double": {
+      "model": "lumomancy:block/aftus_planks"
+    },
+    "type=top": {
+      "model": "lumomancy:block/aftus_slab_top"
+    }
+  }
+}

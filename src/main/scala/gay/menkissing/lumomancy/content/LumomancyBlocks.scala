@@ -144,12 +144,73 @@ object LumomancyBlocks:
   val wiederTrapdoor = makeWithItem(Lumomancy.locate("wieder_trapdoor"), TrapDoorBlock(wiederBlockSet, BlockProps.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(wiederPlanks.defaultMapColor())))
 
 
+  // aftus wood
+  val aftusBlockSet = BlockSetTypeBuilder.copyOf(BlockSetType.OAK).register(Lumomancy.locate("aftus"))
+  val aftusWoodType = WoodTypeBuilder.copyOf(WoodType.OAK).register(Lumomancy.locate("aftus"), wiederBlockSet)
+
+  val strippedAftusLog = makeWithItem(Lumomancy.locate("stripped_aftus_log"), Blocks
+    .log(MapColor.COLOR_YELLOW, MapColor.COLOR_YELLOW))
+  val strippedAftusWood = makeWithItem(Lumomancy.locate("stripped_aftus_wood"), RotatedPillarBlock(BlockProps
+    .ofFullCopy(Blocks.OAK_WOOD).mapColor(MapColor.COLOR_YELLOW)))
+  val aftusLog = makeWithItem(Lumomancy
+    .locate("aftus_log"), StrippablePillarBlock(strippedAftusLog, LumomancyLootTables.stripAftus,
+    BlockProps.ofFullCopy(Blocks.OAK_LOG)
+              .mapColor((state: BlockState) => if state.getValue(RotatedPillarBlock.AXIS) == Direction.Axis
+                                                                                                      .Y then MapColor
+                .COLOR_YELLOW else MapColor.TERRACOTTA_YELLOW)))
+  val aftusWood = makeWithItem(Lumomancy
+    .locate("aftus_wood"), StrippablePillarBlock(strippedAftusWood, LumomancyLootTables.stripAftus, BlockProps
+    .ofFullCopy(Blocks.OAK_WOOD).mapColor(MapColor.TERRACOTTA_YELLOW)))
+
+  val aftusPlanks = makeWithItem(Lumomancy.locate("aftus_planks"), Block(BlockProps.ofFullCopy(Blocks.OAK_PLANKS)
+                                                                                     .mapColor(MapColor.COLOR_YELLOW)))
+  val aftusSlab = makeWithItem(Lumomancy.locate("aftus_slab"), SlabBlock(BlockProps.ofFullCopy(Blocks.OAK_SLAB)
+                                                                                     .mapColor(MapColor.COLOR_YELLOW)))
+
+  val aftusButton = makeWithItem(Lumomancy.locate("aftus_button"), Blocks.woodenButton(aftusBlockSet))
+  val aftusPressurePlate = makeWithItem(Lumomancy
+    .locate("aftus_pressure_plate"), PressurePlateBlock(aftusBlockSet, BlockProps
+    .ofFullCopy(Blocks.OAK_PRESSURE_PLATE).mapColor(aftusPlanks.defaultMapColor())))
+  val aftusFence = makeWithItem(Lumomancy.locate("aftus_fence"), FenceBlock(BlockProps.ofFullCopy(Blocks.OAK_FENCE)
+                                                                                        .mapColor(aftusPlanks
+                                                                                          .defaultMapColor())))
+  val aftusFenceGate = makeWithItem(Lumomancy.locate("aftus_fence_gate"), FenceGateBlock(aftusWoodType, BlockProps
+    .ofFullCopy(Blocks.OAK_FENCE_GATE).mapColor(aftusPlanks.defaultMapColor())))
+  val aftusStairs = makeWithItem(Lumomancy.locate("aftus_stairs"), StairBlock(aftusPlanks
+    .defaultBlockState(), BlockProps.ofFullCopy(Blocks.OAK_STAIRS).mapColor(aftusPlanks.defaultMapColor())))
+  val aftusSign = makeNoItem(Lumomancy.locate("aftus_sign"), StandingSignBlock(aftusWoodType, BlockProps
+    .ofFullCopy(Blocks.OAK_SIGN).mapColor(aftusPlanks.defaultMapColor())))
+  val aftusWallSign = makeNoItem(Lumomancy.locate("aftus_wall_sign"), WallSignBlock(aftusWoodType, BlockProps
+    .ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(aftusPlanks.defaultMapColor()).dropsLike(aftusSign)))
+
+  val aftusSignItem = makeItem(Lumomancy.locate("aftus_sign"), SignItem(Item.Properties()
+                                                                              .stacksTo(16), aftusSign, aftusWallSign))
+
+  val aftusHangingSign = makeNoItem(Lumomancy
+    .locate("aftus_hanging_sign"), CeilingHangingSignBlock(aftusWoodType, BlockProps
+    .ofFullCopy(Blocks.OAK_HANGING_SIGN).mapColor(strippedAftusWood.defaultMapColor())))
+  val aftusWallHangingSign = makeNoItem(Lumomancy
+    .locate("aftus_wall_hanging_sign"), WallHangingSignBlock(aftusWoodType, BlockProps
+    .ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(strippedAftusWood.defaultMapColor())
+    .dropsLike(aftusHangingSign)))
+
+  val aftusHangingSignItem = makeItem(Lumomancy
+    .locate("aftus_hanging_sign"), HangingSignItem(aftusHangingSign, aftusWallHangingSign, Item.Properties()
+                                                                                                  .stacksTo(16)))
+
+  val aftusDoor = makeWithItem(Lumomancy.locate("aftus_door"), DoorBlock(aftusBlockSet, BlockProps
+    .ofFullCopy(Blocks.OAK_DOOR).mapColor(aftusPlanks.defaultMapColor())))
+  val aftusTrapdoor = makeWithItem(Lumomancy.locate("aftus_trapdoor"), TrapDoorBlock(aftusBlockSet, BlockProps
+    .ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(aftusPlanks.defaultMapColor())))
+  
   @Environment(EnvType.CLIENT)
   def registerClient(): Unit =
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodTrapdoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(wiederDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(wiederTrapdoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(aftusDoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(aftusTrapdoor, RenderType.cutout())
 
 
   def init(): Unit =
@@ -164,6 +225,8 @@ object LumomancyBlocks:
     updatedMap.put(stillwoodWood, strippedStillwoodWood)
     updatedMap.put(wiederLog, strippedWiederLog)
     updatedMap.put(wiederWood, strippedWiederWood)
+    updatedMap.put(aftusLog, strippedAftusLog)
+    updatedMap.put(aftusWood, strippedAftusWood)
 
     AxeItemAccessor.setStrippables(ImmutableMap.copyOf(updatedMap))
 
@@ -171,8 +234,12 @@ object LumomancyBlocks:
     BlockEntityType.SIGN.addSupportedBlock(stillwoodWallSign)
     BlockEntityType.SIGN.addSupportedBlock(wiederSign)
     BlockEntityType.SIGN.addSupportedBlock(wiederWallSign)
+    BlockEntityType.SIGN.addSupportedBlock(aftusSign)
+    BlockEntityType.SIGN.addSupportedBlock(aftusWallSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(stillwoodHangingSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(stillwoodWallHangingSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(wiederHangingSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(wiederWallHangingSign)
+    BlockEntityType.HANGING_SIGN.addSupportedBlock(aftusHangingSign)
+    BlockEntityType.HANGING_SIGN.addSupportedBlock(aftusWallHangingSign)
     

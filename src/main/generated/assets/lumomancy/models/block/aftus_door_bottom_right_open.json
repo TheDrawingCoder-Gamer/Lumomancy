@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_right_open",
+  "textures": {
+    "bottom": "lumomancy:block/aftus_door_bottom",
+    "top": "lumomancy:block/aftus_door_top"
+  }
+}

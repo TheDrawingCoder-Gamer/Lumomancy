@@ -25,3 +25,5 @@ object LumomancyLootTables:
     ResourceKey.create(Registries.LOOT_TABLE, Lumomancy.locate("gameplay/stripping/stillwood_stripping"))
   val stripWieder: ResourceKey[LootTable] =
     ResourceKey.create(Registries.LOOT_TABLE, Lumomancy.locate("gameplay/stripping/wieder_stripping"))
+  val stripAftus: ResourceKey[LootTable] =
+    ResourceKey.create(Registries.LOOT_TABLE, Lumomancy.locate("gameplay/stripping/aftus_stripping"))

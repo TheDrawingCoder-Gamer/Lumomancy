@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "lumomancy:block/stripped_aftus_log_top",
+    "side": "lumomancy:block/stripped_aftus_log"
+  }
+}

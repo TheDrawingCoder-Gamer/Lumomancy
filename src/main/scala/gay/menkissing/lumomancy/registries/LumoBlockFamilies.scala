@@ -47,5 +47,19 @@ object LumoBlockFamilies:
                                                .recipeUnlockedBy("has_planks")
                                                .getFamily
 
+  val aftusPlanks: BlockFamily = BlockFamilies.familyBuilder(LumomancyBlocks.aftusPlanks)
+                                               .button(LumomancyBlocks.aftusButton)
+                                               .pressurePlate(LumomancyBlocks.aftusPressurePlate)
+                                               .fence(LumomancyBlocks.aftusFence)
+                                               .fenceGate(LumomancyBlocks.aftusFenceGate)
+                                               .slab(LumomancyBlocks.aftusSlab)
+                                               .stairs(LumomancyBlocks.aftusStairs)
+                                               .sign(LumomancyBlocks.aftusSign, LumomancyBlocks.aftusWallSign)
+                                               .door(LumomancyBlocks.aftusDoor)
+                                               .trapdoor(LumomancyBlocks.aftusTrapdoor)
+                                               .recipeGroupPrefix("wooden")
+                                               .recipeUnlockedBy("has_planks")
+                                               .getFamily
+  
   // is this needed?
   def register(): Unit = ()

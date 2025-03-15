@@ -26,10 +26,12 @@ object LumomancyTags:
     val validToolTag: TagKey[Item] = TagKey.create(BuiltInRegistries.ITEM.key(), Lumomancy.locate("valid_tools"))
     val stillwoodLogsTag: TagKey[Item] = TagKey.create(BuiltInRegistries.ITEM.key(), Lumomancy.locate("stillwood_logs"))
     val wiederLogsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("wieder_logs"))
+    val aftusLogsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("aftus_logs"))
 
   object block:
     val stillwoodLogsTag: TagKey[Block] = TagKey.create(BuiltInRegistries.BLOCK.key(), Lumomancy.locate("stillwood_logs"))
     val wiederLogsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("wieder_logs"))
+    val aftusLogsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("aftus_logs"))
 
   def init(): Unit =
     val _ = block

@@ -73,8 +73,9 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       dropOther(LumomancyBlocks.stillwoodSign, LumomancyBlocks.stillwoodSignItem)
       dropOther(LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodHangingSignItem)
 
-      dropSelf(LumomancyBlocks.stillwoodDoor)
+      add(LumomancyBlocks.stillwoodDoor, createDoorTable(LumomancyBlocks.stillwoodDoor))
       dropSelf(LumomancyBlocks.stillwoodTrapdoor)
+
 
       // wieder wood
 
@@ -92,26 +93,46 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       dropOther(LumomancyBlocks.wiederSign, LumomancyBlocks.wiederSignItem)
       dropOther(LumomancyBlocks.wiederHangingSign, LumomancyBlocks.wiederHangingSignItem)
 
+      add(LumomancyBlocks.wiederDoor, createDoorTable(LumomancyBlocks.wiederDoor))
+      dropSelf(LumomancyBlocks.wiederTrapdoor)
+
+      // aftus wood
+
+      dropSelf(LumomancyBlocks.aftusLog)
+      dropSelf(LumomancyBlocks.aftusWood)
+      dropSelf(LumomancyBlocks.strippedAftusLog)
+      dropSelf(LumomancyBlocks.strippedAftusWood)
+      dropSelf(LumomancyBlocks.aftusPlanks)
+      dropSelf(LumomancyBlocks.aftusSlab)
+      dropSelf(LumomancyBlocks.aftusButton)
+      dropSelf(LumomancyBlocks.aftusPressurePlate)
+      dropSelf(LumomancyBlocks.aftusFence)
+      dropSelf(LumomancyBlocks.aftusFenceGate)
+      dropSelf(LumomancyBlocks.aftusStairs)
+      dropOther(LumomancyBlocks.aftusSign, LumomancyBlocks.aftusSignItem)
+      dropOther(LumomancyBlocks.aftusHangingSign, LumomancyBlocks.aftusHangingSignItem)
+
+      add(LumomancyBlocks.aftusDoor, createDoorTable(LumomancyBlocks.aftusDoor))
+      dropSelf(LumomancyBlocks.aftusTrapdoor)
+
   class GameplayLootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends SimpleFabricLootTableProvider(output, lookup, LootContextParamSets.BLOCK):
     import net.minecraft.world.level.storage.loot.*
     import entries.LootItem
-    override def generate(output: BiConsumer[ResourceKey[LootTable], LootTable.Builder]): Unit =
-      output.accept(LumomancyLootTables.stripStillwood,
-        LootTable.lootTable()
-         .pool(
-           LootPool.lootPool()
-                   .setRolls(ConstantValue.exactly(1.0f))
-                   .`with`(LootItem.lootTableItem(LumomancyItems.stillwoodBark).build())
-                   .build()
-         ))
-      output.accept(LumomancyLootTables.stripWieder,
-        LootTable.lootTable()
-        .pool(
+    
+    def stripTable(bark: Item): LootTable.Builder =
+      LootTable.lootTable()
+      .pool(
           LootPool.lootPool()
                   .setRolls(ConstantValue.exactly(1.0f))
-                  .`with`(LootItem.lootTableItem(LumomancyItems.wiederBark).build())
+                  .`with`(LootItem.lootTableItem(bark).build())
                   .build()
-        ))
+        )
+    
+    override def generate(output: BiConsumer[ResourceKey[LootTable], LootTable.Builder]): Unit =
+      output.accept(LumomancyLootTables.stripStillwood, stripTable(LumomancyItems.stillwoodBark))
+      output.accept(LumomancyLootTables.stripWieder, stripTable(LumomancyItems.wiederBark))
+      output.accept(LumomancyLootTables.stripAftus, stripTable(LumomancyItems.aftusBark))
+      
 
 
   private case class CoolerModelSlotKey(template: ModelTemplate, str: String)
@@ -185,8 +206,18 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       generateLog(blockModelGenerators, LumomancyBlocks.wiederLog, LumomancyBlocks.wiederWood)
       generateLog(blockModelGenerators, LumomancyBlocks.strippedWiederLog, LumomancyBlocks.strippedWiederWood)
       blockModelGenerators
-        .createHangingSign(LumomancyBlocks.strippedWiederWood, LumomancyBlocks.wiederHangingSign, LumomancyBlocks
+        .createHangingSign(LumomancyBlocks.strippedWiederLog, LumomancyBlocks.wiederHangingSign, LumomancyBlocks
           .wiederWallHangingSign)
+
+    def generateAftus(blockModelGenerators: BlockModelGenerators): Unit =
+      val family = LumoBlockFamilies.aftusPlanks
+
+      blockModelGenerators.family(family.getBaseBlock).generateFor(family)
+      generateLog(blockModelGenerators, LumomancyBlocks.aftusLog, LumomancyBlocks.aftusWood)
+      generateLog(blockModelGenerators, LumomancyBlocks.strippedAftusLog, LumomancyBlocks.strippedAftusWood)
+      blockModelGenerators
+        .createHangingSign(LumomancyBlocks.strippedAftusLog, LumomancyBlocks.aftusHangingSign, LumomancyBlocks
+          .aftusWallHangingSign)
 
     override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit =
       // shards
@@ -226,6 +257,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
       itemModelGenerators.generateFlatItem(LumomancyItems.stillwoodBark, ModelTemplates.FLAT_ITEM)
       itemModelGenerators.generateFlatItem(LumomancyItems.wiederBark, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.aftusBark, ModelTemplates.FLAT_ITEM)
 
       // stasis tube
       // is there a way to automate the entity part as well?
@@ -237,6 +269,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       generateStasisCoolerModels(blockModelGenerators)
       generateStillwood(blockModelGenerators)
       generateWieder(blockModelGenerators)
+      generateAftus(blockModelGenerators)
  
 
 
@@ -323,12 +356,34 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
       translationBuilder.add(LumomancyItems.wiederBark, "Wieder Bark")
 
+      // aftus wood
+      translationBuilder.add(LumomancyBlocks.aftusLog, "Aftus Log")
+      translationBuilder.add(LumomancyBlocks.aftusWood, "Aftus Wood")
+      translationBuilder.add(LumomancyBlocks.strippedAftusLog, "Stripped Aftus Log")
+      translationBuilder.add(LumomancyBlocks.strippedAftusWood, "Stripped Aftus Wood")
+
+      translationBuilder.add(LumomancyBlocks.aftusPlanks, "Aftus Planks")
+      translationBuilder.add(LumomancyBlocks.aftusSlab, "Aftus Slab")
+      translationBuilder.add(LumomancyBlocks.aftusButton, "Aftus Button")
+      translationBuilder.add(LumomancyBlocks.aftusPressurePlate, "Aftus Pressure Plate")
+      translationBuilder.add(LumomancyBlocks.aftusFence, "Aftus Fence")
+      translationBuilder.add(LumomancyBlocks.aftusFenceGate, "Aftus Fence Gate")
+      translationBuilder.add(LumomancyBlocks.aftusStairs, "Aftus Stairs")
+      translationBuilder.add(LumomancyBlocks.aftusSignItem, "Aftus Sign")
+      translationBuilder.add(LumomancyBlocks.aftusHangingSignItem, "Aftus Hanging Sign")
+      translationBuilder.add(LumomancyBlocks.aftusDoor, "Aftus Door")
+      translationBuilder.add(LumomancyBlocks.aftusTrapdoor, "Aftus Trapdoor")
+
+      translationBuilder.add(LumomancyItems.aftusBark, "Aftus Bark")
+
       // tags
       translationBuilder.add(LumomancyTags.item.validToolTag, "Tools that go in Tool Containers")
       translationBuilder.add(LumomancyTags.item.stillwoodLogsTag, "Stillwood Logs")
       translationBuilder.add(LumomancyTags.block.stillwoodLogsTag, "Stillwood Logs")
       translationBuilder.add(LumomancyTags.item.wiederLogsTag, "Wieder Logs")
       translationBuilder.add(LumomancyTags.block.wiederLogsTag, "Wieder Logs")
+      translationBuilder.add(LumomancyTags.item.aftusLogsTag, "Aftus Logs")
+      translationBuilder.add(LumomancyTags.block.aftusLogsTag, "Aftus Logs")
 
   private object tagHelper:
     trait AcceptsBlockItems[T]:
@@ -355,42 +410,52 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       makeBuilder(BlockTags.WOODEN_FENCES.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodFence)
         .addBlock(LumomancyBlocks.wiederFence)
+        .addBlock(LumomancyBlocks.aftusFence)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_BUTTONS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodButton)
         .addBlock(LumomancyBlocks.wiederButton)
+        .addBlock(LumomancyBlocks.aftusButton)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_PRESSURE_PLATES.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodPressurePlate)
         .addBlock(LumomancyBlocks.wiederPressurePlate)
+        .addBlock(LumomancyBlocks.aftusPressurePlate)
         .setReplace(false)
       makeBuilder(BlockTags.FENCE_GATES.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodFenceGate)
         .addBlock(LumomancyBlocks.wiederFenceGate)
+        .addBlock(LumomancyBlocks.aftusFenceGate)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_DOORS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodDoor)
         .addBlock(LumomancyBlocks.wiederDoor)
+        .addBlock(LumomancyBlocks.aftusDoor)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_SLABS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodSlab)
         .addBlock(LumomancyBlocks.wiederSlab)
+        .addBlock(LumomancyBlocks.aftusSlab)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_STAIRS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodStairs)
         .addBlock(LumomancyBlocks.wiederStairs)
+        .addBlock(LumomancyBlocks.aftusStairs)
         .setReplace(false)
       makeBuilder(BlockTags.WOODEN_TRAPDOORS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodTrapdoor)
         .addBlock(LumomancyBlocks.wiederTrapdoor)
+        .addBlock(LumomancyBlocks.aftusTrapdoor)
         .setReplace(false)
       makeBuilder(BlockTags.LOGS_THAT_BURN.transmute(registry))
         .addTag(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
         .addTag(LumomancyTags.block.wiederLogsTag.transmute(registry))
+        .addTag(LumomancyTags.block.aftusLogsTag.transmute(registry))
         .setReplace(false)
       makeBuilder(BlockTags.PLANKS.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodPlanks)
         .addBlock(LumomancyBlocks.wiederPlanks)
+        .addBlock(LumomancyBlocks.aftusPlanks)
         .setReplace(false)
       makeBuilder(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodLog)
@@ -404,7 +469,12 @@ object LumoDatagen extends DataGeneratorEntrypoint:
         .addBlock(LumomancyBlocks.strippedWiederLog)
         .addBlock(LumomancyBlocks.strippedWiederWood)
         .setReplace(false)
-
+      makeBuilder(LumomancyTags.block.aftusLogsTag.transmute(registry))
+        .addBlock(LumomancyBlocks.aftusLog)
+        .addBlock(LumomancyBlocks.aftusWood)
+        .addBlock(LumomancyBlocks.strippedAftusLog)
+        .addBlock(LumomancyBlocks.strippedAftusWood)
+        .setReplace(false)
 
 
 
@@ -426,10 +496,12 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       getOrCreateTagBuilder(ItemTags.SIGNS)
         .add(LumomancyBlocks.stillwoodSignItem)
         .add(LumomancyBlocks.wiederSignItem)
+        .add(LumomancyBlocks.aftusSignItem)
         .setReplace(false)
       getOrCreateTagBuilder(ItemTags.HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodHangingSignItem)
         .add(LumomancyBlocks.wiederHangingSignItem)
+        .add(LumomancyBlocks.aftusHangingSignItem)
         .setReplace(false)
 
 
@@ -440,18 +512,22 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       getOrCreateTagBuilder(BlockTags.WALL_SIGNS)
         .add(LumomancyBlocks.stillwoodWallSign)
         .add(LumomancyBlocks.wiederWallSign)
+        .add(LumomancyBlocks.aftusWallSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.STANDING_SIGNS)
         .add(LumomancyBlocks.stillwoodSign)
         .add(LumomancyBlocks.wiederSign)
+        .add(LumomancyBlocks.aftusSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.CEILING_HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodHangingSign)
         .add(LumomancyBlocks.wiederHangingSign)
+        .add(LumomancyBlocks.aftusHangingSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.WALL_HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodWallHangingSign)
         .add(LumomancyBlocks.wiederWallHangingSign)
+        .add(LumomancyBlocks.aftusWallHangingSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
         // all other mineable with axe blocks are covered under other tags
