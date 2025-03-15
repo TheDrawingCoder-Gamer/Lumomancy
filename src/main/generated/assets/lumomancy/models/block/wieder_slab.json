@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "lumomancy:block/wieder_planks",
+    "side": "lumomancy:block/wieder_planks",
+    "top": "lumomancy:block/wieder_planks"
+  }
+}

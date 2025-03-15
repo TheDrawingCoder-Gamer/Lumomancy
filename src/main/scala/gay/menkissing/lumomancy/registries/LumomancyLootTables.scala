@@ -23,3 +23,5 @@ import net.minecraft.world.level.storage.loot.LootTable
 object LumomancyLootTables:
   val stripStillwood: ResourceKey[LootTable] =
     ResourceKey.create(Registries.LOOT_TABLE, Lumomancy.locate("gameplay/stripping/stillwood_stripping"))
+  val stripWieder: ResourceKey[LootTable] =
+    ResourceKey.create(Registries.LOOT_TABLE, Lumomancy.locate("gameplay/stripping/wieder_stripping"))

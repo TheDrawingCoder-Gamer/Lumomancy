@@ -33,5 +33,19 @@ object LumoBlockFamilies:
                                                   .recipeUnlockedBy("has_planks")
                                                   .getFamily
 
+  val wiederPlanks: BlockFamily = BlockFamilies.familyBuilder(LumomancyBlocks.wiederPlanks)
+                                               .button(LumomancyBlocks.wiederButton)
+                                               .pressurePlate(LumomancyBlocks.wiederPressurePlate)
+                                               .fence(LumomancyBlocks.wiederFence)
+                                               .fenceGate(LumomancyBlocks.wiederFenceGate)
+                                               .slab(LumomancyBlocks.wiederSlab)
+                                               .stairs(LumomancyBlocks.wiederStairs)
+                                               .sign(LumomancyBlocks.wiederSign, LumomancyBlocks.wiederWallSign)
+                                               .door(LumomancyBlocks.wiederDoor)
+                                               .trapdoor(LumomancyBlocks.wiederTrapdoor)
+                                               .recipeGroupPrefix("wooden")
+                                               .recipeUnlockedBy("has_planks")
+                                               .getFamily
+
   // is this needed?
   def register(): Unit = ()

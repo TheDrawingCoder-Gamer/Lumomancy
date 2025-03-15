@@ -16,7 +16,7 @@
 package gay.menkissing.lumomancy.registries
 
 import gay.menkissing.lumomancy.Lumomancy
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
@@ -25,9 +25,11 @@ object LumomancyTags:
   object item:
     val validToolTag: TagKey[Item] = TagKey.create(BuiltInRegistries.ITEM.key(), Lumomancy.locate("valid_tools"))
     val stillwoodLogsTag: TagKey[Item] = TagKey.create(BuiltInRegistries.ITEM.key(), Lumomancy.locate("stillwood_logs"))
+    val wiederLogsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("wieder_logs"))
 
   object block:
     val stillwoodLogsTag: TagKey[Block] = TagKey.create(BuiltInRegistries.BLOCK.key(), Lumomancy.locate("stillwood_logs"))
+    val wiederLogsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("wieder_logs"))
 
   def init(): Unit =
     val _ = block

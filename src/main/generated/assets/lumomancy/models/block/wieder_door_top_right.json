@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_top_right",
+  "textures": {
+    "bottom": "lumomancy:block/wieder_door_bottom",
+    "top": "lumomancy:block/wieder_door_top"
+  }
+}

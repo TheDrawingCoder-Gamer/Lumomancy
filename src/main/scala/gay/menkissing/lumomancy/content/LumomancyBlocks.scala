@@ -26,15 +26,16 @@ import net.fabricmc.fabric.api.`object`.builder.v1.block.`type`.{BlockSetTypeBui
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.minecraft.client.renderer.RenderType
-import net.minecraft.core.Registry
+import net.minecraft.core.{Direction, Registry}
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BlockItem, HangingSignItem, Item, SignItem}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
 import net.minecraft.world.level.block.{Block, Blocks, CeilingHangingSignBlock, DoorBlock, FenceBlock, FenceGateBlock, PressurePlateBlock, RotatedPillarBlock, SignBlock, SlabBlock, SoundType, StairBlock, StandingSignBlock, TrapDoorBlock, WallHangingSignBlock, WallSignBlock}
-import net.minecraft.world.level.block.state.BlockBehaviour
+import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState}
 import net.minecraft.world.level.block.state.properties.{BlockSetType, NoteBlockInstrument, WoodType}
 import net.minecraft.world.level.material.{MapColor, PushReaction}
+import BlockBehaviour.Properties as BlockProps
 
 import scala.collection.mutable
 
@@ -111,11 +112,44 @@ object LumomancyBlocks:
   val stillwoodDoor: Block = makeWithItem(Lumomancy.locate("stillwood_door"), DoorBlock(stillwoodBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_DOOR).mapColor(stillwoodPlanks.defaultMapColor())))
   val stillwoodTrapdoor: Block = makeWithItem(Lumomancy.locate("stillwood_trapdoor"), TrapDoorBlock(stillwoodBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(stillwoodPlanks.defaultMapColor())))
 
+  // wieder wood
+  val wiederBlockSet = BlockSetTypeBuilder.copyOf(BlockSetType.OAK).register(Lumomancy.locate("wieder"))
+  val wiederWoodType = WoodTypeBuilder.copyOf(WoodType.OAK).register(Lumomancy.locate("wieder"), wiederBlockSet)
+
+  val strippedWiederLog = makeWithItem(Lumomancy.locate("stripped_wieder_log"), Blocks.log(MapColor.COLOR_MAGENTA, MapColor.COLOR_MAGENTA))
+  val strippedWiederWood = makeWithItem(Lumomancy.locate("stripped_wieder_wood"), RotatedPillarBlock(BlockProps.ofFullCopy(Blocks.OAK_WOOD).mapColor(MapColor.COLOR_MAGENTA)))
+  val wiederLog = makeWithItem(Lumomancy.locate("wieder_log"), StrippablePillarBlock(strippedWiederLog, LumomancyLootTables.stripWieder,
+    BlockProps.ofFullCopy(Blocks.OAK_LOG).mapColor((state: BlockState) => if state.getValue(RotatedPillarBlock.AXIS) == Direction.Axis.Y then MapColor.COLOR_MAGENTA else MapColor.TERRACOTTA_MAGENTA )))
+  val wiederWood = makeWithItem(Lumomancy.locate("wieder_wood"), StrippablePillarBlock(strippedWiederWood, LumomancyLootTables.stripWieder, BlockProps.ofFullCopy(Blocks.OAK_WOOD).mapColor(MapColor.TERRACOTTA_MAGENTA)))
+
+  val wiederPlanks = makeWithItem(Lumomancy.locate("wieder_planks"), Block(BlockProps.ofFullCopy(Blocks.OAK_PLANKS).mapColor(MapColor.COLOR_MAGENTA)))
+  val wiederSlab = makeWithItem(Lumomancy.locate("wieder_slab"), SlabBlock(BlockProps.ofFullCopy(Blocks.OAK_SLAB).mapColor(MapColor.COLOR_MAGENTA)))
+
+  val wiederButton = makeWithItem(Lumomancy.locate("wieder_button"), Blocks.woodenButton(wiederBlockSet))
+  val wiederPressurePlate = makeWithItem(Lumomancy.locate("wieder_pressure_plate"), PressurePlateBlock(wiederBlockSet, BlockProps.ofFullCopy(Blocks.OAK_PRESSURE_PLATE).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederFence = makeWithItem(Lumomancy.locate("wieder_fence"), FenceBlock(BlockProps.ofFullCopy(Blocks.OAK_FENCE).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederFenceGate = makeWithItem(Lumomancy.locate("wieder_fence_gate"), FenceGateBlock(wiederWoodType, BlockProps.ofFullCopy(Blocks.OAK_FENCE_GATE).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederStairs = makeWithItem(Lumomancy.locate("wieder_stairs"), StairBlock(wiederPlanks.defaultBlockState(), BlockProps.ofFullCopy(Blocks.OAK_STAIRS).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederSign = makeNoItem(Lumomancy.locate("wieder_sign"), StandingSignBlock(wiederWoodType, BlockProps.ofFullCopy(Blocks.OAK_SIGN).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederWallSign = makeNoItem(Lumomancy.locate("wieder_wall_sign"), WallSignBlock(wiederWoodType, BlockProps.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(wiederPlanks.defaultMapColor()).dropsLike(wiederSign)))
+
+  val wiederSignItem = makeItem(Lumomancy.locate("wieder_sign"), SignItem(Item.Properties().stacksTo(16), wiederSign, wiederWallSign))
+
+  val wiederHangingSign = makeNoItem(Lumomancy.locate("wieder_hanging_sign"), CeilingHangingSignBlock(wiederWoodType, BlockProps.ofFullCopy(Blocks.OAK_HANGING_SIGN).mapColor(strippedWiederWood.defaultMapColor())))
+  val wiederWallHangingSign = makeNoItem(Lumomancy.locate("wieder_wall_hanging_sign"), WallHangingSignBlock(wiederWoodType, BlockProps.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(strippedWiederWood.defaultMapColor()).dropsLike(wiederHangingSign)))
+
+  val wiederHangingSignItem = makeItem(Lumomancy.locate("wieder_hanging_sign"), HangingSignItem(wiederHangingSign, wiederWallHangingSign, Item.Properties().stacksTo(16)))
+
+  val wiederDoor = makeWithItem(Lumomancy.locate("wieder_door"), DoorBlock(wiederBlockSet, BlockProps.ofFullCopy(Blocks.OAK_DOOR).mapColor(wiederPlanks.defaultMapColor())))
+  val wiederTrapdoor = makeWithItem(Lumomancy.locate("wieder_trapdoor"), TrapDoorBlock(wiederBlockSet, BlockProps.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(wiederPlanks.defaultMapColor())))
+
 
   @Environment(EnvType.CLIENT)
   def registerClient(): Unit =
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodTrapdoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(wiederDoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(wiederTrapdoor, RenderType.cutout())
 
 
   def init(): Unit =
@@ -128,11 +162,17 @@ object LumomancyBlocks:
 
     updatedMap.put(stillwoodLog, strippedStillwoodLog)
     updatedMap.put(stillwoodWood, strippedStillwoodWood)
+    updatedMap.put(wiederLog, strippedWiederLog)
+    updatedMap.put(wiederWood, strippedWiederWood)
 
     AxeItemAccessor.setStrippables(ImmutableMap.copyOf(updatedMap))
 
     BlockEntityType.SIGN.addSupportedBlock(stillwoodSign)
     BlockEntityType.SIGN.addSupportedBlock(stillwoodWallSign)
+    BlockEntityType.SIGN.addSupportedBlock(wiederSign)
+    BlockEntityType.SIGN.addSupportedBlock(wiederWallSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(stillwoodHangingSign)
     BlockEntityType.HANGING_SIGN.addSupportedBlock(stillwoodWallHangingSign)
+    BlockEntityType.HANGING_SIGN.addSupportedBlock(wiederHangingSign)
+    BlockEntityType.HANGING_SIGN.addSupportedBlock(wiederWallHangingSign)
     

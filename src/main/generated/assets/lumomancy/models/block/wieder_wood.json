@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "lumomancy:block/wieder_log",
+    "side": "lumomancy:block/wieder_log"
+  }
+}

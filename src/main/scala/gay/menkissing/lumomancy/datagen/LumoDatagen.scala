@@ -56,6 +56,8 @@ object LumoDatagen extends DataGeneratorEntrypoint:
   private class LootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricBlockLootTableProvider(output, lookup):
     override def generate(): Unit =
       dropSelf(LumomancyBlocks.stasisCooler)
+
+      // stillwood
       dropSelf(LumomancyBlocks.stillwoodLog)
       dropSelf(LumomancyBlocks.stillwoodWood)
       dropSelf(LumomancyBlocks.strippedStillwoodLog)
@@ -74,18 +76,42 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       dropSelf(LumomancyBlocks.stillwoodDoor)
       dropSelf(LumomancyBlocks.stillwoodTrapdoor)
 
+      // wieder wood
+
+      dropSelf(LumomancyBlocks.wiederLog)
+      dropSelf(LumomancyBlocks.wiederWood)
+      dropSelf(LumomancyBlocks.strippedWiederLog)
+      dropSelf(LumomancyBlocks.strippedWiederWood)
+      dropSelf(LumomancyBlocks.wiederPlanks)
+      dropSelf(LumomancyBlocks.wiederSlab)
+      dropSelf(LumomancyBlocks.wiederButton)
+      dropSelf(LumomancyBlocks.wiederPressurePlate)
+      dropSelf(LumomancyBlocks.wiederFence)
+      dropSelf(LumomancyBlocks.wiederFenceGate)
+      dropSelf(LumomancyBlocks.wiederStairs)
+      dropOther(LumomancyBlocks.wiederSign, LumomancyBlocks.wiederSignItem)
+      dropOther(LumomancyBlocks.wiederHangingSign, LumomancyBlocks.wiederHangingSignItem)
+
   class GameplayLootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends SimpleFabricLootTableProvider(output, lookup, LootContextParamSets.BLOCK):
     import net.minecraft.world.level.storage.loot.*
     import entries.LootItem
     override def generate(output: BiConsumer[ResourceKey[LootTable], LootTable.Builder]): Unit =
-      val built = LootTable.lootTable()
-                           .pool(
-                             LootPool.lootPool()
-                                     .setRolls(ConstantValue.exactly(1.0f))
-                                     .`with`(LootItem.lootTableItem(LumomancyItems.stillwoodBark).build())
-                                     .build()
-                           )
-      output.accept(LumomancyLootTables.stripStillwood, built)
+      output.accept(LumomancyLootTables.stripStillwood,
+        LootTable.lootTable()
+         .pool(
+           LootPool.lootPool()
+                   .setRolls(ConstantValue.exactly(1.0f))
+                   .`with`(LootItem.lootTableItem(LumomancyItems.stillwoodBark).build())
+                   .build()
+         ))
+      output.accept(LumomancyLootTables.stripWieder,
+        LootTable.lootTable()
+        .pool(
+          LootPool.lootPool()
+                  .setRolls(ConstantValue.exactly(1.0f))
+                  .`with`(LootItem.lootTableItem(LumomancyItems.wiederBark).build())
+                  .build()
+        ))
 
 
   private case class CoolerModelSlotKey(template: ModelTemplate, str: String)
@@ -142,12 +168,25 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       coolerCache.clear()
 
 
+    def generateLog(bmg: BlockModelGenerators, log: Block, wood: Block): Unit =
+      bmg.woodProvider(log).logWithHorizontal(log).wood(wood)
+
     def generateStillwood(blockModelGenerators: BlockModelGenerators): Unit =
       val family = LumoBlockFamilies.stillwoodPlanks
       blockModelGenerators.family(family.getBaseBlock).generateFor(family)
-      blockModelGenerators.woodProvider(LumomancyBlocks.stillwoodLog).logWithHorizontal(LumomancyBlocks.stillwoodLog).wood(LumomancyBlocks.stillwoodWood)
-      blockModelGenerators.woodProvider(LumomancyBlocks.strippedStillwoodLog).logWithHorizontal(LumomancyBlocks.strippedStillwoodLog).wood(LumomancyBlocks.strippedStillwoodWood)
+      generateLog(blockModelGenerators, LumomancyBlocks.stillwoodLog, LumomancyBlocks.stillwoodWood)
+      generateLog(blockModelGenerators, LumomancyBlocks.strippedStillwoodLog, LumomancyBlocks.strippedStillwoodWood)
       blockModelGenerators.createHangingSign(LumomancyBlocks.strippedStillwoodLog, LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodWallHangingSign)
+
+    def generateWieder(blockModelGenerators: BlockModelGenerators): Unit =
+      val family = LumoBlockFamilies.wiederPlanks
+
+      blockModelGenerators.family(family.getBaseBlock).generateFor(family)
+      generateLog(blockModelGenerators, LumomancyBlocks.wiederLog, LumomancyBlocks.wiederWood)
+      generateLog(blockModelGenerators, LumomancyBlocks.strippedWiederLog, LumomancyBlocks.strippedWiederWood)
+      blockModelGenerators
+        .createHangingSign(LumomancyBlocks.strippedWiederWood, LumomancyBlocks.wiederHangingSign, LumomancyBlocks
+          .wiederWallHangingSign)
 
     override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit =
       // shards
@@ -186,6 +225,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
 
       itemModelGenerators.generateFlatItem(LumomancyItems.stillwoodBark, ModelTemplates.FLAT_ITEM)
+      itemModelGenerators.generateFlatItem(LumomancyItems.wiederBark, ModelTemplates.FLAT_ITEM)
 
       // stasis tube
       // is there a way to automate the entity part as well?
@@ -196,6 +236,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
       generateStasisCoolerModels(blockModelGenerators)
       generateStillwood(blockModelGenerators)
+      generateWieder(blockModelGenerators)
  
 
 
@@ -262,11 +303,33 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
       // item group
       translationBuilder.add(LumomancyItems.itemGroupKey, "Lumomancy")
+      // wieder wood
+      translationBuilder.add(LumomancyBlocks.wiederLog, "Wieder Log")
+      translationBuilder.add(LumomancyBlocks.wiederWood, "Wieder Wood")
+      translationBuilder.add(LumomancyBlocks.strippedWiederLog, "Stripped Wieder Log")
+      translationBuilder.add(LumomancyBlocks.strippedWiederWood, "Stripped Wieder Wood")
+
+      translationBuilder.add(LumomancyBlocks.wiederPlanks, "Wieder Planks")
+      translationBuilder.add(LumomancyBlocks.wiederSlab, "Wieder Slab")
+      translationBuilder.add(LumomancyBlocks.wiederButton, "Wieder Button")
+      translationBuilder.add(LumomancyBlocks.wiederPressurePlate, "Wieder Pressure Plate")
+      translationBuilder.add(LumomancyBlocks.wiederFence, "Wieder Fence")
+      translationBuilder.add(LumomancyBlocks.wiederFenceGate, "Wieder Fence Gate")
+      translationBuilder.add(LumomancyBlocks.wiederStairs, "Wieder Stairs")
+      translationBuilder.add(LumomancyBlocks.wiederSignItem, "Wieder Sign")
+      translationBuilder.add(LumomancyBlocks.wiederHangingSignItem, "Wieder Hanging Sign")
+      translationBuilder.add(LumomancyBlocks.wiederDoor, "Wieder Door")
+      translationBuilder.add(LumomancyBlocks.wiederTrapdoor, "Wieder Trapdoor")
+
+      translationBuilder.add(LumomancyItems.wiederBark, "Wieder Bark")
 
       // tags
       translationBuilder.add(LumomancyTags.item.validToolTag, "Tools that go in Tool Containers")
       translationBuilder.add(LumomancyTags.item.stillwoodLogsTag, "Stillwood Logs")
       translationBuilder.add(LumomancyTags.block.stillwoodLogsTag, "Stillwood Logs")
+      translationBuilder.add(LumomancyTags.item.wiederLogsTag, "Wieder Logs")
+      translationBuilder.add(LumomancyTags.block.wiederLogsTag, "Wieder Logs")
+
   private object tagHelper:
     trait AcceptsBlockItems[T]:
       def addBlock(self: T, block: Block): T
@@ -287,48 +350,60 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       override def addBlock(self: FabricTagProvider[Block]#FabricTagBuilder, block: Block): FabricTagProvider[Block]#FabricTagBuilder =
         self.add(block)
 
-    def addStillwoodLogs[T](builder: FabricTagProvider[T]#FabricTagBuilder)
-                           (using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
-      builder
+
+    def addWoodSetTags[T](registry: ResourceKey[? <: Registry[T]], makeBuilder: TagKey[T] => FabricTagProvider[T]#FabricTagBuilder)(using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
+      makeBuilder(BlockTags.WOODEN_FENCES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodFence)
+        .addBlock(LumomancyBlocks.wiederFence)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_BUTTONS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodButton)
+        .addBlock(LumomancyBlocks.wiederButton)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_PRESSURE_PLATES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodPressurePlate)
+        .addBlock(LumomancyBlocks.wiederPressurePlate)
+        .setReplace(false)
+      makeBuilder(BlockTags.FENCE_GATES.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodFenceGate)
+        .addBlock(LumomancyBlocks.wiederFenceGate)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_DOORS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodDoor)
+        .addBlock(LumomancyBlocks.wiederDoor)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_SLABS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodSlab)
+        .addBlock(LumomancyBlocks.wiederSlab)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_STAIRS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodStairs)
+        .addBlock(LumomancyBlocks.wiederStairs)
+        .setReplace(false)
+      makeBuilder(BlockTags.WOODEN_TRAPDOORS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodTrapdoor)
+        .addBlock(LumomancyBlocks.wiederTrapdoor)
+        .setReplace(false)
+      makeBuilder(BlockTags.LOGS_THAT_BURN.transmute(registry))
+        .addTag(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
+        .addTag(LumomancyTags.block.wiederLogsTag.transmute(registry))
+        .setReplace(false)
+      makeBuilder(BlockTags.PLANKS.transmute(registry))
+        .addBlock(LumomancyBlocks.stillwoodPlanks)
+        .addBlock(LumomancyBlocks.wiederPlanks)
+        .setReplace(false)
+      makeBuilder(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
         .addBlock(LumomancyBlocks.stillwoodLog)
         .addBlock(LumomancyBlocks.stillwoodWood)
         .addBlock(LumomancyBlocks.strippedStillwoodLog)
         .addBlock(LumomancyBlocks.strippedStillwoodWood)
         .setReplace(false)
-
-
-    def addStillwoodSetTags[T](registry: ResourceKey[? <: Registry[T]], makeBuilder: TagKey[T] => FabricTagProvider[T]#FabricTagBuilder)(using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
-      makeBuilder(BlockTags.WOODEN_FENCES.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodFence)
+      makeBuilder(LumomancyTags.block.wiederLogsTag.transmute(registry))
+        .addBlock(LumomancyBlocks.wiederLog)
+        .addBlock(LumomancyBlocks.wiederWood)
+        .addBlock(LumomancyBlocks.strippedWiederLog)
+        .addBlock(LumomancyBlocks.strippedWiederWood)
         .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_BUTTONS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodButton)
-        .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_PRESSURE_PLATES.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodPressurePlate)
-        .setReplace(false)
-      makeBuilder(BlockTags.FENCE_GATES.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodFenceGate)
-        .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_DOORS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodDoor)
-        .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_SLABS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodSlab)
-        .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_STAIRS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodStairs)
-        .setReplace(false)
-      makeBuilder(BlockTags.WOODEN_TRAPDOORS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodTrapdoor)
-        .setReplace(false)
-      makeBuilder(BlockTags.LOGS_THAT_BURN.transmute(registry))
-        .addTag(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
-        .setReplace(false)
-      makeBuilder(BlockTags.PLANKS.transmute(registry))
-        .addBlock(LumomancyBlocks.stillwoodPlanks)
-        .setReplace(false)
-
 
 
 
@@ -347,32 +422,36 @@ object LumoDatagen extends DataGeneratorEntrypoint:
         .addOptionalTag(ItemTags.COMPASSES)
         .addOptionalTag(TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath("c", "wrenches")))
         .setReplace(false)
-      tagHelper.addStillwoodLogs(getOrCreateTagBuilder(LumomancyTags.item.stillwoodLogsTag))
-      tagHelper.addStillwoodSetTags(registryKey, this.getOrCreateTagBuilder)
+      tagHelper.addWoodSetTags(registryKey, this.getOrCreateTagBuilder)
       getOrCreateTagBuilder(ItemTags.SIGNS)
         .add(LumomancyBlocks.stillwoodSignItem)
+        .add(LumomancyBlocks.wiederSignItem)
         .setReplace(false)
       getOrCreateTagBuilder(ItemTags.HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodHangingSignItem)
+        .add(LumomancyBlocks.wiederHangingSignItem)
         .setReplace(false)
 
 
   private class BlockTagGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricTagProvider[Block](output, BuiltInRegistries
     .BLOCK.key(), lookup):
     override def addTags(provider: HolderLookup.Provider): Unit =
-      tagHelper.addStillwoodLogs(getOrCreateTagBuilder(LumomancyTags.block.stillwoodLogsTag))
-      tagHelper.addStillwoodSetTags(registryKey, this.getOrCreateTagBuilder)
+      tagHelper.addWoodSetTags(registryKey, this.getOrCreateTagBuilder)
       getOrCreateTagBuilder(BlockTags.WALL_SIGNS)
         .add(LumomancyBlocks.stillwoodWallSign)
+        .add(LumomancyBlocks.wiederWallSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.STANDING_SIGNS)
         .add(LumomancyBlocks.stillwoodSign)
+        .add(LumomancyBlocks.wiederSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.CEILING_HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodHangingSign)
+        .add(LumomancyBlocks.wiederHangingSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.WALL_HANGING_SIGNS)
         .add(LumomancyBlocks.stillwoodWallHangingSign)
+        .add(LumomancyBlocks.wiederWallHangingSign)
         .setReplace(false)
       getOrCreateTagBuilder(BlockTags.MINEABLE_WITH_AXE)
         // all other mineable with axe blocks are covered under other tags

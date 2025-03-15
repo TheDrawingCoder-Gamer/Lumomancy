@@ -406,108 +406,113 @@ object StasisBottle:
         StasisBottleContents.Builder(prev.variant, prev.amount, max)
 
 
-  object Renderer:
-    val stasisBottleID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_base")
-    val fluidModelID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_fluid")
+// these have to be toplevel because fuck you thats why
+// (fabric datagen is not respecting the annotations when its nested)
+// (only for stasis bottle, stasis tube may do it just fine : ))
+object StasisBottleRenderer:
+  val stasisBottleID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_base")
+  val fluidModelID: ResourceLocation = Lumomancy.locate("item/stasis_bottle_fluid")
 
-  class ItemModel extends UnbakedModel, BakedModel, FabricBakedModel:
-    private var baseModel: BakedModel = uninitialized
-    private var fluidModel: BakedModel = uninitialized
-    private var sprite: TextureAtlasSprite = uninitialized
+@Environment(EnvType.CLIENT)
+class StasisBottleItemModel extends UnbakedModel, BakedModel, FabricBakedModel:
+  private var baseModel: BakedModel = uninitialized
+  private var fluidModel: BakedModel = uninitialized
+  private var sprite: TextureAtlasSprite = uninitialized
 
-    override def getDependencies: util.Collection[ResourceLocation] =
-      util.List.of(Renderer.stasisBottleID, Renderer.fluidModelID)
+  override def getDependencies: util.Collection[ResourceLocation] =
+    util.List.of(StasisBottleRenderer.stasisBottleID, StasisBottleRenderer.fluidModelID)
 
-    override def resolveParents(resolver: function.Function[ResourceLocation, UnbakedModel]): Unit = ()
+  override def resolveParents(resolver: function.Function[ResourceLocation, UnbakedModel]): Unit = ()
 
-    override def getQuads(state: BlockState, direction: Direction, random: RandomSource): util.List[BakedQuad] =
-      util.List.of()
+  override def getQuads(state: BlockState, direction: Direction, random: RandomSource): util.List[BakedQuad] =
+    util.List.of()
 
-    override def emitBlockQuads(blockView: BlockAndTintGetter, state: BlockState, pos: BlockPos, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = ()
+  override def emitBlockQuads(blockView: BlockAndTintGetter, state: BlockState, pos: BlockPos, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = ()
 
-    override def emitItemQuads(stack: ItemStack, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = {
-      baseModel.emitItemQuads(stack, randomSupplier, context)
+  override def emitItemQuads(stack: ItemStack, randomSupplier: Supplier[RandomSource], context: RenderContext): Unit = {
+    baseModel.emitItemQuads(stack, randomSupplier, context)
 
-      if !stack.has(LumomancyDataComponents.stasisBottleContents) || context.itemTransformationMode() != ItemDisplayContext.GUI  then
-        return
+    if !stack.has(LumomancyDataComponents.stasisBottleContents) || context.itemTransformationMode() != ItemDisplayContext.GUI  then
+      return
 
-      val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
+    val contents = stack.get(LumomancyDataComponents.stasisBottleContents)
 
-      val variant = contents.variant
+    val variant = contents.variant
 
-      if variant.isBlank then
-        return
+    if variant.isBlank then
+      return
 
-      val variantRenderHandler = FluidVariantRendering.getHandlerOrDefault(variant.getFluid)
+    val variantRenderHandler = FluidVariantRendering.getHandlerOrDefault(variant.getFluid)
 
-      if variantRenderHandler == null then
-        return
+    if variantRenderHandler == null then
+      return
 
 
-      val fluidSprite = variantRenderHandler.getSprites(variant)(0)
-      // force full alpha
-      val fluidColor = variantRenderHandler.getColor(variant, null, null) | 0xFF000000
-      
-      context.pushTransform { quad =>
-        quad.nominalFace(GeometryHelper.lightFace(quad))
-        quad.color(fluidColor, fluidColor, fluidColor, fluidColor)
-        (0 until 4).foreach { i =>
-          val pos = quad.copyPos(i, null)
-          pos.add(0.5f, 0.5f, 1f)
-          pos.mul(0.5f)
-          pos.add(0.25f, 0.25f, 0.25f)
-          quad.pos(i, pos)
-        }
+    val fluidSprite = variantRenderHandler.getSprites(variant)(0)
+    // force full alpha
+    val fluidColor = variantRenderHandler.getColor(variant, null, null) | 0xFF000000
 
-        if fluidSprite == null then
-          quad.spriteBake(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ResourceLocation.withDefaultNamespace("missingno")), MutableQuadView.BAKE_LOCK_UV)
-        else
-          quad.spriteBake(fluidSprite, MutableQuadView.BAKE_LOCK_UV)
-
-        true
+    context.pushTransform { quad =>
+      quad.nominalFace(GeometryHelper.lightFace(quad))
+      quad.color(fluidColor, fluidColor, fluidColor, fluidColor)
+      (0 until 4).foreach { i =>
+        val pos = quad.copyPos(i, null)
+        pos.add(0.5f, 0.5f, 1f)
+        pos.mul(0.5f)
+        pos.add(0.25f, 0.25f, 0.25f)
+        quad.pos(i, pos)
       }
 
-      val emitter = context.getEmitter
+      if fluidSprite == null then
+        quad.spriteBake(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(ResourceLocation.withDefaultNamespace("missingno")), MutableQuadView.BAKE_LOCK_UV)
+      else
+        quad.spriteBake(fluidSprite, MutableQuadView.BAKE_LOCK_UV)
 
-      fluidModel.getQuads(null, null, randomSupplier.get()).forEach { q =>
-        emitter.fromVanilla(q.getVertices, 0)
-        emitter.emit()
-      }
-
-      context.popTransform()
-
-
+      true
     }
 
-    override def isCustomRenderer: Boolean = false
+    val emitter = context.getEmitter
+
+    fluidModel.getQuads(null, null, randomSupplier.get()).forEach { q =>
+      emitter.fromVanilla(q.getVertices, 0)
+      emitter.emit()
+    }
+
+    context.popTransform()
 
 
-    override def isVanillaAdapter: Boolean = false
+  }
 
-    override def bake(baker: ModelBaker, spriteGetter: function.Function[Material, TextureAtlasSprite], state: ModelState): BakedModel =
-      baseModel = baker.bake(Renderer.stasisBottleID, state)
-      fluidModel = baker.bake(Renderer.fluidModelID, state)
-      sprite = spriteGetter.apply(Material(InventoryMenu.BLOCK_ATLAS, Lumomancy.locate("item/stasis_bottle")))
-      this
+  override def isCustomRenderer: Boolean = false
 
-    override def useAmbientOcclusion(): Boolean = false
 
-    override def isGui3d: Boolean = false
+  override def isVanillaAdapter: Boolean = false
 
-    override def usesBlockLight(): Boolean = false
+  override def bake(baker: ModelBaker, spriteGetter: function.Function[Material, TextureAtlasSprite], state: ModelState): BakedModel =
+    baseModel = baker.bake(StasisBottleRenderer.stasisBottleID, state)
+    fluidModel = baker.bake(StasisBottleRenderer.fluidModelID, state)
+    sprite = spriteGetter.apply(Material(InventoryMenu.BLOCK_ATLAS, Lumomancy.locate("item/stasis_bottle")))
+    this
 
-    override def getParticleIcon: TextureAtlasSprite = sprite
+  override def useAmbientOcclusion(): Boolean = false
 
-    override def getTransforms: ItemTransforms = baseModel.getTransforms
+  override def isGui3d: Boolean = false
 
-    override def getOverrides: ItemOverrides = ItemOverrides.EMPTY
+  override def usesBlockLight(): Boolean = false
 
-  class ItemModelLoader extends ModelLoadingPlugin:
-    override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
-      context.addModels(Renderer.fluidModelID, Renderer.stasisBottleID)
-      context.resolveModel().register { ctx =>
-        if ctx.id() == Lumomancy.locate("item/stasis_bottle") then
-          ItemModel()
-        else
-          null
-      }
+  override def getParticleIcon: TextureAtlasSprite = sprite
+
+  override def getTransforms: ItemTransforms = baseModel.getTransforms
+
+  override def getOverrides: ItemOverrides = ItemOverrides.EMPTY
+
+@Environment(EnvType.CLIENT)
+class StasisBottleModelLoader extends ModelLoadingPlugin:
+  override def onInitializeModelLoader(context: ModelLoadingPlugin.Context): Unit =
+    context.addModels(StasisBottleRenderer.fluidModelID, StasisBottleRenderer.stasisBottleID)
+    context.resolveModel().register { ctx =>
+      if ctx.id() == Lumomancy.locate("item/stasis_bottle") then
+        StasisBottleItemModel()
+      else
+        null
+    }

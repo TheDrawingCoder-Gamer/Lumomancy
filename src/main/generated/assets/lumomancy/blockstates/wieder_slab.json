@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "lumomancy:block/wieder_slab"
+    },
+    "type=double": {
+      "model": "lumomancy:block/wieder_planks"
+    },
+    "type=top": {
+      "model": "lumomancy:block/wieder_slab_top"
+    }
+  }
+}
