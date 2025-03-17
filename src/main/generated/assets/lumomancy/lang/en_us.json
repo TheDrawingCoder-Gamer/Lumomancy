@@ -51,7 +51,7 @@
   "item.lumomancy.black_bottle_of_light": "Black Bottle of Light",
   "item.lumomancy.blood_topaz_shard": "Blood Topaz Shard",
   "item.lumomancy.blue_bottle_of_light": "Blue Bottle of Light",
-  "item.lumomancy.bottle_of_light": "Empty Bottle of Light",
+  "item.lumomancy.bottle_of_light": "Bottle of Light",
   "item.lumomancy.brown_bottle_of_light": "Brown Bottle of Light",
   "item.lumomancy.clear_quartz": "Clear Quartz",
   "item.lumomancy.cyan_bottle_of_light": "Cyan Bottle of Light",
@@ -80,12 +80,5 @@
   "item.lumomancy.white_bottle_of_light": "White Bottle of Light",
   "item.lumomancy.wieder_bark": "Wieder Bark",
   "item.lumomancy.yellow_bottle_of_light": "Yellow Bottle of Light",
-  "itemGroup.lumomancy": "Lumomancy",
-  "tag.block.lumomancy.aftus_logs": "Aftus Logs",
-  "tag.block.lumomancy.stillwood_logs": "Stillwood Logs",
-  "tag.block.lumomancy.wieder_logs": "Wieder Logs",
-  "tag.item.lumomancy.aftus_logs": "Aftus Logs",
-  "tag.item.lumomancy.stillwood_logs": "Stillwood Logs",
-  "tag.item.lumomancy.valid_tools": "Tools that go in Tool Containers",
-  "tag.item.lumomancy.wieder_logs": "Wieder Logs"
+  "itemGroup.lumomancy": "Lumomancy"
 }

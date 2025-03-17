@@ -18,6 +18,8 @@ package gay.menkissing.lumomancy.content
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.item.{LumonLens, StasisBottle, StasisTube, ToolContainer}
 import gay.menkissing.lumomancy.util.LumoEnchantmentHelper
+import gay.menkissing.lumomancy.util.registry.InfoCollector
+import gay.menkissing.lumomancy.util.registry.builder.ItemBuilder
 import net.fabricmc.fabric.api.itemgroup.v1.{FabricItemGroup, ItemGroupEvents}
 import net.fabricmc.fabric.api.transfer.v1.context.ContainerItemContext
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage
@@ -33,9 +35,11 @@ import scala.collection.mutable as mut
 object LumomancyItems:
   private val items: mut.ListBuffer[Item] = mut.ListBuffer()
 
-  def make(rl: ResourceLocation, item: Item): Item =
-    items.append(item)
-    Registry.register(BuiltInRegistries.ITEM, rl, item)
+  extension (builder: ItemBuilder)
+    def make(): Item =
+      val i = builder.register()
+      items.append(i)
+      i
 
 
 
@@ -45,47 +49,141 @@ object LumomancyItems:
                                                   .title(Component.translatable("itemGroup.lumomancy"))
                                                   .build()
 
-  val clearQuartz: Item = make(Lumomancy.locate("clear_quartz"), new Item(Item.Properties()))
+  val clearQuartz: Item =
+    InfoCollector.instance.item("clear_quartz", Item(Item.Properties()))
+                 .lang("Clear Quartz")
+                 .make()
+  
 
-  val bloodTopazShard: Item = make(Lumomancy.locate("blood_topaz_shard"), new Item(Item.Properties()))
+  val bloodTopazShard: Item =
+    InfoCollector.instance.item("blood_topaz_shard", Item(Item.Properties()))
+                 .lang("Blood Topaz Shard")
+                 .make()
 
-  val prasioliteShard: Item = make(Lumomancy.locate("prasiolite_shard"), new Item(Item.Properties()))
+  val prasioliteShard: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("prasiolite_shard"), new Item(Item.Properties()))
+                 .lang("Prasiolite Shard")
+                 .make()
 
-  val adventurineShard: Item = make(Lumomancy.locate("adventurine_shard"), new Item(Item.Properties()))
+  val adventurineShard: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("adventurine_shard"), new Item(Item.Properties()))
+                 .lang("Adventurine Shard")
+                 .make()
   
 
   // val lens: Item = make(Lumomancy.locate("lens"), new Item(Item.Properties()))
   
-  val toolContainer: Item = make(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties().stacksTo(1)))
+  val toolContainer: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties().stacksTo(1)))
+                 .lang("Tool Container")
+                 .make()
 
-  val bottleOfLight: Item = make(Lumomancy.locate("bottle_of_light"), new Item(Item.Properties()))
+  val bottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Bottle of Light")
+                 .make()
 
-  val azureBottleOfLight: Item = make(Lumomancy.locate("azure_bottle_of_light"), new Item(Item.Properties()))
-  val blackBottleOfLight: Item = make(Lumomancy.locate("black_bottle_of_light"), new Item(Item.Properties()))
-  val blueBottleOfLight: Item = make(Lumomancy.locate("blue_bottle_of_light"), new Item(Item.Properties()))
-  val brownBottleOfLight: Item = make(Lumomancy.locate("brown_bottle_of_light"), new Item(Item.Properties()))
-  val cyanBottleOfLight: Item = make(Lumomancy.locate("cyan_bottle_of_light"), new Item(Item.Properties()))
-  val grayBottleOfLight: Item = make(Lumomancy.locate("gray_bottle_of_light"), new Item(Item.Properties()))
-  val greenBottleOfLight: Item = make(Lumomancy.locate("green_bottle_of_light"), new Item(Item.Properties()))
-  val lightGrayBottleOfLight: Item = make(Lumomancy.locate("light_gray_bottle_of_light"), new Item(Item.Properties()))
-  val limeBottleOfLight: Item = make(Lumomancy.locate("lime_bottle_of_light"), new Item(Item.Properties()))
-  val magentaBottleOfLight: Item = make(Lumomancy.locate("magenta_bottle_of_light"), new Item(Item.Properties()))
-  val orangeBottleOfLight: Item = make(Lumomancy.locate("orange_bottle_of_light"), new Item(Item.Properties()))
-  val purpleBottleOfLight: Item = make(Lumomancy.locate("purple_bottle_of_light"), new Item(Item.Properties()))
-  val redBottleOfLight: Item = make(Lumomancy.locate("red_bottle_of_light"), new Item(Item.Properties()))
-  val roseBottleOfLight: Item = make(Lumomancy.locate("rose_bottle_of_light"), new Item(Item.Properties()))
-  val seafoamBottleOfLight: Item = make(Lumomancy.locate("seafoam_bottle_of_light"), new Item(Item.Properties()))
-  val whiteBottleOfLight: Item = make(Lumomancy.locate("white_bottle_of_light"), new Item(Item.Properties()))
-  val yellowBottleOfLight: Item = make(Lumomancy.locate("yellow_bottle_of_light"), new Item(Item.Properties()))
+  val azureBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("azure_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Azure Bottle of Light")
+                 .make()
+  val blackBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("black_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Black Bottle of Light")
+                 .make()
+  val blueBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("blue_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Blue Bottle of Light")
+                 .make()
+  val brownBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("brown_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Brown Bottle of Light")
+                 .make()
+  val cyanBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("cyan_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Cyan Bottle of Light")
+                 .make()
+  val grayBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("gray_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Gray Bottle of Light")
+                 .make()
+  val greenBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("green_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Green Bottle of Light")
+                 .make()
+  val lightGrayBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("light_gray_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Light Gray Bottle of Light")
+                 .make()
+  val limeBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("lime_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Lime Bottle of Light")
+                 .make()
+  val magentaBottleOfLight: Item =
+    InfoCollector.instance.item(Lumomancy.locate("magenta_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Magenta Bottle of Light")
+                 .make()
+  val orangeBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("orange_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Orange Bottle of Light")
+                 .make()
+  val purpleBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("purple_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Purple Bottle of Light")
+                 .make()
+  val redBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("red_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Red Bottle of Light")
+                 .make()
+  val roseBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("rose_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Rose Bottle of Light")
+                 .make()
+  val seafoamBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("seafoam_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Seafoam Bottle of Light")
+                 .make()
+  val whiteBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("white_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("White Bottle of Light")
+                 .make()
+  val yellowBottleOfLight: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("yellow_bottle_of_light"), new Item(Item.Properties()))
+                 .lang("Yellow Bottle of Light")
+                 .make()
 
-  val stasisTube: Item = make(Lumomancy.locate("stasis_tube"), new StasisTube(Item.Properties().stacksTo(1)))
-  val stasisBottle: Item = make(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
+  val stasisTube: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("stasis_tube"), new StasisTube(Item.Properties().stacksTo(1)))
+                 .lang("Stasis Tube")
+                 .tooltip("empty", "Empty")
+                 .tooltip("count", "%1$d / %2$d (%3$d stacks)")
+                 .make()
+  val stasisBottle: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("stasis_bottle"), new StasisBottle(Item.Properties().stacksTo(1)))
+                 .lang("Stasis Bottle")
+                 .tooltip("empty", "Empty")
+                 .tooltip("usage_pickup", "Use to pickup")
+                 .tooltip("usage_place", "Sneak-use to place")
+                 .tooltip("count_mb", "%1$s mB / %2$s buckets")
+                 .make()
 
-  val lumonLens: Item = make(Lumomancy.locate("lumon_lens"), new LumonLens(Item.Properties().stacksTo(1)))
+  val lumonLens: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("lumon_lens"), new LumonLens(Item.Properties().stacksTo(1)))
+                 .lang("Lumon Lens")
+                 .make()
   
-  val stillwoodBark: Item = make(Lumomancy.locate("stillwood_bark"), new Item(Item.Properties()))
-  val wiederBark: Item = make(Lumomancy.locate("wieder_bark"), Item(Item.Properties()))
-  val aftusBark: Item = make(Lumomancy.locate("aftus_bark"), Item(Item.Properties()))
+  val stillwoodBark: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("stillwood_bark"), new Item(Item.Properties()))
+                 .lang("Stillwood Bark")
+                 .make()
+  val wiederBark: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("wieder_bark"), Item(Item.Properties()))
+                 .lang("Wieder Bark")
+                 .make()
+  val aftusBark: Item = 
+    InfoCollector.instance.item(Lumomancy.locate("aftus_bark"), Item(Item.Properties()))
+                 .lang("Aftus Bark")
+                 .make()
 
   def init(): Unit =
     Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, itemGroupKey, itemGroup)

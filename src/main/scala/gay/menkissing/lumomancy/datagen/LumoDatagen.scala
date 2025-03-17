@@ -18,6 +18,7 @@ package gay.menkissing.lumomancy.datagen
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.StasisCooler
 import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables, LumomancyTags, LumomancyTranslationKeys}
+import gay.menkissing.lumomancy.util.registry.InfoCollector
 import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider, SimpleFabricLootTableProvider}
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
@@ -45,75 +46,14 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     val pack = fabricDataGenerator.createPack()
 
     pack.addProvider(ModelGenerator.apply)
-    pack.addProvider(LootTableGenerator.apply)
+    // pack.addProvider(LootTableGenerator.apply)
     pack.addProvider(GameplayLootTableGenerator.apply)
-    pack.addProvider(EnglishLanguageGenerator.apply)
+    // pack.addProvider(EnglishLanguageGenerator.apply)
+    InfoCollector.instance.registerDataGenerators(pack)
     pack.addProvider(ItemTagGenerator.apply)
     pack.addProvider(BlockTagGenerator.apply)
 
 
-
-  private class LootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricBlockLootTableProvider(output, lookup):
-    override def generate(): Unit =
-      dropSelf(LumomancyBlocks.stasisCooler)
-
-      // stillwood
-      dropSelf(LumomancyBlocks.stillwoodLog)
-      dropSelf(LumomancyBlocks.stillwoodWood)
-      dropSelf(LumomancyBlocks.strippedStillwoodLog)
-      dropSelf(LumomancyBlocks.strippedStillwoodWood)
-      dropSelf(LumomancyBlocks.stillwoodPlanks)
-      dropSelf(LumomancyBlocks.stillwoodSlab)
-      dropSelf(LumomancyBlocks.stillwoodButton)
-      dropSelf(LumomancyBlocks.stillwoodPressurePlate)
-      dropSelf(LumomancyBlocks.stillwoodFence)
-      dropSelf(LumomancyBlocks.stillwoodFenceGate)
-      dropSelf(LumomancyBlocks.stillwoodStairs)
-      // wall variants of signs drop like their normal variant
-      dropOther(LumomancyBlocks.stillwoodSign, LumomancyBlocks.stillwoodSignItem)
-      dropOther(LumomancyBlocks.stillwoodHangingSign, LumomancyBlocks.stillwoodHangingSignItem)
-
-      add(LumomancyBlocks.stillwoodDoor, createDoorTable(LumomancyBlocks.stillwoodDoor))
-      dropSelf(LumomancyBlocks.stillwoodTrapdoor)
-
-
-      // wieder wood
-
-      dropSelf(LumomancyBlocks.wiederLog)
-      dropSelf(LumomancyBlocks.wiederWood)
-      dropSelf(LumomancyBlocks.strippedWiederLog)
-      dropSelf(LumomancyBlocks.strippedWiederWood)
-      dropSelf(LumomancyBlocks.wiederPlanks)
-      dropSelf(LumomancyBlocks.wiederSlab)
-      dropSelf(LumomancyBlocks.wiederButton)
-      dropSelf(LumomancyBlocks.wiederPressurePlate)
-      dropSelf(LumomancyBlocks.wiederFence)
-      dropSelf(LumomancyBlocks.wiederFenceGate)
-      dropSelf(LumomancyBlocks.wiederStairs)
-      dropOther(LumomancyBlocks.wiederSign, LumomancyBlocks.wiederSignItem)
-      dropOther(LumomancyBlocks.wiederHangingSign, LumomancyBlocks.wiederHangingSignItem)
-
-      add(LumomancyBlocks.wiederDoor, createDoorTable(LumomancyBlocks.wiederDoor))
-      dropSelf(LumomancyBlocks.wiederTrapdoor)
-
-      // aftus wood
-
-      dropSelf(LumomancyBlocks.aftusLog)
-      dropSelf(LumomancyBlocks.aftusWood)
-      dropSelf(LumomancyBlocks.strippedAftusLog)
-      dropSelf(LumomancyBlocks.strippedAftusWood)
-      dropSelf(LumomancyBlocks.aftusPlanks)
-      dropSelf(LumomancyBlocks.aftusSlab)
-      dropSelf(LumomancyBlocks.aftusButton)
-      dropSelf(LumomancyBlocks.aftusPressurePlate)
-      dropSelf(LumomancyBlocks.aftusFence)
-      dropSelf(LumomancyBlocks.aftusFenceGate)
-      dropSelf(LumomancyBlocks.aftusStairs)
-      dropOther(LumomancyBlocks.aftusSign, LumomancyBlocks.aftusSignItem)
-      dropOther(LumomancyBlocks.aftusHangingSign, LumomancyBlocks.aftusHangingSignItem)
-
-      add(LumomancyBlocks.aftusDoor, createDoorTable(LumomancyBlocks.aftusDoor))
-      dropSelf(LumomancyBlocks.aftusTrapdoor)
 
   class GameplayLootTableGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends SimpleFabricLootTableProvider(output, lookup, LootContextParamSets.BLOCK):
     import net.minecraft.world.level.storage.loot.*
@@ -271,119 +211,6 @@ object LumoDatagen extends DataGeneratorEntrypoint:
       generateWieder(blockModelGenerators)
       generateAftus(blockModelGenerators)
  
-
-
-
-  private class EnglishLanguageGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricLanguageProvider(output, "en_us", lookup):
-    override def generateTranslations(provider: HolderLookup.Provider, translationBuilder: FabricLanguageProvider.TranslationBuilder): Unit =
-      translationBuilder.add(LumomancyItems.clearQuartz, "Clear Quartz")
-      translationBuilder.add(LumomancyItems.bloodTopazShard, "Blood Topaz Shard")
-      translationBuilder.add(LumomancyItems.prasioliteShard, "Prasiolite Shard")
-      translationBuilder.add(LumomancyItems.adventurineShard, "Adventurine Shard")
-      translationBuilder.add(LumomancyItems.toolContainer, "Tool Container")
-      translationBuilder.add(LumomancyItems.bottleOfLight, "Empty Bottle of Light")
-      translationBuilder.add(LumomancyItems.azureBottleOfLight, "Azure Bottle of Light")
-      translationBuilder.add(LumomancyItems.blackBottleOfLight, "Black Bottle of Light")
-      translationBuilder.add(LumomancyItems.blueBottleOfLight, "Blue Bottle of Light")
-      translationBuilder.add(LumomancyItems.brownBottleOfLight, "Brown Bottle of Light")
-      translationBuilder.add(LumomancyItems.cyanBottleOfLight, "Cyan Bottle of Light")
-      translationBuilder.add(LumomancyItems.grayBottleOfLight, "Gray Bottle of Light")
-      translationBuilder.add(LumomancyItems.greenBottleOfLight, "Green Bottle of Light")
-      translationBuilder.add(LumomancyItems.lightGrayBottleOfLight, "Light Gray Bottle of Light")
-      translationBuilder.add(LumomancyItems.limeBottleOfLight, "Lime Bottle of Light")
-      translationBuilder.add(LumomancyItems.magentaBottleOfLight, "Magenta Bottle of Light")
-      translationBuilder.add(LumomancyItems.orangeBottleOfLight, "Orange Bottle of Light")
-      translationBuilder.add(LumomancyItems.purpleBottleOfLight, "Purple Bottle of Light")
-      translationBuilder.add(LumomancyItems.redBottleOfLight, "Red Bottle of Light")
-      translationBuilder.add(LumomancyItems.roseBottleOfLight, "Rose Bottle of Light")
-      translationBuilder.add(LumomancyItems.seafoamBottleOfLight, "Seafoam Bottle of Light")
-      translationBuilder.add(LumomancyItems.whiteBottleOfLight, "White Bottle of Light")
-      translationBuilder.add(LumomancyItems.yellowBottleOfLight, "Yellow Bottle of Light")
-
-      translationBuilder.add(LumomancyItems.stasisTube, "Stasis Tube")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisTube.tooltip.empty, "Empty")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisTube.tooltip.count, "%1$d / %2$d (%3$d stacks)")
-
-      translationBuilder.add(LumomancyItems.stasisBottle, "Stasis Bottle")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.empty, "Empty")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.usagePickup, "Use to pickup")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.usagePlace, "Sneak-use to place")
-      translationBuilder.add(LumomancyTranslationKeys.keys.stasisBottle.tooltip.countMB, "%1$s mB / %2$s buckets")
-
-      translationBuilder.add(LumomancyItems.lumonLens, "Lumon Lens")
-
-      // blocks
-      translationBuilder.add(LumomancyBlocks.stasisCooler, "Stasis Cooler")
-      // stillwood
-      translationBuilder.add(LumomancyBlocks.stillwoodLog, "Stillwood Log")
-      translationBuilder.add(LumomancyBlocks.stillwoodWood, "Stillwood Wood")
-      translationBuilder.add(LumomancyBlocks.strippedStillwoodLog, "Stripped Stillwood Log")
-      translationBuilder.add(LumomancyBlocks.strippedStillwoodWood, "Stripped Stillwood Wood")
-
-      translationBuilder.add(LumomancyBlocks.stillwoodPlanks, "Stillwood Planks")
-      translationBuilder.add(LumomancyBlocks.stillwoodSlab, "Stillwood Slab")
-      translationBuilder.add(LumomancyBlocks.stillwoodButton, "Stillwood Button")
-      translationBuilder.add(LumomancyBlocks.stillwoodPressurePlate, "Stillwood Pressure Plate")
-      translationBuilder.add(LumomancyBlocks.stillwoodFence, "Stillwood Fence")
-      translationBuilder.add(LumomancyBlocks.stillwoodFenceGate, "Stillwood Fence Gate")
-      translationBuilder.add(LumomancyBlocks.stillwoodStairs, "Stillwood Stairs")
-      translationBuilder.add(LumomancyBlocks.stillwoodSignItem, "Stillwood Sign")
-      translationBuilder.add(LumomancyBlocks.stillwoodHangingSignItem, "Stillwood Hanging Sign")
-      translationBuilder.add(LumomancyBlocks.stillwoodDoor, "Stillwood Door")
-      translationBuilder.add(LumomancyBlocks.stillwoodTrapdoor, "Stillwood Trapdoor")
-
-      translationBuilder.add(LumomancyItems.stillwoodBark, "Stillwood Bark")
-
-      // item group
-      translationBuilder.add(LumomancyItems.itemGroupKey, "Lumomancy")
-      // wieder wood
-      translationBuilder.add(LumomancyBlocks.wiederLog, "Wieder Log")
-      translationBuilder.add(LumomancyBlocks.wiederWood, "Wieder Wood")
-      translationBuilder.add(LumomancyBlocks.strippedWiederLog, "Stripped Wieder Log")
-      translationBuilder.add(LumomancyBlocks.strippedWiederWood, "Stripped Wieder Wood")
-
-      translationBuilder.add(LumomancyBlocks.wiederPlanks, "Wieder Planks")
-      translationBuilder.add(LumomancyBlocks.wiederSlab, "Wieder Slab")
-      translationBuilder.add(LumomancyBlocks.wiederButton, "Wieder Button")
-      translationBuilder.add(LumomancyBlocks.wiederPressurePlate, "Wieder Pressure Plate")
-      translationBuilder.add(LumomancyBlocks.wiederFence, "Wieder Fence")
-      translationBuilder.add(LumomancyBlocks.wiederFenceGate, "Wieder Fence Gate")
-      translationBuilder.add(LumomancyBlocks.wiederStairs, "Wieder Stairs")
-      translationBuilder.add(LumomancyBlocks.wiederSignItem, "Wieder Sign")
-      translationBuilder.add(LumomancyBlocks.wiederHangingSignItem, "Wieder Hanging Sign")
-      translationBuilder.add(LumomancyBlocks.wiederDoor, "Wieder Door")
-      translationBuilder.add(LumomancyBlocks.wiederTrapdoor, "Wieder Trapdoor")
-
-      translationBuilder.add(LumomancyItems.wiederBark, "Wieder Bark")
-
-      // aftus wood
-      translationBuilder.add(LumomancyBlocks.aftusLog, "Aftus Log")
-      translationBuilder.add(LumomancyBlocks.aftusWood, "Aftus Wood")
-      translationBuilder.add(LumomancyBlocks.strippedAftusLog, "Stripped Aftus Log")
-      translationBuilder.add(LumomancyBlocks.strippedAftusWood, "Stripped Aftus Wood")
-
-      translationBuilder.add(LumomancyBlocks.aftusPlanks, "Aftus Planks")
-      translationBuilder.add(LumomancyBlocks.aftusSlab, "Aftus Slab")
-      translationBuilder.add(LumomancyBlocks.aftusButton, "Aftus Button")
-      translationBuilder.add(LumomancyBlocks.aftusPressurePlate, "Aftus Pressure Plate")
-      translationBuilder.add(LumomancyBlocks.aftusFence, "Aftus Fence")
-      translationBuilder.add(LumomancyBlocks.aftusFenceGate, "Aftus Fence Gate")
-      translationBuilder.add(LumomancyBlocks.aftusStairs, "Aftus Stairs")
-      translationBuilder.add(LumomancyBlocks.aftusSignItem, "Aftus Sign")
-      translationBuilder.add(LumomancyBlocks.aftusHangingSignItem, "Aftus Hanging Sign")
-      translationBuilder.add(LumomancyBlocks.aftusDoor, "Aftus Door")
-      translationBuilder.add(LumomancyBlocks.aftusTrapdoor, "Aftus Trapdoor")
-
-      translationBuilder.add(LumomancyItems.aftusBark, "Aftus Bark")
-
-      // tags
-      translationBuilder.add(LumomancyTags.item.validToolTag, "Tools that go in Tool Containers")
-      translationBuilder.add(LumomancyTags.item.stillwoodLogsTag, "Stillwood Logs")
-      translationBuilder.add(LumomancyTags.block.stillwoodLogsTag, "Stillwood Logs")
-      translationBuilder.add(LumomancyTags.item.wiederLogsTag, "Wieder Logs")
-      translationBuilder.add(LumomancyTags.block.wiederLogsTag, "Wieder Logs")
-      translationBuilder.add(LumomancyTags.item.aftusLogsTag, "Aftus Logs")
-      translationBuilder.add(LumomancyTags.block.aftusLogsTag, "Aftus Logs")
 
   private object tagHelper:
     trait AcceptsBlockItems[T]:

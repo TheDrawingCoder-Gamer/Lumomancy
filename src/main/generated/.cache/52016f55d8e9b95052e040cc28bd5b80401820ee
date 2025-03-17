@@ -1,6 +1,6 @@
-// 1.21.1	2025-03-15T14:55:32.812475327	Lumomancy/Block Loot Tables
+// 1.21.1	2025-03-17T00:05:33.011928878	Lumomancy/Block + Lang provider for lumomancy
 07aed8b55bec8396d206808a66b6a7cc8b0d87c9 data/lumomancy/loot_table/blocks/aftus_trapdoor.json
-d16145a1ddd0aca87339d09414f03626bc2c801c data/lumomancy/loot_table/blocks/wieder_slab.json
+8a1cb21ebf2459bbe1568b2193c6acf579c0cf16 data/lumomancy/loot_table/blocks/wieder_slab.json
 cc7eaea35e18079ffe6ecd6871e861c38bca3307 data/lumomancy/loot_table/blocks/wieder_hanging_sign.json
 c7d74386331addaecdf665c971ec38586f54cb2b data/lumomancy/loot_table/blocks/stillwood_fence.json
 8832442db160d4a7c38e16e35ddd9dab783454f6 data/lumomancy/loot_table/blocks/wieder_log.json
@@ -12,8 +12,8 @@ c678f8d77f61f5402997d4ac0be188232459ddbb data/lumomancy/loot_table/blocks/stripp
 ff1665ea6b13be3e526a5beec1b2ccfed2445c36 data/lumomancy/loot_table/blocks/wieder_pressure_plate.json
 8e95cdbf06dc21878432ccb4dfdec02b4eb4a2f1 data/lumomancy/loot_table/blocks/aftus_hanging_sign.json
 137408b3fe98bf17a4f64639b08b4ea2cc26a335 data/lumomancy/loot_table/blocks/stillwood_wood.json
-c2e5f74effb145cb5e13923aff02b96ad39d1ec0 data/lumomancy/loot_table/blocks/stillwood_slab.json
-3ee4bec844d17c0c115331ed9963b31788866b91 data/lumomancy/loot_table/blocks/aftus_slab.json
+78349bb9fce4c02d86febad5d06b5fbe5c7f9841 data/lumomancy/loot_table/blocks/stillwood_slab.json
+d69e6f027c13d6302762fe76a614f0769ea48f93 data/lumomancy/loot_table/blocks/aftus_slab.json
 fbff15cc3101b0d54e875e8650898c83feaefca4 data/lumomancy/loot_table/blocks/stillwood_trapdoor.json
 076d9c732d7b5cbcd05b0bd453514d2b1c4fb1d4 data/lumomancy/loot_table/blocks/stillwood_pressure_plate.json
 3de98f9a128d522b33cea6368488d79406ab0c2e data/lumomancy/loot_table/blocks/aftus_fence.json
@@ -25,6 +25,7 @@ d2c7b432f10f3c4ec4093139b52561caeb4677f8 data/lumomancy/loot_table/blocks/stillw
 880d74755c6e2a62ff2331c56086d9a39b4baccd data/lumomancy/loot_table/blocks/aftus_stairs.json
 a32fb6a1403f6b50ada3492def8b575e8fc13c70 data/lumomancy/loot_table/blocks/wieder_fence.json
 e38922339754489aa87422158795040f5f10faa0 data/lumomancy/loot_table/blocks/wieder_sign.json
+6e4ad9e30dfff1f07fc2f25c3c2f9924cce11c74 assets/lumomancy/lang/en_us.json
 f38e0fffe6113d17bc16afe3bcb32e1c00b7e469 data/lumomancy/loot_table/blocks/stillwood_stairs.json
 5bb9b1a39de1439b74e12b349095f6be2d67f9c4 data/lumomancy/loot_table/blocks/stasis_cooler.json
 788eb28d1619cdf40384a0a39597d2b32185eb38 data/lumomancy/loot_table/blocks/aftus_door.json
