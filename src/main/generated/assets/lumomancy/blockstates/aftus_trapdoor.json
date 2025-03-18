@@ -2,14 +2,17 @@
   "variants": {
     "facing=east,half=bottom,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_bottom",
+      "x": 0,
       "y": 90
     },
     "facing=east,half=bottom,open=true": {
       "model": "lumomancy:block/aftus_trapdoor_open",
+      "x": 0,
       "y": 90
     },
     "facing=east,half=top,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_top",
+      "x": 0,
       "y": 90
     },
     "facing=east,half=top,open=true": {
@@ -18,13 +21,19 @@
       "y": 270
     },
     "facing=north,half=bottom,open=false": {
-      "model": "lumomancy:block/aftus_trapdoor_bottom"
+      "model": "lumomancy:block/aftus_trapdoor_bottom",
+      "x": 0,
+      "y": 0
     },
     "facing=north,half=bottom,open=true": {
-      "model": "lumomancy:block/aftus_trapdoor_open"
+      "model": "lumomancy:block/aftus_trapdoor_open",
+      "x": 0,
+      "y": 0
     },
     "facing=north,half=top,open=false": {
-      "model": "lumomancy:block/aftus_trapdoor_top"
+      "model": "lumomancy:block/aftus_trapdoor_top",
+      "x": 0,
+      "y": 0
     },
     "facing=north,half=top,open=true": {
       "model": "lumomancy:block/aftus_trapdoor_open",
@@ -33,14 +42,17 @@
     },
     "facing=south,half=bottom,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_bottom",
+      "x": 0,
       "y": 180
     },
     "facing=south,half=bottom,open=true": {
       "model": "lumomancy:block/aftus_trapdoor_open",
+      "x": 0,
       "y": 180
     },
     "facing=south,half=top,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_top",
+      "x": 0,
       "y": 180
     },
     "facing=south,half=top,open=true": {
@@ -50,14 +62,17 @@
     },
     "facing=west,half=bottom,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_bottom",
+      "x": 0,
       "y": 270
     },
     "facing=west,half=bottom,open=true": {
       "model": "lumomancy:block/aftus_trapdoor_open",
+      "x": 0,
       "y": 270
     },
     "facing=west,half=top,open=false": {
       "model": "lumomancy:block/aftus_trapdoor_top",
+      "x": 0,
       "y": 270
     },
     "facing=west,half=top,open=true": {

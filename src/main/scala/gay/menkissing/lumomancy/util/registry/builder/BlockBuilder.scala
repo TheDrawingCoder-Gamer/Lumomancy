@@ -45,8 +45,8 @@ class BlockBuilder[P](val owner: InfoCollector, val parent: P, val block: Block,
       )
       .build()
 
-  def blockstate(func: LumoBlockStateGenerator => Block => Unit): this.type =
-    owner.blockStates(block) = func
+  def blockstate(func: LumoBlockStateGenerator => Block => Unit): this.type = 
+    owner.setBlockState(block, func)
     this
 
   def defaultBlockstate(): this.type =

@@ -98,6 +98,7 @@ object LumomancyBlocks:
     InfoCollector.instance.block("stripped_stillwood_wood", RotatedPillarBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
                       .lang("Stripped Stillwood Wood")
                       .simpleItem()
+                      .blockstate(gen => block => gen.woodBlock(block, strippedStillwoodLog.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodLog: Block =
@@ -109,6 +110,7 @@ object LumomancyBlocks:
                                           .strength(2.0f).ignitedByLava()))
                       .lang("Stillwood Log")
                       .simpleItem()
+                      .blockstate(_.logBlock)
                       .dropSelf()
                       .registerItem()
   // wood is still a rotated pillar block
@@ -119,6 +121,7 @@ object LumomancyBlocks:
                       .lang("Stillwood Wood")
                       .simpleItem()
                       .dropSelf()
+                      .blockstate(gen => block => gen.woodBlock(block, stillwoodLog.modelLoc))
                       .registerItem()
 
   val stillwoodPlanks: Block =
@@ -126,6 +129,7 @@ object LumomancyBlocks:
       Block(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).mapColor(MapColor.COLOR_CYAN).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Stillwood Planks")
                       .simpleItem()
+                      .blockstate(_.simpleBlock)
                       .dropSelf()
                       .registerItem()
 
@@ -135,38 +139,50 @@ object LumomancyBlocks:
                       .lang("Stillwood Slab")
                       .simpleItem()
                       .lootTable(_.createSlabItemTable(stillwoodSlab))
+                      .blockstate(gen => block => gen.slabBlock(block, stillwoodPlanks.modelLoc, stillwoodPlanks.modelLoc))
                       .registerItem()
 
   val stillwoodButton: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_button"), Blocks.woodenButton(stillwoodBlockSet))
                       .lang("Stillwood Button")
                       .item()
-                      .model(gen => item => gen.withExistingParent(item, stillwoodButton.modelLoc.extend("_inventory")))
+                      .model(gen => item =>
+                        gen.buttonInventory(stillwoodButton.modelLoc.withSuffix("_inventory"), stillwoodPlanks.modelLoc)
+                        gen.withExistingParent(item, stillwoodButton.modelLoc.withSuffix("_inventory"))
+                      )
                       .build()
+                      .blockstate(gen => block => gen.buttonBlock(block, stillwoodPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodPressurePlate: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_pressure_plate"), PressurePlateBlock(stillwoodBlockSet, BlockBehaviour.Properties.of().sound(SoundType.WOOD).forceSolidOn().mapColor(stillwoodPlanks.defaultMapColor()).noCollission().strength(0.5f).pushReaction(PushReaction.DESTROY)))
                       .lang("Stillwood Pressure Plate")
                       .simpleItem()
+                      .blockstate(gen => block => gen.pressurePlateBlock(block, stillwoodPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodFence: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_fence"), FenceBlock(BlockBehaviour.Properties.of().mapColor(stillwoodPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()))
                       .lang("Stillwood Fence")
-                      .item().model(gen => item => gen.withExistingParent(item, stillwoodFence.modelLoc.withSuffix("_inventory"))).build()
+                      .item().model(gen => item =>
+                        gen.fenceInventory(stillwoodFence.modelLoc.withSuffix("_inventory"), stillwoodPlanks.modelLoc)
+                        gen.withExistingParent(item, stillwoodFence.modelLoc.withSuffix("_inventory"))
+                      ).build()
+                      .blockstate(gen => block => gen.fenceBlock(block, stillwoodPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodFenceGate: Block =
     InfoCollector.instance.block("stillwood_fence_gate", FenceGateBlock(stillwoodWoodSet, BlockBehaviour.Properties.of().mapColor(stillwoodPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Stillwood Fence Gate")
                       .simpleItem()
+                      .blockstate(gen => block => gen.fenceGateBlock(block, stillwoodPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodStairs: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_stairs"), StairBlock(stillwoodPlanks.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(stillwoodPlanks)))
                       .lang("Stillwood Stairs")
                       .simpleItem()
+                      .blockstate(gen => block => gen.stairsBlock(block, stillwoodPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val stillwoodSign: Block =
@@ -177,11 +193,13 @@ object LumomancyBlocks:
                       .register()
   val stillwoodWallSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_wall_sign"), WallSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(MapColor.COLOR_CYAN).dropsLike(stillwoodSign)))
+                      .blockstate(gen => block => gen.signBlock(stillwoodSign, block, stillwoodPlanks.modelLoc))
                       .register()
 
   val stillwoodSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("stillwood_sign"), SignItem(Item.Properties().stacksTo(16), stillwoodSign, stillwoodWallSign))
                  .lang("Stillwood Sign")
+                 .defaultModel()
                  .registerItem()
 
   val stillwoodHangingSign: Block =
@@ -191,11 +209,13 @@ object LumomancyBlocks:
                       .register()
   val stillwoodWallHangingSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("stillwood_wall_hanging_sign"), WallHangingSignBlock(stillwoodWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(MapColor.COLOR_CYAN).dropsLike(stillwoodHangingSign)))
+                      .blockstate(gen => block => gen.signBlock(stillwoodHangingSign, block, strippedStillwoodLog.modelLoc))
                       .register()
 
   val stillwoodHangingSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("stillwood_hanging_sign"), HangingSignItem(stillwoodHangingSign, stillwoodWallHangingSign, Item.Properties().stacksTo(16)))
                  .lang("Stillwood Hanging Sign")
+                 .defaultModel()
                  .registerItem()
 
   val stillwoodDoor: Block =
@@ -203,12 +223,14 @@ object LumomancyBlocks:
                       .lang("Stillwood Door")
                       .item().defaultModel().build()
                       .lootTable(_.createDoorTable(stillwoodDoor))
+                      .blockstate(_.doorBlock)
                       .registerItem()
   val stillwoodTrapdoor: Block =
     InfoCollector.instance.block("stillwood_trapdoor", TrapDoorBlock(stillwoodBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(stillwoodPlanks.defaultMapColor())))
                       .lang("Stillwood Trapdoor")
                       .item()
-                 .model(gen => item => gen.withExistingParent(item, stillwoodTrapdoor.modelLoc.extend("_bottom"))).build()
+                      .model(gen => item => gen.withExistingParent(item, stillwoodTrapdoor.modelLoc.extend("_bottom"))).build()
+                      .blockstate(gen => block => gen.trapdoorBlock(block))
                       .dropSelf()
                       .registerItem()
 
@@ -227,6 +249,7 @@ object LumomancyBlocks:
     InfoCollector.instance.block("stripped_wieder_wood", RotatedPillarBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
                       .lang("Stripped Wieder Wood")
                       .simpleItem()
+                      .blockstate(gen => block => gen.woodBlock(block, strippedWiederLog.modelLoc))
                       .dropSelf()
                       .registerItem()
   val wiederLog: Block =
@@ -238,6 +261,7 @@ object LumomancyBlocks:
                                           .strength(2.0f).ignitedByLava()))
                       .lang("Wieder Log")
                       .simpleItem()
+                      .blockstate(_.logBlock)
                       .dropSelf()
                       .registerItem()
   // wood is still a rotated pillar block
@@ -247,6 +271,7 @@ object LumomancyBlocks:
       BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
                       .lang("Wieder Wood")
                       .simpleItem()
+                      .blockstate(gen => block => gen.woodBlock(block, wiederLog.modelLoc))
                       .dropSelf()
                       .registerItem()
 
@@ -255,6 +280,7 @@ object LumomancyBlocks:
       Block(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).mapColor(MapColor.COLOR_MAGENTA).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Wieder Planks")
                       .simpleItem()
+                      .blockstate(_.simpleBlock)
                       .dropSelf()
                       .registerItem()
 
@@ -263,30 +289,41 @@ object LumomancyBlocks:
       SlabBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Wieder Slab")
                       .simpleItem()
+                      .blockstate(gen => block => gen.slabBlock(block, wiederPlanks.modelLoc, wiederPlanks.modelLoc))
                       .lootTable(_.createSlabItemTable(wiederSlab))
                       .registerItem()
 
   val wiederButton: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_button"), Blocks.woodenButton(wiederBlockSet))
                       .lang("Wieder Button")
-                      .item().model(gen => item => gen.withExistingParent(item, wiederButton.modelLoc.withSuffix("_inventory"))).build()
+                      .item().model(gen => item =>
+                        gen.buttonInventory(wiederButton.modelLoc.withSuffix("_inventory"), wiederPlanks.modelLoc)
+                        gen.withExistingParent(item, wiederButton.modelLoc.withSuffix("_inventory"))
+                      ).build()
+                      .blockstate(gen => block => gen.buttonBlock(block, wiederPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val wiederPressurePlate: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_pressure_plate"), PressurePlateBlock(wiederBlockSet, BlockBehaviour.Properties.of().sound(SoundType.WOOD).forceSolidOn().mapColor(wiederPlanks.defaultMapColor()).noCollission().strength(0.5f).pushReaction(PushReaction.DESTROY)))
                       .lang("Wieder Pressure Plate")
                       .simpleItem()
+                      .blockstate(gen => block => gen.pressurePlateBlock(block, wiederPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val wiederFence: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_fence"), FenceBlock(BlockBehaviour.Properties.of().mapColor(wiederPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()))
                       .lang("Wieder Fence")
-                      .item().model(gen => item => gen.withExistingParent(item, wiederFence.modelLoc.extend("_inventory"))).build()
+                      .item().model(gen => item =>
+                        gen.fenceInventory(wiederFence.modelLoc.withSuffix("_inventory"), wiederPlanks.modelLoc)
+                        gen.withExistingParent(item, wiederFence.modelLoc.withSuffix("_inventory"))
+                      ).build()
+                      .blockstate(gen => block => gen.fenceBlock(block, wiederPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val wiederFenceGate: Block =
     InfoCollector.instance.block("wieder_fence_gate", FenceGateBlock(wiederWoodSet, BlockBehaviour.Properties.of().mapColor(wiederPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Wieder Fence Gate")
+                      .blockstate(gen => block => gen.fenceGateBlock(block, wiederPlanks.modelLoc))
                       .simpleItem()
                       .dropSelf()
                       .registerItem()
@@ -294,21 +331,25 @@ object LumomancyBlocks:
     InfoCollector.instance.block(Lumomancy.locate("wieder_stairs"), StairBlock(wiederPlanks.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(wiederPlanks)))
                       .lang("Wieder Stairs")
                       .simpleItem()
+                      .blockstate(gen => block => gen.stairsBlock(block, wiederPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val wiederSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_sign"), StandingSignBlock(wiederWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_SIGN).mapColor(wiederPlanks.defaultMapColor())))
                       .lang("Wieder Sign")
+
                       // hopefully the forward reference is tolerable here
                       .lootTable(_.createSingleItemTable(LumomancyBlocks.wiederSignItem))
                       .register()
   val wiederWallSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_wall_sign"), WallSignBlock(wiederWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(wiederPlanks.defaultMapColor()).dropsLike(wiederSign)))
+                      .blockstate(gen => block => gen.signBlock(wiederSign, block, wiederPlanks.modelLoc))
                       .register()
 
   val wiederSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("wieder_sign"), SignItem(Item.Properties().stacksTo(16), wiederSign, wiederWallSign))
                  .lang("Wieder Sign")
+                 .defaultModel()
                  .registerItem()
 
   val wiederHangingSign: Block =
@@ -318,11 +359,13 @@ object LumomancyBlocks:
                       .register()
   val wiederWallHangingSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("wieder_wall_hanging_sign"), WallHangingSignBlock(wiederWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(wiederPlanks.defaultMapColor()).dropsLike(wiederHangingSign)))
+                      .blockstate(gen => block => gen.signBlock(wiederHangingSign, block, strippedWiederLog.modelLoc))
                       .register()
 
   val wiederHangingSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("wieder_hanging_sign"), HangingSignItem(wiederHangingSign, wiederWallHangingSign, Item.Properties().stacksTo(16)))
                  .lang("Wieder Hanging Sign")
+                 .defaultModel()
                  .registerItem()
 
   val wiederDoor: Block =
@@ -330,11 +373,13 @@ object LumomancyBlocks:
                       .lang("Wieder Door")
                       .item().defaultModel().build()
                       .lootTable(_.createDoorTable(wiederDoor))
+                      .blockstate(_.doorBlock)
                       .registerItem()
   val wiederTrapdoor: Block =
     InfoCollector.instance.block("wieder_trapdoor", TrapDoorBlock(wiederBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(wiederPlanks.defaultMapColor())))
                       .lang("Wieder Trapdoor")
                       .item().model(gen => item => gen.withExistingParent(item, wiederTrapdoor.modelLoc.withSuffix("_bottom"))).build()
+                      .blockstate(gen => block => gen.trapdoorBlock(block))
                       .dropSelf()
                       .registerItem()
 
@@ -347,12 +392,14 @@ object LumomancyBlocks:
     InfoCollector.instance.block("stripped_aftus_log", Blocks.log(MapColor.COLOR_YELLOW, MapColor.COLOR_YELLOW))
                  .lang("Stripped Aftus Log")
                  .simpleItem()
+                 .blockstate(_.logBlock)
                  .dropSelf()
                  .registerItem()
   val strippedAftusWood: Block =
     InfoCollector.instance.block("stripped_aftus_wood", RotatedPillarBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
                       .lang("Stripped Aftus Wood")
                       .simpleItem()
+                      .blockstate(gen => block => gen.woodBlock(block, strippedAftusLog.modelLoc))
                       .dropSelf()
                       .registerItem()
   val aftusLog: Block =
@@ -364,6 +411,7 @@ object LumomancyBlocks:
                                           .strength(2.0f).ignitedByLava()))
                       .lang("Aftus Log")
                       .simpleItem()
+                      .blockstate(_.logBlock)
                       .dropSelf()
                       .registerItem()
   // wood is still a rotated pillar block
@@ -373,6 +421,7 @@ object LumomancyBlocks:
       BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f).ignitedByLava()))
                       .lang("Aftus Wood")
                       .simpleItem()
+                      .blockstate(gen => block => gen.woodBlock(block, aftusLog.modelLoc))
                       .dropSelf()
                       .registerItem()
 
@@ -381,6 +430,7 @@ object LumomancyBlocks:
       Block(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).mapColor(MapColor.COLOR_YELLOW).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Aftus Planks")
                       .simpleItem()
+                      .blockstate(_.simpleBlock)
                       .dropSelf()
                       .registerItem()
 
@@ -389,13 +439,18 @@ object LumomancyBlocks:
       SlabBlock(BlockBehaviour.Properties.of().sound(SoundType.WOOD).instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).ignitedByLava()))
                       .lang("Aftus Slab")
                       .simpleItem()
+                      .blockstate(gen => block => gen.slabBlock(block, aftusPlanks.modelLoc, aftusPlanks.modelLoc))
                       .lootTable(_.createSlabItemTable(aftusSlab))
                       .registerItem()
 
   val aftusButton: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_button"), Blocks.woodenButton(aftusBlockSet))
                       .lang("Aftus Button")
-                      .item().model(gen => item => gen.withExistingParent(item, aftusButton.modelLoc.withSuffix("_inventory"))).build()
+                      .item().model(gen => item =>
+                          gen.buttonInventory(aftusButton.modelLoc.withSuffix("_inventory"), aftusPlanks.modelLoc)
+                          gen.withExistingParent(item, aftusButton.modelLoc.withSuffix("_inventory"))
+                      ).build()
+                      .blockstate(gen => block => gen.buttonBlock(block, aftusPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val aftusPressurePlate: Block =
@@ -403,11 +458,16 @@ object LumomancyBlocks:
                       .lang("Aftus Pressure Plate")
                       .simpleItem()
                       .dropSelf()
+                      .blockstate(gen => block => gen.pressurePlateBlock(block, aftusPlanks.modelLoc))
                       .registerItem()
   val aftusFence: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_fence"), FenceBlock(BlockBehaviour.Properties.of().mapColor(aftusPlanks.defaultMapColor()).forceSolidOn().instrument(NoteBlockInstrument.BASS).strength(2.0f, 3.0f).sound(SoundType.WOOD).ignitedByLava()))
                       .lang("Aftus Fence")
-                      .item().model(gen => item => gen.withExistingParent(item, aftusFence.modelLoc.withSuffix("_inventory"))).build()
+                      .item().model(gen => item =>
+                        gen.fenceInventory(aftusFence.modelLoc.withSuffix("_inventory"), aftusPlanks.modelLoc)
+                        gen.withExistingParent(item, aftusFence.modelLoc.withSuffix("_inventory"))
+                      ).build()
+                      .blockstate(gen => block => gen.fenceBlock(block, aftusPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val aftusFenceGate: Block =
@@ -415,11 +475,13 @@ object LumomancyBlocks:
                       .lang("Aftus Fence Gate")
                       .simpleItem()
                       .dropSelf()
+                      .blockstate(gen => block => gen.fenceGateBlock(block, aftusPlanks.modelLoc))
                       .registerItem()
   val aftusStairs: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_stairs"), StairBlock(aftusPlanks.defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(aftusPlanks)))
                       .lang("Aftus Stairs")
                       .simpleItem()
+                      .blockstate(gen => block => gen.stairsBlock(block, aftusPlanks.modelLoc))
                       .dropSelf()
                       .registerItem()
   val aftusSign: Block =
@@ -430,25 +492,30 @@ object LumomancyBlocks:
                       .register()
   val aftusWallSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_wall_sign"), WallSignBlock(aftusWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_SIGN).mapColor(aftusPlanks.defaultMapColor()).dropsLike(aftusSign)))
+                      .blockstate(gen => block => gen.signBlock(aftusSign, block, aftusPlanks.modelLoc))
                       .register()
 
   val aftusSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("aftus_sign"), SignItem(Item.Properties().stacksTo(16), aftusSign, aftusWallSign))
                  .lang("Aftus Sign")
+                 .defaultModel()
                  .registerItem()
 
   val aftusHangingSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_hanging_sign"), CeilingHangingSignBlock(aftusWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_HANGING_SIGN).mapColor(aftusPlanks.defaultMapColor())))
                       .lang("Aftus Hanging Sign")
                       .lootTable(_.createSingleItemTable(LumomancyBlocks.aftusHangingSignItem))
+
                       .register()
   val aftusWallHangingSign: Block =
     InfoCollector.instance.block(Lumomancy.locate("aftus_wall_hanging_sign"), WallHangingSignBlock(aftusWoodSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_WALL_HANGING_SIGN).mapColor(aftusPlanks.defaultMapColor()).dropsLike(aftusHangingSign)))
+                      .blockstate(gen => block => gen.signBlock(aftusHangingSign, block, strippedAftusLog.modelLoc))
                       .register()
 
   val aftusHangingSignItem: Item =
     InfoCollector.instance.item(Lumomancy.locate("aftus_hanging_sign"), HangingSignItem(aftusHangingSign, aftusWallHangingSign, Item.Properties().stacksTo(16)))
                  .lang("Aftus Hanging Sign")
+                 .defaultModel()
                  .registerItem()
 
   val aftusDoor: Block =
@@ -456,11 +523,13 @@ object LumomancyBlocks:
                       .lang("Aftus Door")
                       .item().defaultModel().build()
                       .lootTable(_.createDoorTable(aftusDoor))
+                      .blockstate(_.doorBlock)
                       .registerItem()
   val aftusTrapdoor: Block =
     InfoCollector.instance.block("aftus_trapdoor", TrapDoorBlock(aftusBlockSet, BlockBehaviour.Properties.ofFullCopy(Blocks.OAK_TRAPDOOR).mapColor(aftusPlanks.defaultMapColor())))
                       .lang("Aftus Trapdoor")
                       .item().model(gen => item => gen.withExistingParent(item, aftusTrapdoor.modelLoc.withSuffix("_bottom"))).build()
+                      .blockstate(gen => block => gen.trapdoorBlock(block))
                       .dropSelf()
                       .registerItem()
   

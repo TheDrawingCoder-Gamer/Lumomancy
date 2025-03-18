@@ -43,11 +43,19 @@ class InfoCollector:
 
   private val blockLootTables = mutable.HashMap[Block, FabricBlockLootTableProvider => LootTable.Builder]()
 
-  val itemModels = mutable.HashMap[Item, LumoItemModelProvider => Item => Unit]()
+  private val itemModels = mutable.HashMap[Item, LumoItemModelProvider => Item => Unit]()
   
-  val blockStates = mutable.HashMap[Block, LumoBlockStateGenerator => Block => Unit]()
+  private val blockStates = mutable.HashMap[Block, LumoBlockStateGenerator => Block => Unit]()
 
   private lazy val doDatagen = System.getProperty("fabric-api.datagen") != null
+
+  def setBlockState(block: Block, func: LumoBlockStateGenerator => Block => Unit): Unit =
+    if doDatagen then
+      blockStates(block) = func
+
+  def setItemModel(item: Item, func: LumoItemModelProvider => Item => Unit): Unit =
+    if doDatagen then
+      itemModels(item) = func
 
   def addRawLang(key: String, value: String): InfoCollector =
     if doDatagen then

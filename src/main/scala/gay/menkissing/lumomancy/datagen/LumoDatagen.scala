@@ -209,9 +209,9 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
     override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
       generateStasisCoolerModels(blockModelGenerators)
-      generateStillwood(blockModelGenerators)
-      generateWieder(blockModelGenerators)
-      generateAftus(blockModelGenerators)
+      //generateStillwood(blockModelGenerators)
+      //generateWieder(blockModelGenerators)
+      //generateAftus(blockModelGenerators)
  
 
   private object tagHelper:

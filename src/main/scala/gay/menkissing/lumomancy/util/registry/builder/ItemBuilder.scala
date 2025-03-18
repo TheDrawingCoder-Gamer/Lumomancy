@@ -38,7 +38,7 @@ class ItemBuilder[P](val owner: InfoCollector, val parent: P, val item: Item, va
     )
 
   def model(func: LumoItemModelProvider => Item => Unit): this.type =
-    owner.itemModels(item) = func
+    owner.setItemModel(item, func)
     this
   
   def defaultModel(): this.type =

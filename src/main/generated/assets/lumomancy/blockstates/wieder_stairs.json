@@ -3,26 +3,38 @@
     "facing=east,half=bottom,shape=inner_left": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 270
     },
     "facing=east,half=bottom,shape=inner_right": {
-      "model": "lumomancy:block/wieder_stairs_inner"
+      "model": "lumomancy:block/wieder_stairs_inner",
+      "uvlock": false,
+      "x": 0,
+      "y": 0
     },
     "facing=east,half=bottom,shape=outer_left": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 270
     },
     "facing=east,half=bottom,shape=outer_right": {
-      "model": "lumomancy:block/wieder_stairs_outer"
+      "model": "lumomancy:block/wieder_stairs_outer",
+      "uvlock": false,
+      "x": 0,
+      "y": 0
     },
     "facing=east,half=bottom,shape=straight": {
-      "model": "lumomancy:block/wieder_stairs"
+      "model": "lumomancy:block/wieder_stairs",
+      "uvlock": false,
+      "x": 0,
+      "y": 0
     },
     "facing=east,half=top,shape=inner_left": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
-      "x": 180
+      "x": 180,
+      "y": 0
     },
     "facing=east,half=top,shape=inner_right": {
       "model": "lumomancy:block/wieder_stairs_inner",
@@ -33,7 +45,8 @@
     "facing=east,half=top,shape=outer_left": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
-      "x": 180
+      "x": 180,
+      "y": 0
     },
     "facing=east,half=top,shape=outer_right": {
       "model": "lumomancy:block/wieder_stairs_outer",
@@ -44,31 +57,37 @@
     "facing=east,half=top,shape=straight": {
       "model": "lumomancy:block/wieder_stairs",
       "uvlock": true,
-      "x": 180
+      "x": 180,
+      "y": 0
     },
     "facing=north,half=bottom,shape=inner_left": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 180
     },
     "facing=north,half=bottom,shape=inner_right": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 270
     },
     "facing=north,half=bottom,shape=outer_left": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 180
     },
     "facing=north,half=bottom,shape=outer_right": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 270
     },
     "facing=north,half=bottom,shape=straight": {
       "model": "lumomancy:block/wieder_stairs",
       "uvlock": true,
+      "x": 0,
       "y": 270
     },
     "facing=north,half=top,shape=inner_left": {
@@ -80,7 +99,8 @@
     "facing=north,half=top,shape=inner_right": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
-      "x": 180
+      "x": 180,
+      "y": 0
     },
     "facing=north,half=top,shape=outer_left": {
       "model": "lumomancy:block/wieder_stairs_outer",
@@ -91,7 +111,8 @@
     "facing=north,half=top,shape=outer_right": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
-      "x": 180
+      "x": 180,
+      "y": 0
     },
     "facing=north,half=top,shape=straight": {
       "model": "lumomancy:block/wieder_stairs",
@@ -100,24 +121,33 @@
       "y": 270
     },
     "facing=south,half=bottom,shape=inner_left": {
-      "model": "lumomancy:block/wieder_stairs_inner"
+      "model": "lumomancy:block/wieder_stairs_inner",
+      "uvlock": false,
+      "x": 0,
+      "y": 0
     },
     "facing=south,half=bottom,shape=inner_right": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 90
     },
     "facing=south,half=bottom,shape=outer_left": {
-      "model": "lumomancy:block/wieder_stairs_outer"
+      "model": "lumomancy:block/wieder_stairs_outer",
+      "uvlock": false,
+      "x": 0,
+      "y": 0
     },
     "facing=south,half=bottom,shape=outer_right": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 90
     },
     "facing=south,half=bottom,shape=straight": {
       "model": "lumomancy:block/wieder_stairs",
       "uvlock": true,
+      "x": 0,
       "y": 90
     },
     "facing=south,half=top,shape=inner_left": {
@@ -153,26 +183,31 @@
     "facing=west,half=bottom,shape=inner_left": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 90
     },
     "facing=west,half=bottom,shape=inner_right": {
       "model": "lumomancy:block/wieder_stairs_inner",
       "uvlock": true,
+      "x": 0,
       "y": 180
     },
     "facing=west,half=bottom,shape=outer_left": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 90
     },
     "facing=west,half=bottom,shape=outer_right": {
       "model": "lumomancy:block/wieder_stairs_outer",
       "uvlock": true,
+      "x": 0,
       "y": 180
     },
     "facing=west,half=bottom,shape=straight": {
       "model": "lumomancy:block/wieder_stairs",
       "uvlock": true,
+      "x": 0,
       "y": 180
     },
     "facing=west,half=top,shape=inner_left": {
