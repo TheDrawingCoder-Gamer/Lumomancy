@@ -16,12 +16,15 @@
 package gay.menkissing.lumomancy.util.registry.builder
 
 import gay.menkissing.lumomancy.util.registry.InfoCollector
+import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoItemModelProvider, LumoModelProvider}
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.data.models.ItemModelGenerators
+import net.minecraft.data.models.model.{ModelTemplate, ModelTemplates}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
 
-class ItemBuilder(val owner: InfoCollector, val item: Item, val rl: ResourceLocation) extends Builder[Item, ItemBuilder]:
+class ItemBuilder[P](val owner: InfoCollector, val parent: P, val item: Item, val rl: ResourceLocation) extends Builder[Item, P]:
   override protected def registered(): Item =
     Registry.register(BuiltInRegistries.ITEM, rl, item)
 
@@ -33,3 +36,10 @@ class ItemBuilder(val owner: InfoCollector, val item: Item, val rl: ResourceLoca
       it.getDescriptionId + ".tooltip." + sub,
       value
     )
+
+  def model(func: LumoItemModelProvider => Item => Unit): this.type =
+    owner.itemModels(item) = func
+    this
+  
+  def defaultModel(): this.type =
+    model(gen => gen.generated)

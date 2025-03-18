@@ -160,6 +160,7 @@ object LumoDatagen extends DataGeneratorEntrypoint:
           .aftusWallHangingSign)
 
     override def generateItemModels(itemModelGenerators: ItemModelGenerators): Unit =
+      /*
       // shards
       itemModelGenerators.generateFlatItem(LumomancyItems.adventurineShard, ModelTemplates.FLAT_ITEM)
       itemModelGenerators.generateFlatItem(LumomancyItems.clearQuartz, ModelTemplates.FLAT_ITEM)
@@ -188,17 +189,18 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
       // lumon lens
       itemModelGenerators.generateFlatItem(LumomancyItems.lumonLens, ModelTemplates.FLAT_ITEM)
-
+      */
       // stasis bottle
       ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(LumomancyItems.stasisBottle, "_base"), TextureMapping.layer0(LumomancyItems.stasisBottle), itemModelGenerators.output)
 
       // tool container
-      itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
+      // itemModelGenerators.generateFlatItem(LumomancyItems.toolContainer, ModelTemplates.FLAT_ITEM)
 
+      /*
       itemModelGenerators.generateFlatItem(LumomancyItems.stillwoodBark, ModelTemplates.FLAT_ITEM)
       itemModelGenerators.generateFlatItem(LumomancyItems.wiederBark, ModelTemplates.FLAT_ITEM)
       itemModelGenerators.generateFlatItem(LumomancyItems.aftusBark, ModelTemplates.FLAT_ITEM)
-
+      */
       // stasis tube
       // is there a way to automate the entity part as well?
       ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(LumomancyItems.stasisTube, "_base"), TextureMapping.layer0(LumomancyItems.stasisTube), itemModelGenerators.output)

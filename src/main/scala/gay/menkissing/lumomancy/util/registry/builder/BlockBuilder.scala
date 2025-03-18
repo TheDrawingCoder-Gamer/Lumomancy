@@ -17,27 +17,43 @@ package gay.menkissing.lumomancy.util.registry.builder
 
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.util.registry.InfoCollector
+import gay.menkissing.lumomancy.util.registry.provider.generators.LumoBlockStateGenerator
+import gay.menkissing.lumomancy.util.resources.{*, given}
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
 import net.minecraft.core.Registry
 import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.data.models.BlockModelGenerators
+import net.minecraft.data.models.blockstates.BlockStateGenerator
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.{BlockItem, Item}
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.storage.loot.LootTable
 
-class BlockBuilder(val owner: InfoCollector, val block: Block, val rl: ResourceLocation) extends Builder[Block, BlockBuilder]:
-  private var makeItem = false
-  
-  def item(): this.type =
-    makeItem = true
+class BlockBuilder[P](val owner: InfoCollector, val parent: P, val block: Block, val rl: ResourceLocation) extends Builder[Block, P]:
+  private var daItem: Option[Item] = None
+
+  def item(props: Item.Properties = Item.Properties()): ItemBuilder[this.type] =
+    val item = BlockItem(block, props)
+    daItem = Some(item)
+    ItemBuilder[this.type](owner, this, item, rl)
+
+  def simpleItem(props: Item.Properties = Item.Properties()): this.type =
+    item(props)
+      .model(gen => item =>
+        gen.withExistingParent(item, block.modelLoc)
+      )
+      .build()
+
+  def blockstate(func: LumoBlockStateGenerator => Block => Unit): this.type =
+    owner.blockStates(block) = func
     this
+
+  def defaultBlockstate(): this.type =
+    blockstate(gen => block => gen.simpleBlock(block))
   
   override protected def registered(): Block =
     Registry.register(BuiltInRegistries.BLOCK, rl, block)
-    if makeItem then
-      val bi = BlockItem(block, Item.Properties())
-      Registry.register(BuiltInRegistries.ITEM, rl, bi)
     block
     
   def lang(value: String): this.type =

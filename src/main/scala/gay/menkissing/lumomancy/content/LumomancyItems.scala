@@ -35,7 +35,7 @@ import scala.collection.mutable as mut
 object LumomancyItems:
   private val items: mut.ListBuffer[Item] = mut.ListBuffer()
 
-  extension (builder: ItemBuilder)
+  extension (builder: ItemBuilder[?])
     def make(): Item =
       val i = builder.register()
       items.append(i)
@@ -52,22 +52,26 @@ object LumomancyItems:
   val clearQuartz: Item =
     InfoCollector.instance.item("clear_quartz", Item(Item.Properties()))
                  .lang("Clear Quartz")
+                 .defaultModel()
                  .make()
   
 
   val bloodTopazShard: Item =
     InfoCollector.instance.item("blood_topaz_shard", Item(Item.Properties()))
                  .lang("Blood Topaz Shard")
+                 .defaultModel()
                  .make()
 
   val prasioliteShard: Item = 
     InfoCollector.instance.item(Lumomancy.locate("prasiolite_shard"), new Item(Item.Properties()))
                  .lang("Prasiolite Shard")
+                 .defaultModel()
                  .make()
 
   val adventurineShard: Item = 
     InfoCollector.instance.item(Lumomancy.locate("adventurine_shard"), new Item(Item.Properties()))
                  .lang("Adventurine Shard")
+                 .defaultModel()
                  .make()
   
 
@@ -76,80 +80,99 @@ object LumomancyItems:
   val toolContainer: Item = 
     InfoCollector.instance.item(Lumomancy.locate("tool_container"), new ToolContainer(Item.Properties().stacksTo(1)))
                  .lang("Tool Container")
+                 .defaultModel()
                  .make()
 
   val bottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("bottle_of_light"), new Item(Item.Properties()))
                  .lang("Bottle of Light")
+                 .defaultModel()
                  .make()
 
   val azureBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("azure_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Azure Bottle of Light")
+                 .defaultModel()
                  .make()
   val blackBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("black_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Black Bottle of Light")
+                 .defaultModel()
                  .make()
   val blueBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("blue_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Blue Bottle of Light")
+                 .defaultModel()
                  .make()
   val brownBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("brown_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Brown Bottle of Light")
+                 .defaultModel()
                  .make()
   val cyanBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("cyan_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Cyan Bottle of Light")
+                 .defaultModel()
                  .make()
   val grayBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("gray_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Gray Bottle of Light")
+                 .defaultModel()
                  .make()
   val greenBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("green_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Green Bottle of Light")
+                 .defaultModel()
                  .make()
   val lightGrayBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("light_gray_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Light Gray Bottle of Light")
+                 .defaultModel()
                  .make()
   val limeBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("lime_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Lime Bottle of Light")
+                 .defaultModel()
                  .make()
   val magentaBottleOfLight: Item =
     InfoCollector.instance.item(Lumomancy.locate("magenta_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Magenta Bottle of Light")
+                 .defaultModel()
                  .make()
   val orangeBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("orange_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Orange Bottle of Light")
+                 .defaultModel()
                  .make()
   val purpleBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("purple_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Purple Bottle of Light")
+                 .defaultModel()
                  .make()
   val redBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("red_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Red Bottle of Light")
+                 .defaultModel()
                  .make()
   val roseBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("rose_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Rose Bottle of Light")
+                 .defaultModel()
                  .make()
   val seafoamBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("seafoam_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Seafoam Bottle of Light")
+                 .defaultModel()
                  .make()
   val whiteBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("white_bottle_of_light"), new Item(Item.Properties()))
                  .lang("White Bottle of Light")
+                 .defaultModel()
                  .make()
   val yellowBottleOfLight: Item = 
     InfoCollector.instance.item(Lumomancy.locate("yellow_bottle_of_light"), new Item(Item.Properties()))
                  .lang("Yellow Bottle of Light")
+                 .defaultModel()
                  .make()
 
   val stasisTube: Item = 
@@ -170,19 +193,23 @@ object LumomancyItems:
   val lumonLens: Item = 
     InfoCollector.instance.item(Lumomancy.locate("lumon_lens"), new LumonLens(Item.Properties().stacksTo(1)))
                  .lang("Lumon Lens")
+                 .defaultModel()
                  .make()
   
   val stillwoodBark: Item = 
     InfoCollector.instance.item(Lumomancy.locate("stillwood_bark"), new Item(Item.Properties()))
                  .lang("Stillwood Bark")
+                 .defaultModel()
                  .make()
   val wiederBark: Item = 
     InfoCollector.instance.item(Lumomancy.locate("wieder_bark"), Item(Item.Properties()))
                  .lang("Wieder Bark")
+                 .defaultModel()
                  .make()
   val aftusBark: Item = 
     InfoCollector.instance.item(Lumomancy.locate("aftus_bark"), Item(Item.Properties()))
                  .lang("Aftus Bark")
+                 .defaultModel()
                  .make()
 
   def init(): Unit =

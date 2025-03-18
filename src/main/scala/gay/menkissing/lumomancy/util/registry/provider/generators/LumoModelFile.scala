@@ -13,40 +13,12 @@
  *  see <https://www.gnu.org/licenses/>
  */
 
-package gay.menkissing.lumomancy.util.registry.builder
+package gay.menkissing.lumomancy.util.registry.provider.generators
 
-import gay.menkissing.lumomancy.util.registry.InfoCollector
 import net.minecraft.resources.ResourceLocation
 
-import scala.collection.mutable
-
-abstract class Builder[R, P]:
-
-  private val delayedLangEntries = mutable.ListBuffer[(R => String, String)]()
-  
-  def owner: InfoCollector
-
-  def lang(key: String, value: String): this.type =
-    owner.addRawLang(key, value)
-    this
-  
-  def lang(key: R => String, value: String): this.type =
-    delayedLangEntries.append((key, value))
-    this
-    
-  def parent: P
+trait LumoModelFile:
+  def location: ResourceLocation
   
 
-  def build(): P =
-    register()
-    parent
-    
-
-  protected def registered(): R
-  
-  def register(): R =
-    val item = registered()
-    delayedLangEntries.foreach { (k, v) =>
-      owner.addRawLang(k(item), v)
-    }
-    item
+class ExistingModelFile(val location: ResourceLocation) extends LumoModelFile

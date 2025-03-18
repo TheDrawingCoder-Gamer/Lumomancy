@@ -17,9 +17,13 @@ package gay.menkissing.lumomancy.util.registry
 
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.util.registry.builder.{BlockBuilder, ItemBuilder}
+import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoBlockStateGenerator, LumoItemModelProvider, LumoModelProvider}
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider}
+import net.minecraft.client.model.Model
 import net.minecraft.core.HolderLookup
+import net.minecraft.data.models.blockstates.BlockStateGenerator
+import net.minecraft.data.models.{BlockModelGenerators, ItemModelGenerators}
 import net.minecraft.data.{CachedOutput, DataProvider}
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.item.Item
@@ -39,6 +43,10 @@ class InfoCollector:
 
   private val blockLootTables = mutable.HashMap[Block, FabricBlockLootTableProvider => LootTable.Builder]()
 
+  val itemModels = mutable.HashMap[Item, LumoItemModelProvider => Item => Unit]()
+  
+  val blockStates = mutable.HashMap[Block, LumoBlockStateGenerator => Block => Unit]()
+
   private lazy val doDatagen = System.getProperty("fabric-api.datagen") != null
 
   def addRawLang(key: String, value: String): InfoCollector =
@@ -51,16 +59,16 @@ class InfoCollector:
       blockLootTables(block) = table
     this
 
-  def block(name: ResourceLocation, block: Block): BlockBuilder =
-    BlockBuilder(this, block, name)
+  def block(name: ResourceLocation, block: Block): BlockBuilder[Unit] =
+    BlockBuilder(this, (), block, name)
 
-  def block(name: String, block: Block): BlockBuilder =
+  def block(name: String, block: Block): BlockBuilder[Unit] =
     this.block(Lumomancy.locate(name), block)
 
-  def item(name: ResourceLocation, item: Item): ItemBuilder =
-    ItemBuilder(this, item, name)
+  def item(name: ResourceLocation, item: Item): ItemBuilder[Unit] =
+    ItemBuilder(this, (), item, name)
 
-  def item(name: String, item: Item): ItemBuilder =
+  def item(name: String, item: Item): ItemBuilder[Unit] =
     this.item(Lumomancy.locate(name), item)
 
   def registerDataGenerators(pack: FabricDataGenerator#Pack): Unit =
@@ -77,12 +85,35 @@ class InfoCollector:
             blockLootTables.foreach { (block, gen) =>
               this.add(block, gen(this))
             }
+      val itemModelProvider = new LumoItemModelProvider(output) with DataProvider:
+        def run(cache: CachedOutput): CompletableFuture[?] =
+          itemModels.foreach { (k, v) =>
+            v(this)(k)
+          }
+          this.generateAll(cache)
+          
+        override def getName: String = "Lumo Item Model Provider"
+      
+      
+      
+      val blockModelProvider = new LumoBlockStateGenerator(output):
+        override def registerStates(): Unit =
+          InfoCollector.this.blockStates.foreach { (k, v) =>
+            v(this)(k)
+          }
 
+      // registered like this so that the normal ones could also
+      // be used along side this
       new DataProvider {
         override def run(output: CachedOutput): CompletableFuture[?] =
-          CompletableFuture.allOf(langProvider.run(output), blockLootProvider.run(output))
+          CompletableFuture.allOf(
+            langProvider.run(output), 
+            blockLootProvider.run(output),
+            itemModelProvider.run(output),
+            blockModelProvider.run(output)
+          )
 
-        override def getName: String = "Block Loot + Lang provider for lumomancy"
+        override def getName: String = "InfoCollector-based provider for lumomancy"
       }
     }
 
