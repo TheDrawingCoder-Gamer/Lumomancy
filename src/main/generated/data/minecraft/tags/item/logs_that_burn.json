@@ -1,7 +1,16 @@
 {
   "values": [
-    "#lumomancy:stillwood_logs",
-    "#lumomancy:wieder_logs",
-    "#lumomancy:aftus_logs"
+    {
+      "id": "#lumomancy:stillwood_logs",
+      "required": false
+    },
+    {
+      "id": "#lumomancy:wieder_logs",
+      "required": false
+    },
+    {
+      "id": "#lumomancy:aftus_logs",
+      "required": false
+    }
   ]
 }

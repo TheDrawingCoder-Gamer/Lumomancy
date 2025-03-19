@@ -18,10 +18,11 @@ package gay.menkissing.lumomancy.util.registry.builder
 import gay.menkissing.lumomancy.util.registry.InfoCollector
 import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoItemModelProvider, LumoModelProvider}
 import net.minecraft.core.Registry
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.data.models.ItemModelGenerators
 import net.minecraft.data.models.model.{ModelTemplate, ModelTemplates}
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 
 class ItemBuilder[P](val owner: InfoCollector, val parent: P, val item: Item, val rl: ResourceLocation) extends Builder[Item, P]:
@@ -40,6 +41,9 @@ class ItemBuilder[P](val owner: InfoCollector, val parent: P, val item: Item, va
   def model(func: LumoItemModelProvider => Item => Unit): this.type =
     owner.setItemModel(item, func)
     this
+
+  def tag(tag: TagKey[Item]): this.type =
+    this.tag(Registries.ITEM, tag)
   
   def defaultModel(): this.type =
     model(gen => gen.generated)

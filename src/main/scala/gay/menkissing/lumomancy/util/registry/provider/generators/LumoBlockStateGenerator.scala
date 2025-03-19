@@ -267,7 +267,7 @@ abstract class LumoBlockStateGenerator(val output: FabricDataOutput) extends Dat
 
   def doorBlock(block: Block): Unit =
     doorBlock(block, block.modelLoc.withSuffix("_bottom"), block.modelLoc.withSuffix("_top"))
-  
+
   def doorBlock(block: Block, bottom: ResourceLocation, top: ResourceLocation): Unit =
     val bottomLeft = models.doorBottomLeft(block.modelLoc.withSuffix("_bottom_left"), bottom, top)
     val bottomLeftOpen = models.doorBottomLeftOpen(block.modelLoc.withSuffix("_bottom_left_open"), bottom, top)
@@ -279,7 +279,7 @@ abstract class LumoBlockStateGenerator(val output: FabricDataOutput) extends Dat
     val topRightOpen = models.doorTopRightOpen(block.modelLoc.withSuffix("_top_right_open"), bottom, top)
 
     doorBlock(block, bottomLeft, bottomLeftOpen, bottomRight, bottomRightOpen, topLeft, topLeftOpen, topRight, topRightOpen)
-  
+
   def doorBlock(block: Block,
                 bottomLeft: LumoModelFile,
                 bottomLeftOpen: LumoModelFile,

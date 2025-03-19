@@ -21,10 +21,11 @@ import gay.menkissing.lumomancy.util.registry.provider.generators.LumoBlockState
 import gay.menkissing.lumomancy.util.resources.{*, given}
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider
 import net.minecraft.core.Registry
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.data.models.BlockModelGenerators
 import net.minecraft.data.models.blockstates.BlockStateGenerator
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.tags.TagKey
 import net.minecraft.world.item.{BlockItem, Item}
 import net.minecraft.world.level.ItemLike
 import net.minecraft.world.level.block.Block
@@ -38,14 +39,17 @@ class BlockBuilder[P](val owner: InfoCollector, val parent: P, val block: Block,
     daItem = Some(item)
     ItemBuilder[this.type](owner, this, item, rl)
 
-  def simpleItem(props: Item.Properties = Item.Properties()): this.type =
+  def blockItem(props: Item.Properties = Item.Properties()): ItemBuilder[this.type] =
     item(props)
       .model(gen => item =>
         gen.withExistingParent(item, block.modelLoc)
       )
+  
+  def simpleItem(props: Item.Properties = Item.Properties()): this.type =
+    blockItem(props)
       .build()
 
-  def blockstate(func: LumoBlockStateGenerator => Block => Unit): this.type = 
+  def blockstate(func: LumoBlockStateGenerator => Block => Unit): this.type =
     owner.setBlockState(block, func)
     this
 
@@ -72,3 +76,5 @@ class BlockBuilder[P](val owner: InfoCollector, val parent: P, val block: Block,
     lootTable(_.createSingleItemTable(block))
     this
 
+  def tag(tag: TagKey[Block]): this.type =
+    this.tag(Registries.BLOCK, tag)

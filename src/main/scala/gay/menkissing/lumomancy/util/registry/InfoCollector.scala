@@ -15,22 +15,25 @@
 
 package gay.menkissing.lumomancy.util.registry
 
+import com.google.common.collect.{ArrayListMultimap, HashMultimap, Multimap}
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.util.registry.builder.{BlockBuilder, ItemBuilder}
-import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoBlockStateGenerator, LumoItemModelProvider, LumoModelProvider}
+import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoBlockStateGenerator, LumoItemModelProvider, LumoModelProvider, LumoTagsProvider}
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
-import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider}
+import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricTagProvider}
 import net.minecraft.client.model.Model
-import net.minecraft.core.HolderLookup
+import net.minecraft.core.{HolderLookup, Registry}
 import net.minecraft.data.models.blockstates.BlockStateGenerator
 import net.minecraft.data.models.{BlockModelGenerators, ItemModelGenerators}
 import net.minecraft.data.{CachedOutput, DataProvider}
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.tags.TagKey
 import net.minecraft.world.item.Item
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.storage.loot.LootTable
 
 import java.util.concurrent.CompletableFuture
+import scala.jdk.CollectionConverters.*
 import scala.collection.mutable
 
 /**
@@ -47,7 +50,17 @@ class InfoCollector:
   
   private val blockStates = mutable.HashMap[Block, LumoBlockStateGenerator => Block => Unit]()
 
+  private[registry] val tags = ArrayListMultimap.create[ResourceKey[? <: Registry[?]], LumoTagsProvider[?] => Unit]()
+
+  private[registry] val tagMembers = mutable.HashMap[ResourceKey[? <: Registry[?]], Multimap[Any, TagKey[?]]]()
+
   private lazy val doDatagen = System.getProperty("fabric-api.datagen") != null
+
+  def addToTag[T](registry: ResourceKey[? <: Registry[T]], tag: TagKey[T], block: T): Unit =
+    if doDatagen then
+      tagMembers.getOrElseUpdate(registry, ArrayListMultimap.create[Any, TagKey[?]]()).put(block, tag)
+
+
 
   def setBlockState(block: Block, func: LumoBlockStateGenerator => Block => Unit): Unit =
     if doDatagen then
@@ -109,16 +122,25 @@ class InfoCollector:
           InfoCollector.this.blockStates.foreach { (k, v) =>
             v(this)(k)
           }
+      val tagsProvider =
+        (tags.keySet().asScala ++ tagMembers.keySet).map { registry =>
+          // god made
+          LumoTagsProvider[Any](this, registry.asInstanceOf[ResourceKey[Registry[Any]]], output, lookup)
+        }
 
       // registered like this so that the normal ones could also
       // be used along side this
       new DataProvider {
         override def run(output: CachedOutput): CompletableFuture[?] =
+          val f150: CompletableFuture[?] = CompletableFuture.allOf(
+            tagsProvider.map(_.run(output)).toSeq*
+          )
           CompletableFuture.allOf(
-            langProvider.run(output), 
-            blockLootProvider.run(output),
-            itemModelProvider.run(output),
-            blockModelProvider.run(output)
+              langProvider.run(output),
+              blockLootProvider.run(output),
+              itemModelProvider.run(output),
+              blockModelProvider.run(output),
+              f150
           )
 
         override def getName: String = "InfoCollector-based provider for lumomancy"

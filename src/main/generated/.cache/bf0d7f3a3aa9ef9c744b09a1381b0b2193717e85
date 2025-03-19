@@ -1,19 +1,2 @@
-// 1.21.1	2025-03-18T16:57:50.745606612	Lumomancy/Tags for minecraft:block
-e59c341b3cce5fdae5c22625341ae8dba5c9fb97 data/minecraft/tags/block/fence_gates.json
-18de98ea10a6f4912a85318535fa5de4178a78e3 data/minecraft/tags/block/wooden_pressure_plates.json
-48454a58ea74f9b5488ade7c29c00268f8d3292e data/minecraft/tags/block/planks.json
-49ee439e4b6193fcb18a9ef7b399d7aec27754cf data/minecraft/tags/block/ceiling_hanging_signs.json
-0fcad0be57875545dcc87b1e1dac6d11f6550cd6 data/minecraft/tags/block/wall_hanging_signs.json
-9068f9934a640d205dfc7ab9f2cbeffc46445a62 data/lumomancy/tags/block/wieder_logs.json
-7d9a49d8eb2df26d33748b6b605d33b89e79357c data/minecraft/tags/block/wooden_slabs.json
-74e713b6f1451a030ca37f5fd4701647849267d4 data/minecraft/tags/block/standing_signs.json
-cab4608090c4bd8180a89286e4a272c934ba903e data/minecraft/tags/block/wooden_trapdoors.json
-9f974eef1b9399bc33fd901cf1879f6a774e73a5 data/minecraft/tags/block/wooden_fences.json
-d1e545bd3cf9a2d26d072428debd3bc4330563aa data/minecraft/tags/block/wooden_stairs.json
-6a5c27ba03836940f2d3e36a632ecaa2a2920120 data/lumomancy/tags/block/stillwood_logs.json
-3acd0fce5505756ded6913ee83a54f3229fb6600 data/minecraft/tags/block/wall_signs.json
-505eb715498903cd609f063fcb9e4596289d16ed data/minecraft/tags/block/wooden_buttons.json
-3aae5bea2ab20f52447bd2eddc00c1f3af36af27 data/minecraft/tags/block/logs_that_burn.json
-e6bc4601b1eedba5b82132e4a120707b1778e684 data/lumomancy/tags/block/aftus_logs.json
-f43cff3aed2cdacafa9bc394734777a99fd501cf data/minecraft/tags/block/wooden_doors.json
-8f0bba8478e0d47efae59122293bc91dbff242b5 data/minecraft/tags/block/mineable/axe.json
+// 1.21.1	2025-03-19T14:41:15.844771872	Lumomancy/Tags for minecraft:block
+c53dd8c511087788dc69caa074a59894f208ef20 data/minecraft/tags/block/logs_that_burn.json

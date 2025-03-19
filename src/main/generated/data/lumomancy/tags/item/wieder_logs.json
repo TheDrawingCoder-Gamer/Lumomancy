@@ -1,8 +1,8 @@
 {
   "values": [
-    "lumomancy:wieder_log",
-    "lumomancy:wieder_wood",
     "lumomancy:stripped_wieder_log",
-    "lumomancy:stripped_wieder_wood"
+    "lumomancy:stripped_wieder_wood",
+    "lumomancy:wieder_log",
+    "lumomancy:wieder_wood"
   ]
 }

@@ -15,14 +15,18 @@
 
 package gay.menkissing.lumomancy.util.registry.builder
 
+import com.google.common.collect.{ArrayListMultimap, HashMultimap}
 import gay.menkissing.lumomancy.util.registry.InfoCollector
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
+import net.minecraft.tags.TagKey
+import net.minecraft.core.Registry
 
 import scala.collection.mutable
 
 abstract class Builder[R, P]:
 
   private val delayedLangEntries = mutable.ListBuffer[(R => String, String)]()
+  private val tagsByType = ArrayListMultimap.create[ResourceKey[? <: Registry[?]], TagKey[?]]()
   
   def owner: InfoCollector
 
@@ -32,6 +36,10 @@ abstract class Builder[R, P]:
   
   def lang(key: R => String, value: String): this.type =
     delayedLangEntries.append((key, value))
+    this
+
+  def tag[T](registry: ResourceKey[? <: Registry[T]], tag: TagKey[T]): this.type =
+    tagsByType.put(registry, tag)
     this
     
   def parent: P
@@ -48,5 +56,8 @@ abstract class Builder[R, P]:
     val item = registered()
     delayedLangEntries.foreach { (k, v) =>
       owner.addRawLang(k(item), v)
+    }
+    tagsByType.forEach { (k, v) =>
+      owner.addToTag(k.asInstanceOf[ResourceKey[Registry[Any]]], v.asInstanceOf[TagKey[Any]], item.asInstanceOf[Any])
     }
     item
