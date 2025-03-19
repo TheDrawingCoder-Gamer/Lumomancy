@@ -27,9 +27,7 @@ import java.util.concurrent.CompletableFuture
 class LumoItemModelProvider(output: FabricDataOutput) extends LumoModelProvider(output):
 
   def generated(item: ResourceLocation): LumoModelBuilder =
-    getBuilder(item)
-      .parent(ResourceLocation.withDefaultNamespace("item/generated"))
-      .texture("layer0", ResourceLocation.fromNamespaceAndPath(item.getNamespace, item.getPath))
+    flatItem(item, item)
 
   def generated(item: Item): LumoModelBuilder =
     generated(item.modelLoc)

@@ -29,10 +29,11 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents
 import net.minecraft.client.renderer.RenderType
 import net.minecraft.core.{Direction, Registry}
 import net.minecraft.core.registries.BuiltInRegistries
-import net.minecraft.resources.ResourceLocation
+import net.minecraft.core.registries.Registries
+import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.world.item.{BlockItem, HangingSignItem, Item, SignItem}
 import net.minecraft.world.level.block.entity.{BlockEntity, BlockEntityType}
-import net.minecraft.world.level.block.{Block, Blocks, CeilingHangingSignBlock, DoorBlock, FenceBlock, FenceGateBlock, PressurePlateBlock, RotatedPillarBlock, SignBlock, SlabBlock, SoundType, StairBlock, StandingSignBlock, TrapDoorBlock, WallHangingSignBlock, WallSignBlock}
+import net.minecraft.world.level.block.{Block, Blocks, CeilingHangingSignBlock, DoorBlock, FenceBlock, FenceGateBlock, LeavesBlock, PressurePlateBlock, RotatedPillarBlock, SaplingBlock, SignBlock, SlabBlock, SoundType, StairBlock, StandingSignBlock, TrapDoorBlock, WallHangingSignBlock, WallSignBlock}
 import net.minecraft.world.level.block.state.{BlockBehaviour, BlockState}
 import net.minecraft.world.level.block.state.properties.{BlockSetType, NoteBlockInstrument, WoodType}
 import net.minecraft.world.level.material.{MapColor, PushReaction}
@@ -40,8 +41,10 @@ import BlockBehaviour.Properties as BlockProps
 import gay.menkissing.lumomancy.util.registry.InfoCollector
 import gay.menkissing.lumomancy.util.registry.builder.{BlockBuilder, ItemBuilder}
 import net.minecraft.tags.{BlockTags, ItemTags}
+import net.minecraft.world.level.block.grower.TreeGrower
 
 import scala.collection.mutable
+import java.util.Optional
 
 object LumomancyBlocks:
   private val blockItems: mutable.ListBuffer[Item] = mutable.ListBuffer()
@@ -607,7 +610,33 @@ object LumomancyBlocks:
                       .blockstate(gen => block => gen.trapdoorBlock(block))
                       .dropSelf()
                       .registerItem()
-  
+
+  val aftusGrower = TreeGrower("LUMO_AFTUS", Optional.empty(), Optional.of(ResourceKey.create(Registries.CONFIGURED_FEATURE, Lumomancy.locate("aftus_tree"))), Optional.empty())
+
+  val aftusSapling: Block =
+    InfoCollector.instance.block("aftus_sapling", SaplingBlock(aftusGrower, BlockProps.ofFullCopy(Blocks.OAK_SAPLING)))
+                 .item()
+                 .model(gen => item => gen.flatItem(item, aftusSapling.modelLoc))
+                 .tag(LumomancyTags.item.coloredSaplingsTag)
+                 .build()
+                 .blockstate(gen => block => gen.crossBlock(block, aftusSapling.modelLoc))
+                 .lang("Aftus Sapling")
+                 .tag(LumomancyTags.block.coloredSaplingsTag)
+                 .dropSelf()
+                 .registerItem()
+
+  val aftusLeaves: Block =
+    InfoCollector.instance.block("aftus_leaves", LeavesBlock(BlockProps.ofFullCopy(Blocks.OAK_LEAVES)))
+                 .blockItem()
+                 .tag(LumomancyTags.item.coloredLeavesTag)
+                 .build()
+                 .lang("Aftus Leaves")
+                 .lootTable(loot => loot.createLeavesDrops(aftusLeaves, aftusSapling, 0.02f, 0.022222223f, 0.025f, 0.033333335f, 0.1f))
+                 .blockstate(_.simpleBlock)
+                 .tag(LumomancyTags.block.coloredLeavesTag)
+                 .tag(BlockTags.MINEABLE_WITH_HOE)
+                 .registerItem()
+
   @Environment(EnvType.CLIENT)
   def registerClient(): Unit =
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodDoor, RenderType.cutout())
@@ -616,6 +645,8 @@ object LumomancyBlocks:
     BlockRenderLayerMap.INSTANCE.putBlock(wiederTrapdoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(aftusDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(aftusTrapdoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(aftusSapling, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(aftusLeaves, RenderType.cutout())
 
 
   def init(): Unit =

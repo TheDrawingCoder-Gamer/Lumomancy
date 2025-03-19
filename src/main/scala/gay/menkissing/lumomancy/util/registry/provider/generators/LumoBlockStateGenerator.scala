@@ -49,6 +49,10 @@ abstract class LumoBlockStateGenerator(val output: FabricDataOutput) extends Dat
     val key = BuiltInRegistries.BLOCK.getKey(block)
     ResourceLocation.fromNamespaceAndPath(key.getNamespace, "block/" + key.getPath)
 
+  def crossBlock(block: Block, texture: ResourceLocation): Unit =
+    val model = models.cross(block, texture)
+    simpleBlock(block, model)
+
   def signBlock(block: Block, wall: Block, particle: ResourceLocation): Unit =
     val model = models.sign(block, particle)
     simpleBlock(block, model)

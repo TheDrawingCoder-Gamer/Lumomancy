@@ -26,31 +26,31 @@ import net.minecraft.tags.TagKey
 import java.util.concurrent.CompletableFuture
 import scala.collection.mutable
 import scala.jdk.CollectionConverters.*
+import annotation.{nowarn, unchecked}
 
 class LumoTagsProvider[T](val owner: InfoCollector, registry: ResourceKey[Registry[T]], output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider])
   extends FabricTagProvider[T](output, registry, lookup):
 
   override def tag(tag: TagKey[T]): FabricTagProvider[T]#FabricTagBuilder = super.getOrCreateTagBuilder(tag)
 
+  @nowarn("msg=type test")
   override def addTags(provider: HolderLookup.Provider): Unit =
     owner.tags.get(registryKey).forEach(_(this))
-    val freakyTags = ArrayListMultimap.create[TagKey[T], T | TagKey[T]]()
-    owner.tagMembers(registry).forEach: (block, tags) =>
-      freakyTags.put(tags.asInstanceOf[TagKey[T]], block.asInstanceOf[T | TagKey[T]])
 
     val reg = provider.lookup(registryKey).get()
 
     val thangs = mutable.HashMap[T, ResourceKey[T]]()
 
     // done this way so i can SORT THAT THANG!!!
-    freakyTags.asMap().forEach: (tag, blocks) =>
-      val builder = super.getOrCreateTagBuilder(tag)
+    owner.tagMembers(registryKey).asMap().forEach: (tag, blocks) =>
+      val goodTag = tag.asInstanceOf[TagKey[T]]
+      val builder = super.getOrCreateTagBuilder(goodTag)
       blocks.iterator().asScala.toList.sortBy {
+        case key: TagKey[?] => "#" + key.location().toString
         case block: T => thangs.getOrElseUpdate(block, reg.listElements().filter(_.value() == block).findFirst().get().key()).location().toString
-        case key: TagKey[T] => "#" + key.location().toString
       }.foreach {
-        case block: T => builder.add(block)
         case key: TagKey[T] => builder.addOptionalTag(key)
+        case block: T => builder.add(block)
       }
 
 

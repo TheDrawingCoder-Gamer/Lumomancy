@@ -32,7 +32,7 @@ object Lumomancy extends ModInitializer:
     LumomancyBlocks.init()
     LumomancyRegistries.init()
     LumomancyDataComponents.init()
-
+    LumomancyTags.init()
     LumomancyScreens.init()
     LumonColors.init()
     

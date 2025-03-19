@@ -17,7 +17,7 @@ package gay.menkissing.lumomancy.util.registry
 
 import com.google.common.collect.{ArrayListMultimap, HashMultimap, Multimap}
 import gay.menkissing.lumomancy.Lumomancy
-import gay.menkissing.lumomancy.util.registry.builder.{BlockBuilder, ItemBuilder}
+import gay.menkissing.lumomancy.util.registry.builder.{BlockBuilder, ItemBuilder, TagBuilder}
 import gay.menkissing.lumomancy.util.registry.provider.generators.{LumoBlockStateGenerator, LumoItemModelProvider, LumoModelProvider, LumoTagsProvider}
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricTagProvider}
@@ -52,15 +52,17 @@ class InfoCollector:
 
   private[registry] val tags = ArrayListMultimap.create[ResourceKey[? <: Registry[?]], LumoTagsProvider[?] => Unit]()
 
-  private[registry] val tagMembers = mutable.HashMap[ResourceKey[? <: Registry[?]], Multimap[Any, TagKey[?]]]()
+  private[registry] val tagMembers = mutable.HashMap[ResourceKey[? <: Registry[?]], Multimap[TagKey[?], Any]]()
 
   private lazy val doDatagen = System.getProperty("fabric-api.datagen") != null
 
   def addToTag[T](registry: ResourceKey[? <: Registry[T]], tag: TagKey[T], block: T): Unit =
     if doDatagen then
-      tagMembers.getOrElseUpdate(registry, ArrayListMultimap.create[Any, TagKey[?]]()).put(block, tag)
+      tagMembers.getOrElseUpdate(registry, ArrayListMultimap.create[TagKey[?], Any]()).put(tag, block)
 
-
+  def addTagToTag[T](registry: ResourceKey[? <: Registry[T]], tag: TagKey[T], subtag: TagKey[T]): Unit =
+    if doDatagen then
+      tagMembers.getOrElseUpdate(registry, ArrayListMultimap.create()).put(tag, subtag)
 
   def setBlockState(block: Block, func: LumoBlockStateGenerator => Block => Unit): Unit =
     if doDatagen then
@@ -92,6 +94,15 @@ class InfoCollector:
   def item(name: String, item: Item): ItemBuilder[Unit] =
     this.item(Lumomancy.locate(name), item)
 
+  def tag[T](registry: ResourceKey[? <: Registry[T]], name: ResourceLocation): TagBuilder[T, Unit] =
+    TagBuilder(this, (), registry, TagKey.create(registry, name))
+  
+  def tag[T](registry: ResourceKey[? <: Registry[T]], name: String): TagBuilder[T, Unit] =
+    this.tag(registry, Lumomancy.locate(name))
+    
+  def appendTag[T](key: TagKey[T]): TagBuilder[T, Unit] =
+    TagBuilder(this, (), key.registry(), key)
+  
   def registerDataGenerators(pack: FabricDataGenerator#Pack): Unit =
     pack.addProvider { (output, lookup) =>
       val langProvider = new FabricLanguageProvider(output, "en_us", lookup) {

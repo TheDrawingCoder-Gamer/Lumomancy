@@ -1,15 +1,15 @@
 {
   "values": [
     {
+      "id": "#lumomancy:aftus_logs",
+      "required": false
+    },
+    {
       "id": "#lumomancy:stillwood_logs",
       "required": false
     },
     {
       "id": "#lumomancy:wieder_logs",
-      "required": false
-    },
-    {
-      "id": "#lumomancy:aftus_logs",
       "required": false
     }
   ]

@@ -44,6 +44,9 @@ class LumoModelProvider(val output: FabricDataOutput):
   def getBuilder[T: ModelResourceLike](path: T): LumoModelBuilder =
     generatedModels.getOrElseUpdate(path.modelLoc, LumoModelBuilder(path.modelLoc))
 
+  def flatItem[T: ModelResourceLike](name: T, texture: ResourceLocation): LumoModelBuilder =
+    withExistingParent(name, ResourceLocation.withDefaultNamespace("item/generated")).texture("layer0", texture)
+
   def withExistingParent[T: ModelResourceLike](name: T, parent: ResourceLocation): LumoModelBuilder =
     getBuilder(name).parent(parent)
 
@@ -183,6 +186,9 @@ class LumoModelProvider(val output: FabricDataOutput):
 
   def trapdoorOrientableOpen[T: ModelResourceLike](name: T, texture: ResourceLocation): LumoModelBuilder =
     singleTexture(name, "block/template_orientable_trapdoor_open", texture)
+
+  def cross[T: ModelResourceLike](name: T, texture: ResourceLocation): LumoModelBuilder =
+    singleTexture(name, "block/cross", "cross", texture)
 
 
   def generateAll(cache: CachedOutput): CompletableFuture[?] =

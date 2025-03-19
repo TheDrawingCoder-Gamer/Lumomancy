@@ -15,6 +15,7 @@
 
 package gay.menkissing.lumomancy.datagen
 
+import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.StasisCooler
 import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables, LumomancyTags, LumomancyTranslationKeys}
@@ -23,23 +24,35 @@ import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider, SimpleFabricLootTableProvider}
 import net.fabricmc.fabric.api.datagen.v1.{DataGeneratorEntrypoint, FabricDataGenerator, FabricDataOutput}
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalItemTags
-import net.minecraft.core.registries.BuiltInRegistries
+import net.minecraft.core.registries.{BuiltInRegistries, Registries}
 import net.minecraft.core.{Direction, HolderLookup, Registry}
+import net.minecraft.data.PackOutput.Target
+import net.minecraft.data.{CachedOutput, DataProvider}
 import net.minecraft.data.models.{BlockModelGenerators, ItemModelGenerators}
 import net.minecraft.data.models.blockstates.{Condition, MultiPartGenerator, Variant, VariantProperties}
 import net.minecraft.data.models.model.{ModelLocationUtils, ModelTemplate, ModelTemplates, TextureMapping, TextureSlot}
+import net.minecraft.data.worldgen.features.FeatureUtils
 import net.minecraft.resources.{ResourceKey, ResourceLocation}
 import net.minecraft.tags.{BlockTags, ItemTags, TagKey}
+import net.minecraft.util.valueproviders.ConstantInt
 import net.minecraft.world.item.{Item, Items}
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.properties.{BlockStateProperties, EnumProperty}
+import net.minecraft.world.level.levelgen.feature.configurations.{FeatureConfiguration, TreeConfiguration}
+import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize
+import net.minecraft.world.level.levelgen.feature.foliageplacers.BlobFoliagePlacer
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider
+import net.minecraft.world.level.levelgen.feature.trunkplacers.{StraightTrunkPlacer, TrunkPlacer}
+import net.minecraft.world.level.levelgen.feature.{ConfiguredFeature, TreeFeature}
 import net.minecraft.world.level.storage.loot.{LootPool, LootTable}
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue
+import net.minecraft.world.level.levelgen.feature.Feature
 
 import java.util.concurrent.CompletableFuture
 import java.util.function.BiConsumer
 import scala.collection.mutable
+import cats.syntax.arrow.*
 
 object LumoDatagen extends DataGeneratorEntrypoint:
   override def onInitializeDataGenerator(fabricDataGenerator: FabricDataGenerator): Unit =
@@ -50,8 +63,9 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     pack.addProvider(GameplayLootTableGenerator.apply)
     // pack.addProvider(EnglishLanguageGenerator.apply)
     InfoCollector.instance.registerDataGenerators(pack)
-    pack.addProvider(ItemTagGenerator.apply)
-    pack.addProvider(BlockTagGenerator.apply)
+    //pack.addProvider(ItemTagGenerator.apply)
+    //pack.addProvider(BlockTagGenerator.apply)
+    pack.addProvider(FeatureGenerator.apply)
 
 
 
@@ -178,22 +192,45 @@ object LumoDatagen extends DataGeneratorEntrypoint:
 
   import tagHelper.given
 
-  private class ItemTagGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricTagProvider[Item](output, BuiltInRegistries.ITEM.key(), lookup):
-    override def addTags(provider: HolderLookup.Provider): Unit =
-      getOrCreateTagBuilder(LumomancyTags.item.validToolTag)
-        .addOptionalTag(ConventionalItemTags.TOOLS)
-        .addOptionalTag(ItemTags.HEAD_ARMOR)
-        .addOptionalTag(ItemTags.CHEST_ARMOR)
-        .addOptionalTag(ItemTags.LEG_ARMOR)
-        .addOptionalTag(ItemTags.FOOT_ARMOR)
-        .add(Items.SPYGLASS)
-        .addOptionalTag(ItemTags.COMPASSES)
-        .addOptionalTag(TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath("c", "wrenches")))
-        .setReplace(false)
-      tagHelper.addWoodSetTags(registryKey, this.getOrCreateTagBuilder)
 
-  private class BlockTagGenerator(output: FabricDataOutput, lookup: CompletableFuture[HolderLookup.Provider]) extends FabricTagProvider[Block](output, BuiltInRegistries
-    .BLOCK.key(), lookup):
-    override def addTags(provider: HolderLookup.Provider): Unit =
-      tagHelper.addWoodSetTags(registryKey, this.getOrCreateTagBuilder)
+
+
+  private class FeatureGenerator(val output: FabricDataOutput, val lookup: CompletableFuture[HolderLookup.Provider]) extends DataProvider:
+    override def run(cache: CachedOutput): CompletableFuture[?] =
+      features.clear()
+      lookup.thenCompose { lookup =>
+        registerFeatures(lookup)
+        CompletableFuture.allOf(
+          features.map { (key, value) =>
+            saveFeature(cache, lookup, key.location(), value)
+          }.toSeq*
+        )
+      }
+
+    override def getName: String = "Lumo Feature Generator"
+
+    val features: mutable.HashMap[ResourceKey[ConfiguredFeature[?, ?]], ConfiguredFeature[?, ?]] = mutable.HashMap()
+
+    def saveFeature(cache: CachedOutput, lookup: HolderLookup.Provider, loc: ResourceLocation, configuredFeature: ConfiguredFeature[?, ?]): CompletableFuture[?] =
+      val outputPath = output.getOutputFolder(Target.DATA_PACK).resolve(loc.getNamespace).resolve("worldgen/configured_feature").resolve(loc.getPath + ".json")
+      DataProvider.saveStable(cache, lookup, ConfiguredFeature.DIRECT_CODEC, configuredFeature, outputPath)
+
+
+    def key(loc: ResourceLocation): ResourceKey[ConfiguredFeature[?, ?]] =
+      ResourceKey.create(Registries.CONFIGURED_FEATURE, loc)
+
+    def straightTree(log: Block, leaves: Block, baseHeight: Int, heightRandA: Int, heightRandB: Int, radius: Int): TreeConfiguration.TreeConfigurationBuilder =
+      new TreeConfiguration.TreeConfigurationBuilder(BlockStateProvider.simple(log),
+        StraightTrunkPlacer(baseHeight, heightRandA, heightRandB),
+        BlockStateProvider.simple(leaves),
+        BlobFoliagePlacer(ConstantInt.of(radius), ConstantInt.of(0), 3),
+        TwoLayersFeatureSize(1, 0, 1))
+
+
+    def feature[FC <: FeatureConfiguration, F <: Feature[FC]](loc: ResourceLocation, feature: F, config: FC): Unit =
+      features(key(loc)) = ConfiguredFeature[FC, F](feature, config)
+
+    def registerFeatures(lookup: HolderLookup.Provider): Unit =
+     feature(Lumomancy.locate("aftus_tree"), Feature.TREE,
+       straightTree(LumomancyBlocks.aftusLog, LumomancyBlocks.aftusLeaves, 4, 2, 0, 2).ignoreVines().build())
 
