@@ -28,51 +28,61 @@ object LumomancyTags:
   object item:
     val validToolTag: TagKey[Item] =
       InfoCollector.instance.tag(Registries.ITEM, "valid_tools")
-                   .subtag(ConventionalItemTags.TOOLS)
-                   .subtag(ItemTags.HEAD_ARMOR)
-                   .subtag(ItemTags.CHEST_ARMOR)
-                   .subtag(ItemTags.LEG_ARMOR)
-                   .subtag(ItemTags.FOOT_ARMOR)
+                   .addTag(ConventionalItemTags.TOOLS)
+                   .addTag(ItemTags.HEAD_ARMOR)
+                   .addTag(ItemTags.CHEST_ARMOR)
+                   .addTag(ItemTags.LEG_ARMOR)
+                   .addTag(ItemTags.FOOT_ARMOR)
                    .add(Items.SPYGLASS)
-                   .subtag(ItemTags.COMPASSES)
-                   .subtag(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "wrenches")))
+                   .addTag(ItemTags.COMPASSES)
+                   .addTag(TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath("c", "wrenches")))
                    .register()
 
-    val stillwoodLogsTag: TagKey[Item] = TagKey.create(BuiltInRegistries.ITEM.key(), Lumomancy.locate("stillwood_logs"))
-    val wiederLogsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("wieder_logs"))
-    val aftusLogsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("aftus_logs"))
-    val coloredLeavesTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("colored_leaves"))
-    val coloredSaplingsTag: TagKey[Item] = TagKey.create(Registries.ITEM, Lumomancy.locate("colored_saplings"))
+    val stillwoodLogsTag: TagKey[Item] = 
+      InfoCollector.instance.tag(BuiltInRegistries.ITEM.key(), Lumomancy.locate("stillwood_logs"))
+                   .tag(ItemTags.LOGS_THAT_BURN)
+                   .register()
+    val wiederLogsTag: TagKey[Item] = 
+      InfoCollector.instance.tag(Registries.ITEM, Lumomancy.locate("wieder_logs"))
+                   .tag(ItemTags.LOGS_THAT_BURN)
+                   .register()
+    val aftusLogsTag: TagKey[Item] = 
+      InfoCollector.instance.tag(Registries.ITEM, Lumomancy.locate("aftus_logs"))
+                   .tag(ItemTags.LOGS_THAT_BURN)
+                   .register()
+    val coloredLeavesTag: TagKey[Item] = 
+      InfoCollector.instance.tag(Registries.ITEM, Lumomancy.locate("colored_leaves"))
+                   .tag(ItemTags.LEAVES)
+                   .register()
+    val coloredSaplingsTag: TagKey[Item] = 
+      InfoCollector.instance.tag(Registries.ITEM, Lumomancy.locate("colored_saplings"))
+                   .tag(ItemTags.SAPLINGS)
+                   .register()
 
   object block:
-    val stillwoodLogsTag: TagKey[Block] = TagKey.create(BuiltInRegistries.BLOCK.key(), Lumomancy.locate("stillwood_logs"))
-    val wiederLogsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("wieder_logs"))
-    val aftusLogsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("aftus_logs"))
-    val coloredLeavesTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("colored_leaves"))
-    val coloredSaplingsTag: TagKey[Block] = TagKey.create(Registries.BLOCK, Lumomancy.locate("colored_saplings"))
+    val stillwoodLogsTag: TagKey[Block] = 
+      InfoCollector.instance.tag(BuiltInRegistries.BLOCK.key(), Lumomancy.locate("stillwood_logs"))
+                   .tag(BlockTags.LOGS_THAT_BURN)
+                   .register()
+    val wiederLogsTag: TagKey[Block] = 
+      InfoCollector.instance.tag(Registries.BLOCK, Lumomancy.locate("wieder_logs"))
+                   .tag(BlockTags.LOGS_THAT_BURN)
+                   .register()
+    val aftusLogsTag: TagKey[Block] = 
+      InfoCollector.instance.tag(Registries.BLOCK, Lumomancy.locate("aftus_logs"))
+                   .tag(BlockTags.LOGS_THAT_BURN)
+                   .register()
+    val coloredLeavesTag: TagKey[Block] = 
+      InfoCollector.instance.tag(Registries.BLOCK, Lumomancy.locate("colored_leaves"))
+                   .tag(BlockTags.LEAVES)
+                   .tag(BlockTags.MINEABLE_WITH_HOE)
+                   .tag(BlockTags.SWORD_EFFICIENT)
+                   .register()
+    val coloredSaplingsTag: TagKey[Block] = 
+      InfoCollector.instance.tag(Registries.BLOCK, Lumomancy.locate("colored_saplings"))
+                   .tag(BlockTags.SAPLINGS)
+                   .register()
 
   def init(): Unit =
     val _ = block
     val _ = item
-    InfoCollector.instance.appendTag(ItemTags.LOGS_THAT_BURN)
-                 .subtag(item.stillwoodLogsTag)
-                 .subtag(item.wiederLogsTag)
-                 .subtag(item.aftusLogsTag)
-                 .build()
-    InfoCollector.instance.appendTag(BlockTags.LOGS_THAT_BURN)
-                 .subtag(block.stillwoodLogsTag)
-                 .subtag(block.wiederLogsTag)
-                 .subtag(block.aftusLogsTag)
-                 .build()
-    InfoCollector.instance.appendTag(ItemTags.SAPLINGS)
-                 .subtag(item.coloredSaplingsTag)
-                 .build()
-    InfoCollector.instance.appendTag(BlockTags.SAPLINGS)
-                 .subtag(block.coloredSaplingsTag)
-                 .build()
-    InfoCollector.instance.appendTag(ItemTags.LEAVES)
-                 .subtag(item.coloredLeavesTag)
-                 .build()
-    InfoCollector.instance.appendTag(BlockTags.LEAVES)
-                 .subtag(block.coloredLeavesTag)
-                 .build()

@@ -159,42 +159,6 @@ object LumoDatagen extends DataGeneratorEntrypoint:
     override def generateBlockStateModels(blockModelGenerators: BlockModelGenerators): Unit =
       generateStasisCoolerModels(blockModelGenerators)
  
-
-  private object tagHelper:
-    trait AcceptsBlockItems[T]:
-      def addBlock(self: T, block: Block): T
-
-    extension[T](self: T)(using abi: AcceptsBlockItems[T])
-      def addBlock(block: Block): T =
-        abi.addBlock(self, block)
-
-    extension[T](self: TagKey[T])
-      def transmute[G](target: ResourceKey[? <: Registry[G]]) : TagKey[G] =
-        TagKey.create(target, self.location())
-
-    given acceptsBlockItemsItem: AcceptsBlockItems[FabricTagProvider[Item]#FabricTagBuilder]:
-      override def addBlock(self: FabricTagProvider[Item]#FabricTagBuilder, block: Block): FabricTagProvider[Item]#FabricTagBuilder =
-        self.add(block.asItem())
-
-    given acceptsBlockItemsBlock: AcceptsBlockItems[FabricTagProvider[Block]#FabricTagBuilder]:
-      override def addBlock(self: FabricTagProvider[Block]#FabricTagBuilder, block: Block): FabricTagProvider[Block]#FabricTagBuilder =
-        self.add(block)
-
-
-    def addWoodSetTags[T](registry: ResourceKey[? <: Registry[T]], makeBuilder: TagKey[T] => FabricTagProvider[T]#FabricTagBuilder)(using AcceptsBlockItems[FabricTagProvider[T]#FabricTagBuilder]): Unit =
-      makeBuilder(BlockTags.LOGS_THAT_BURN.transmute(registry))
-        .addOptionalTag(LumomancyTags.block.stillwoodLogsTag.transmute(registry))
-        .addOptionalTag(LumomancyTags.block.wiederLogsTag.transmute(registry))
-        .addOptionalTag(LumomancyTags.block.aftusLogsTag.transmute(registry))
-        .setReplace(false)
-
-
-
-  import tagHelper.given
-
-
-
-
   private class FeatureGenerator(val output: FabricDataOutput, val lookup: CompletableFuture[HolderLookup.Provider]) extends DataProvider:
     override def run(cache: CachedOutput): CompletableFuture[?] =
       features.clear()
@@ -234,3 +198,8 @@ object LumoDatagen extends DataGeneratorEntrypoint:
      feature(Lumomancy.locate("aftus_tree"), Feature.TREE,
        straightTree(LumomancyBlocks.aftusLog, LumomancyBlocks.aftusLeaves, 4, 2, 0, 2).ignoreVines().build())
 
+     feature(Lumomancy.locate("stillwood_tree"), Feature.TREE,
+       straightTree(LumomancyBlocks.stillwoodLog, LumomancyBlocks.stillwoodLeaves, 4, 2, 0, 2).ignoreVines().build())
+
+     feature(Lumomancy.locate("wieder_tree"), Feature.TREE,
+       straightTree(LumomancyBlocks.wiederLog, LumomancyBlocks.wiederLeaves, 4, 2, 0, 2).ignoreVines().build())

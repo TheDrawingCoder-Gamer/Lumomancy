@@ -20,7 +20,7 @@ import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.block.{StasisCooler, StrippablePillarBlock}
 import gay.menkissing.lumomancy.content.block.entity.StasisCoolerBlockEntity
 import gay.menkissing.lumomancy.mixin.AxeItemAccessor
-import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables, LumomancyTags}
+import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumoWorldFeatures, LumomancyLootTables, LumomancyTags}
 import gay.menkissing.lumomancy.util.resources.{*, given}
 import net.fabricmc.api.{EnvType, Environment}
 import net.fabricmc.fabric.api.`object`.builder.v1.block.`type`.{BlockSetTypeBuilder, WoodTypeBuilder}
@@ -265,6 +265,34 @@ object LumomancyBlocks:
                       .dropSelf()
                       .registerItem()
 
+  val stillwoodGrower = TreeGrower("LUMO_STILLWOOD", Optional.empty(), Optional.of(LumoWorldFeatures.stillwoodTree), Optional
+    .empty())
+
+  val stillwoodSapling: Block =
+    InfoCollector.instance
+                 .block("stillwood_sapling", SaplingBlock(stillwoodGrower, BlockProps.ofFullCopy(Blocks.OAK_SAPLING)))
+                 .item()
+                 .model(gen => item => gen.flatItem(item, stillwoodSapling.modelLoc))
+                 .tag(LumomancyTags.item.coloredSaplingsTag)
+                 .build()
+                 .blockstate(gen => block => gen.crossBlock(block, stillwoodSapling.modelLoc))
+                 .lang("Stillwood Sapling")
+                 .tag(LumomancyTags.block.coloredSaplingsTag)
+                 .dropSelf()
+                 .registerItem()
+
+  val stillwoodLeaves: Block =
+    InfoCollector.instance.block("stillwood_leaves", LeavesBlock(BlockProps.ofFullCopy(Blocks.OAK_LEAVES)))
+                 .blockItem()
+                 .tag(LumomancyTags.item.coloredLeavesTag)
+                 .build()
+                 .lang("Stillwood Leaves")
+                 .lootTable(loot => loot
+                   .createLeavesDrops(stillwoodLeaves, stillwoodSapling, 0.02f, 0.022222223f, 0.025f, 0.033333335f, 0.1f))
+                 .blockstate(_.simpleBlock)
+                 .tag(LumomancyTags.block.coloredLeavesTag)
+                 .registerItem()
+
   // wieder wood
   val wiederBlockSet = BlockSetTypeBuilder.copyOf(BlockSetType.OAK).register(Lumomancy.locate("wieder"))
   val wiederWoodSet = WoodTypeBuilder.copyOf(WoodType.OAK).register(Lumomancy.locate("wieder"), wiederBlockSet)
@@ -437,6 +465,33 @@ object LumomancyBlocks:
                       .tag(BlockTags.WOODEN_TRAPDOORS)
                       .dropSelf()
                       .registerItem()
+
+  val wiederGrower = TreeGrower("LUMO_WIEDER", Optional.empty(), Optional.of(LumoWorldFeatures.wiederTree), Optional
+    .empty())
+
+  val wiederSapling: Block =
+    InfoCollector.instance.block("wieder_sapling", SaplingBlock(wiederGrower, BlockProps.ofFullCopy(Blocks.OAK_SAPLING)))
+                 .item()
+                 .model(gen => item => gen.flatItem(item, wiederSapling.modelLoc))
+                 .tag(LumomancyTags.item.coloredSaplingsTag)
+                 .build()
+                 .blockstate(gen => block => gen.crossBlock(block, wiederSapling.modelLoc))
+                 .lang("Wieder Sapling")
+                 .tag(LumomancyTags.block.coloredSaplingsTag)
+                 .dropSelf()
+                 .registerItem()
+
+  val wiederLeaves: Block =
+    InfoCollector.instance.block("wieder_leaves", LeavesBlock(BlockProps.ofFullCopy(Blocks.OAK_LEAVES)))
+                 .blockItem()
+                 .tag(LumomancyTags.item.coloredLeavesTag)
+                 .build()
+                 .lang("Wieder Leaves")
+                 .lootTable(loot => loot
+                   .createLeavesDrops(wiederLeaves, wiederSapling, 0.02f, 0.022222223f, 0.025f, 0.033333335f, 0.1f))
+                 .blockstate(_.simpleBlock)
+                 .tag(LumomancyTags.block.coloredLeavesTag)
+                 .registerItem()
 
 
   // aftus wood
@@ -611,7 +666,7 @@ object LumomancyBlocks:
                       .dropSelf()
                       .registerItem()
 
-  val aftusGrower = TreeGrower("LUMO_AFTUS", Optional.empty(), Optional.of(ResourceKey.create(Registries.CONFIGURED_FEATURE, Lumomancy.locate("aftus_tree"))), Optional.empty())
+  val aftusGrower = TreeGrower("LUMO_AFTUS", Optional.empty(), Optional.of(LumoWorldFeatures.aftusTree), Optional.empty())
 
   val aftusSapling: Block =
     InfoCollector.instance.block("aftus_sapling", SaplingBlock(aftusGrower, BlockProps.ofFullCopy(Blocks.OAK_SAPLING)))
@@ -634,15 +689,20 @@ object LumomancyBlocks:
                  .lootTable(loot => loot.createLeavesDrops(aftusLeaves, aftusSapling, 0.02f, 0.022222223f, 0.025f, 0.033333335f, 0.1f))
                  .blockstate(_.simpleBlock)
                  .tag(LumomancyTags.block.coloredLeavesTag)
-                 .tag(BlockTags.MINEABLE_WITH_HOE)
                  .registerItem()
 
   @Environment(EnvType.CLIENT)
   def registerClient(): Unit =
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(stillwoodTrapdoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(stillwoodSapling, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(stillwoodLeaves, RenderType.cutout())
+
     BlockRenderLayerMap.INSTANCE.putBlock(wiederDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(wiederTrapdoor, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(wiederSapling, RenderType.cutout())
+    BlockRenderLayerMap.INSTANCE.putBlock(wiederLeaves, RenderType.cutout())
+
     BlockRenderLayerMap.INSTANCE.putBlock(aftusDoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(aftusTrapdoor, RenderType.cutout())
     BlockRenderLayerMap.INSTANCE.putBlock(aftusSapling, RenderType.cutout())

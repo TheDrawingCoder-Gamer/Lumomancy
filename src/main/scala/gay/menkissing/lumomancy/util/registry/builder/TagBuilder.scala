@@ -32,9 +32,13 @@ class TagBuilder[T, P](val owner: InfoCollector, val parent: P, val registryKey:
     this
 
 
-  def subtag(daTag: TagKey[T]): this.type =
+  def addTag(daTag: TagKey[T]): this.type =
     childTags.add(daTag)
     this
+    
+  def tag(parent: TagKey[T]): this.type =
+    // parent
+    tag(registryKey, parent)
 
   override protected def registered(): TagKey[T] =
     childTags.foreach { child =>
