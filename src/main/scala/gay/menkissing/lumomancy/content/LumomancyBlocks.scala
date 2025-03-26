@@ -293,7 +293,7 @@ object LumomancyBlocks:
 
     def treeFeature: ResourceKey[ConfiguredFeature[?, ?]]
 
-    val treeGrower = TreeGrower("LUMO_" + id.toUpperCase, Optional.empty(), Optional.of(LumoWorldFeatures.stillwoodTree), Optional
+    val treeGrower = TreeGrower("LUMO_" + id.toUpperCase, Optional.empty(), Optional.of(treeFeature), Optional
       .empty())
 
     val sapling: Block =
