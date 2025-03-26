@@ -1,4 +1,4 @@
-// 1.21.1	2025-03-19T21:46:50.705453624	Lumomancy/InfoCollector-based provider for lumomancy
+// 1.21.1	2025-03-25T23:08:34.63940659	Lumomancy/InfoCollector-based provider for lumomancy
 fbe78c650acd913214757e9c5afa24e6fbf62f90 assets/lumomancy/blockstates/aftus_fence_gate.json
 8832442db160d4a7c38e16e35ddd9dab783454f6 data/lumomancy/loot_table/blocks/wieder_log.json
 6247477dc5d23b744aba076efc5108bb5a90c6fa assets/lumomancy/models/block/wieder_sapling.json
@@ -88,8 +88,8 @@ c43cf96f9e933f83a9e2f52f2cae681560b6e508 assets/lumomancy/blockstates/aftus_butt
 afbd853ebc1efa59e0a735627c0d46f6dc234423 assets/lumomancy/models/item/wieder_slab.json
 86da11a8974e4aca27f8cc6a0bf069baccefdcc5 assets/lumomancy/models/block/stripped_aftus_log.json
 366227fd0353dcb69cce860b047ed44315608663 assets/lumomancy/models/block/stillwood_fence_gate_wall_open.json
-8338103dda2e3a405e2fd2e01cf06b66c1d9ce3e assets/lumomancy/blockstates/stillwood_planks.json
 17ca8d7e00466f83c5739f31df4a29badb83aeb4 assets/lumomancy/blockstates/wieder_slab.json
+8338103dda2e3a405e2fd2e01cf06b66c1d9ce3e assets/lumomancy/blockstates/stillwood_planks.json
 1345c10808c08845037047dc1255b41aa1702e2c assets/lumomancy/models/item/light_gray_bottle_of_light.json
 0fafc923afd7d7c7e55262377223fbff9dee2bf8 assets/lumomancy/blockstates/wieder_fence.json
 d50c741ad00758bfff3809fbd05eb594559ac255 assets/lumomancy/models/block/aftus_button.json
@@ -112,8 +112,8 @@ ef3f2b4f9cce47ac0bf664f15bbc92fc08028359 assets/lumomancy/blockstates/aftus_trap
 d6f9ae34e14567fd16436a5b8ebbb5cc923ff4ca data/lumomancy/tags/item/colored_saplings.json
 578251dc7e3223e867c1b8fd3a0469b168947509 data/minecraft/tags/block/saplings.json
 a8502c0e60660c34806a251a76cbe6c1d4ad642d assets/lumomancy/models/block/aftus_fence_inventory.json
-e89de88bfc0596871ee8aa94d2c2be6b6623a7e2 assets/lumomancy/models/item/aftus_sign.json
 32080a00ca5b3e6153ba4961c01a9bb0e0beb6a8 assets/lumomancy/models/item/brown_bottle_of_light.json
+e89de88bfc0596871ee8aa94d2c2be6b6623a7e2 assets/lumomancy/models/item/aftus_sign.json
 159c0561963988e378de6165ceee9c2ddb6f45f0 assets/lumomancy/models/block/stripped_stillwood_log_horizontal.json
 9468a4b4ee2d0200e2d794273fac94db8bad90f9 data/lumomancy/loot_table/blocks/stillwood_sign.json
 5b9156422bed52f4050a998eb719e6af3d4db035 data/minecraft/tags/block/logs_that_burn.json
@@ -172,8 +172,8 @@ aa9a2575f0e43b5e056002d89ce06cf6c4d3b6f7 data/minecraft/tags/block/sword_efficie
 b18141a805c6844af89f82b51583c74c8c226042 assets/lumomancy/models/item/wieder_stairs.json
 0a5d23372d11ab4ced86f3c5c887843f636f4796 assets/lumomancy/models/item/aftus_door.json
 294c848da3d0c48ef19ad388f62a6baa92d58142 assets/lumomancy/models/item/stillwood_stairs.json
-f1461f5a9e58abdabc06980acd9433b28de8952e assets/lumomancy/models/item/stripped_aftus_log.json
 65c6d01734c0396bd64eec7350cc001e529e6538 assets/lumomancy/models/item/aftus_fence.json
+f1461f5a9e58abdabc06980acd9433b28de8952e assets/lumomancy/models/item/stripped_aftus_log.json
 598a05801b5eb39fd9e7cdfaa5a30bfb04684bdf assets/lumomancy/models/item/green_bottle_of_light.json
 8a1031b1ad2ee7a82eaf39d8c80b7be6599efc8f data/lumomancy/loot_table/blocks/wieder_door.json
 d57017b1cc56148ce03ce6311a6b8775cc135a8a assets/lumomancy/models/block/wieder_trapdoor_top.json

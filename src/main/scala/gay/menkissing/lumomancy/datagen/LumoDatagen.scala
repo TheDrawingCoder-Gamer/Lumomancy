@@ -18,7 +18,7 @@ package gay.menkissing.lumomancy.datagen
 import gay.menkissing.lumomancy.Lumomancy
 import gay.menkissing.lumomancy.content.{LumomancyBlocks, LumomancyItems}
 import gay.menkissing.lumomancy.content.block.StasisCooler
-import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumomancyLootTables, LumomancyTags, LumomancyTranslationKeys}
+import gay.menkissing.lumomancy.registries.{LumoBlockFamilies, LumoWorldFeatures, LumomancyLootTables, LumomancyTags, LumomancyTranslationKeys}
 import gay.menkissing.lumomancy.util.registry.InfoCollector
 import net.fabricmc.fabric.api.datagen.v1.loot.FabricBlockLootTableGenerator
 import net.fabricmc.fabric.api.datagen.v1.provider.{FabricBlockLootTableProvider, FabricLanguageProvider, FabricModelProvider, FabricTagProvider, SimpleFabricLootTableProvider}
@@ -190,16 +190,16 @@ object LumoDatagen extends DataGeneratorEntrypoint:
         BlobFoliagePlacer(ConstantInt.of(radius), ConstantInt.of(0), 3),
         TwoLayersFeatureSize(1, 0, 1))
 
-
-    def feature[FC <: FeatureConfiguration, F <: Feature[FC]](loc: ResourceLocation, feature: F, config: FC): Unit =
-      features(key(loc)) = ConfiguredFeature[FC, F](feature, config)
+    
+    def feature[FC <: FeatureConfiguration, F <: Feature[FC]](key: ResourceKey[ConfiguredFeature[?, ?]], feature: F, config: FC): Unit =
+      features(key) = ConfiguredFeature[FC, F](feature, config)
 
     def registerFeatures(lookup: HolderLookup.Provider): Unit =
-     feature(Lumomancy.locate("aftus_tree"), Feature.TREE,
-       straightTree(LumomancyBlocks.aftusLog, LumomancyBlocks.aftusLeaves, 4, 2, 0, 2).ignoreVines().build())
+     feature(LumoWorldFeatures.aftusTree, Feature.TREE,
+       straightTree(LumomancyBlocks.aftus.log, LumomancyBlocks.aftus.leaves, 4, 2, 0, 2).ignoreVines().build())
 
-     feature(Lumomancy.locate("stillwood_tree"), Feature.TREE,
-       straightTree(LumomancyBlocks.stillwoodLog, LumomancyBlocks.stillwoodLeaves, 4, 2, 0, 2).ignoreVines().build())
+     feature(LumoWorldFeatures.stillwoodTree, Feature.TREE,
+       straightTree(LumomancyBlocks.stillwood.log, LumomancyBlocks.stillwood.leaves, 4, 2, 0, 2).ignoreVines().build())
 
-     feature(Lumomancy.locate("wieder_tree"), Feature.TREE,
-       straightTree(LumomancyBlocks.wiederLog, LumomancyBlocks.wiederLeaves, 4, 2, 0, 2).ignoreVines().build())
+     feature(LumoWorldFeatures.wiederTree, Feature.TREE,
+       straightTree(LumomancyBlocks.wieder.log, LumomancyBlocks.wieder.leaves, 4, 2, 0, 2).ignoreVines().build())
